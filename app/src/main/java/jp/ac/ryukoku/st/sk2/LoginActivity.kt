@@ -1,6 +1,5 @@
 package jp.ac.ryukoku.st.sk2
 
-import android.content.Intent
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -18,7 +17,7 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         //setContentView(R.layout.activity_login)
 
-        setTitle("龍大理工学部出欠システム ログイン")
+        setTitle("ログイン：龍大理工学部出欠システム")
         LoginActivityUi().setContentView(this)
     }
 }
@@ -52,16 +51,6 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
                 backgroundColor = ContextCompat.getColor(ctx, R.color.colorPrimary)
                 onClick {
                     ctx.toast("${title.text} : ${description.text}")
-                }
-            }.lparams{
-                gravity = Gravity.CENTER_HORIZONTAL
-                topMargin = dip(16)
-            }
-
-            button("intent test") {
-                textColor = Color.WHITE
-                backgroundColor = ContextCompat.getColor(ctx, R.color.colorPrimary)
-                onClick {
                     startActivity<MainActivity>()
                 }
             }.lparams{

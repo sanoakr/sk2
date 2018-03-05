@@ -16,14 +16,16 @@ class MainActivity : AppCompatActivity() {
         setTitle("龍大理工学部出欠システム")
         MainActivityUi().setContentView(this)
 
+        if (!wifiManager.isWifiEnabled()) {
+            toast("無線LANをオンにしてください")
+        }
     }
 }
 
 class MainActivityUi: AnkoComponent<MainActivity> {
     override fun createView(ui: AnkoContext<MainActivity>) = with(ui) {
 
-        verticalLayout {
-            padding = dip(16)
+        relativeLayout {
 
             button("出席") {
                 textColor = Color.WHITE
@@ -33,42 +35,59 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                     ctx.toast("出席！！！")
                 }
             }.lparams {
-                gravity = Gravity.CENTER_HORIZONTAL
-                margin = dip(64)
-                width = dip(256)
-                height = dip(256)
+                alignParentTop()
+                centerHorizontally()
+                //gravity = Gravity.CENTER_HORIZONTAL
+                topMargin = dip(100)
+                width = dip(250)
+                height = dip(250)
             }
 
             linearLayout {
 
-                button("?") {
-                    textColor = Color.WHITE
-                    textSize = 24f
+                imageButton {
+                    imageResource = R.drawable.ic_settings_32dp
                     background = ContextCompat.getDrawable(context, R.drawable.button_circle)
                     onClick {
-                        browse("https://sk2.st.ryukoku.ac.jp/index.html")
+                        startActivity<PreferenceActivity>()
                     }
                 }.lparams {
                     gravity = Gravity.CENTER_HORIZONTAL
-                    margin = dip(32)
+                    margin = dip(16)
                     width = dip(64)
                     height = dip(64)
                 }
 
-                button("?") {
-                    textColor = Color.WHITE
-                    textSize = 24f
+                imageButton {
+                    imageResource = R.drawable.ic_history_32dp
+                    background = ContextCompat.getDrawable(context, R.drawable.button_circle)
+                    onClick {
+                        startActivity<RecordActivity>()
+                    }
+                }.lparams {
+                    gravity = Gravity.CENTER_HORIZONTAL
+                    margin = dip(16)
+                    width = dip(64)
+                    height = dip(64)
+                }
+
+                imageButton {
+                    imageResource = R.drawable.ic_live_help_32dp
                     background = ContextCompat.getDrawable(context, R.drawable.button_circle)
                     onClick {
                         startActivity<HelpActivity>()
                     }
                 }.lparams {
                     gravity = Gravity.CENTER_HORIZONTAL
-                    margin = dip(32)
+                    margin = dip(16)
                     width = dip(64)
                     height = dip(64)
                 }
-            }.lparams { gravity = Gravity.CENTER_HORIZONTAL }
+
+            }.lparams {
+                alignParentBottom()
+                centerHorizontally()
+            }
         }
     }
 }
