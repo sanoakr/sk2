@@ -5,88 +5,105 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
+import android.widget.Button
+import android.widget.TextView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
+////////////////////////////////////////////////////////////////////////////////
 class MainActivity : AppCompatActivity() {
+    var mainUi = MainActivityUi()
 
+    ////////////////////////////////////////
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setTitle("龍大理工学部出欠システム")
-        MainActivityUi().setContentView(this)
+        mainUi.setContentView(this)
+    }
+    ////////////////////////////////////////
+    override fun onResume() {
+        super.onResume()
 
         if (!wifiManager.isWifiEnabled()) {
-            toast("無線LANをオンにしてください")
+            mainUi.attToastText ="無線LANをオンにしてください"
+            mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
+        } else {
+            mainUi.attToastText ="出席！！！"
         }
+    }
+    ////////////////////////////////////////
+    fun testfun(ui: AnkoContext<MainActivity>, text: String) {
+        mainUi.wifiInfo.text = "do testfunc()"
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////
 class MainActivityUi: AnkoComponent<MainActivity> {
+    lateinit var attBtn: Button
+    lateinit var wifiInfo: TextView
+    var attToastText = "出席！！！"
+
+    ////////////////////////////////////////
     override fun createView(ui: AnkoContext<MainActivity>) = with(ui) {
-
         relativeLayout {
-
-            button("出席") {
+            attBtn = button("出席") {
                 textColor = Color.WHITE
                 textSize = 32f
-                background = ContextCompat.getDrawable(context, R.drawable.button_states)
+                background = ContextCompat.getDrawable(ctx, R.drawable.button_states)
                 onClick {
-                    ctx.toast("出席！！！")
+                    toast(attToastText)
+                    ui.owner.testfun(ui, "renew text")
                 }
             }.lparams {
-                alignParentTop()
-                centerHorizontally()
-                //gravity = Gravity.CENTER_HORIZONTAL
-                topMargin = dip(100)
-                width = dip(250)
-                height = dip(250)
+                alignParentTop(); centerHorizontally()
+                topMargin = dip(50); width = dip(250); height = dip(250)
             }
-
-            linearLayout {
-
-                imageButton {
-                    imageResource = R.drawable.ic_settings_32dp
-                    background = ContextCompat.getDrawable(context, R.drawable.button_circle)
-                    onClick {
-                        startActivity<PreferenceActivity>()
-                    }
+            verticalLayout {
+                wifiInfo = textView("") {
+                    textSize = 10f
                 }.lparams {
-                    gravity = Gravity.CENTER_HORIZONTAL
-                    margin = dip(16)
-                    width = dip(64)
-                    height = dip(64)
+                    bottomMargin = dip(10)
+                    width = matchParent; gravity = Gravity.RIGHT
                 }
 
-                imageButton {
-                    imageResource = R.drawable.ic_history_32dp
-                    background = ContextCompat.getDrawable(context, R.drawable.button_circle)
-                    onClick {
-                        startActivity<RecordActivity>()
+                linearLayout {
+                    imageButton {
+                        imageResource = R.drawable.ic_settings_32dp
+                        background = ContextCompat.getDrawable(context, R.drawable.button_circle)
+                        onClick {
+                            startActivity<PreferenceActivity>()
+                        }
+                    }.lparams {
+                        gravity = Gravity.CENTER_HORIZONTAL
+                        margin = dip(16); width = dip(64); height = dip(64)
                     }
-                }.lparams {
-                    gravity = Gravity.CENTER_HORIZONTAL
-                    margin = dip(16)
-                    width = dip(64)
-                    height = dip(64)
-                }
 
-                imageButton {
-                    imageResource = R.drawable.ic_live_help_32dp
-                    background = ContextCompat.getDrawable(context, R.drawable.button_circle)
-                    onClick {
-                        startActivity<HelpActivity>()
+                    imageButton {
+                        imageResource = R.drawable.ic_history_32dp
+                        background = ContextCompat.getDrawable(context, R.drawable.button_circle)
+                        onClick {
+                            startActivity<RecordActivity>()
+                        }
+                    }.lparams {
+                        gravity = Gravity.CENTER_HORIZONTAL
+                        margin = dip(16); width = dip(64); height = dip(64)
                     }
-                }.lparams {
-                    gravity = Gravity.CENTER_HORIZONTAL
-                    margin = dip(16)
-                    width = dip(64)
-                    height = dip(64)
-                }
 
+                    imageButton {
+                        imageResource = R.drawable.ic_live_help_32dp
+                        background = ContextCompat.getDrawable(context, R.drawable.button_circle)
+                        onClick {
+                            startActivity<HelpActivity>()
+                        }
+                    }.lparams {
+                        gravity = Gravity.CENTER_HORIZONTAL
+                        margin = dip(16); width = dip(64); height = dip(64)
+                    }
+
+                }
             }.lparams {
-                alignParentBottom()
-                centerHorizontally()
+                alignParentBottom(); centerHorizontally()
             }
         }
     }

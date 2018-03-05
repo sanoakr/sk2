@@ -4,7 +4,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import org.jetbrains.anko.*
 
-
+////////////////////////////////////////////////////////////////////////////////
 class HelpActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -14,6 +14,7 @@ class HelpActivity : AppCompatActivity() {
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////
 class HelpActivityUi: AnkoComponent<HelpActivity> {
     override fun createView(ui: AnkoContext<HelpActivity>) = with(ui) {
 
