@@ -7,13 +7,9 @@ import android.os.Bundle
 import android.provider.Settings
 import android.provider.Settings.Secure.getString
 import android.support.v4.content.ContextCompat
-import android.text.InputType.TYPE_CLASS_TEXT
-import android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+import android.text.InputType.*
 import android.view.Gravity
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.*
-import org.jetbrains.anko.coroutines.experimental.bg
-import org.jetbrains.anko.custom.async
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.io.BufferedReader
 import java.io.BufferedWriter
@@ -21,11 +17,11 @@ import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.net.InetSocketAddress
 import javax.net.ssl.SSLSocketFactory
-import kotlin.concurrent.thread
 
 ////////////////////////////////////////////////////////////////////////////////
 class LoginActivity : AppCompatActivity(), AnkoLogger {
     private val prefName = "st.ryukoku.sk2"
+    private val replyFail = "authfail"
 
     ////////////////////////////////////////
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,31 +42,26 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
         val gcos = pref.getString("gcos", "")
         val name = pref.getString("name", "")
         val time = pref.getLong("time", 0)
-        if (user.isNullOrBlank()) {
-            toast("There is no user info.")
+        if (! user.isNullOrBlank()) {
+            startActivity<MainActivity>()
         }
     }
-
     ////////////////////////////////////////
-    fun attemptLogin(user: String, passwd: String): Boolean {
+    fun attemptLogin(user: String, passwd: String) {
         if (user.isNullOrBlank()) {
             toast("学籍番号を入力して下さい")
-            return false
         } else if (passwd.isNullOrBlank()) {
             toast("パスワードを入力して下さい")
-            return false
         } else if(user.contains('@')) {
             toast("認証IDに @ 以降を含めないで下さい")
-            return false
         }
-        val failReply = "authfail" // word in auth failer
-
-        async {
-            val result = bg {
-                authServer(user, passwd)
+        // authentication on sk2 Server
+        doAsync {
+            val result = authServer(user, passwd)
+            uiThread {
+                Login(user, result)
             }
         }
-        return true
     }
     ////////////////////////////////////////
     fun authServer(user: String, passwd: String): String {
@@ -99,40 +90,35 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
             result = bufReader.use(BufferedReader::readText)
 
         } catch (e: Exception) {
-            info(e)
-            ctx.toast("サーバに接続できません")
+            result = replyFail
         }
         return result
     }
 
     ////////////////////////////////////////
-    fun authLogin(result: String) {
-        val success = true
-        if (success!!) {
+    fun Login(user: String, result: String) {
+        if (result != replyFail) {
             val v = result.split(",")
             val time = System.currentTimeMillis()
 
             val pref = getSharedPreferences(prefName, Context.MODE_PRIVATE)
             val e = pref.edit()
 
-            //e.putString("uid", user)
+            e.putString("uid", user)
             e.putString("key", v[0])
             e.putString("gcos", v[1])
             e.putString("name", v[2])
             e.putLong("time", time)
             e.apply()
 
-            toast("Logged in")
-            finish()
+            toast("ログインします")
+            startActivity<MainActivity>()
+
         } else {
-            toast("Login fail")
-            //passwd.error = getString(R.string.error_incorrect_password)
-            //passwd.requestFocus()
+            toast("ログインに失敗しました")
         }
     }
 }
-
-
 ////////////////////////////////////////////////////////////////////////////////
 class LoginActivityUi: AnkoComponent<LoginActivity> {
 
@@ -143,7 +129,7 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
 
             val user = editText {
                 hint = "学籍番号ID"
-                inputType = TYPE_CLASS_TEXT
+                inputType = TYPE_TEXT_VARIATION_EMAIL_ADDRESS
             }
 
             val passwd = editText {
@@ -159,12 +145,6 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
                 }
             }.lparams{
                 gravity = Gravity.CENTER_HORIZONTAL; topMargin = dip(16)
-            }
-
-            button("test") {
-                onClick {
-                    startActivity<MainActivity>()
-                }
             }
         }
     }

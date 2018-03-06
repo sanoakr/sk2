@@ -1,5 +1,6 @@
 package jp.ac.ryukoku.st.sk2
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -12,7 +13,8 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 
 ////////////////////////////////////////////////////////////////////////////////
 class MainActivity : AppCompatActivity() {
-    var mainUi = MainActivityUi()
+    private var mainUi = MainActivityUi()
+    private var username = "no user"
 
     ////////////////////////////////////////
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,6 +27,9 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
+        if (! SetUserInfo(mainUi) ) {
+            startActivity(intentFor<LoginActivity>().clearTop())
+        }
         if (!wifiManager.isWifiEnabled()) {
             mainUi.attToastText ="無線LANをオンにしてください"
             mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
@@ -33,30 +38,55 @@ class MainActivity : AppCompatActivity() {
         }
     }
     ////////////////////////////////////////
-    fun testfun(ui: AnkoContext<MainActivity>, text: String) {
-        mainUi.wifiInfo.text = "do testfunc()"
+    fun SetUserInfo(ui: MainActivityUi): Boolean {
+        val prefName = "st.ryukoku.sk2"
+
+        // get uid & set title
+        val pref = getSharedPreferences(prefName, Context.MODE_PRIVATE)
+        username = pref.getString("uid", "no user")
+        val gcos = pref.getString("gcos", "")
+        val name = pref.getString("name", "")
+        val time = pref.getLong("time", 0)
+
+        // check key life
+        //val now = System.currentTimeMillis()
+        //val over = (now - time) > lifetime
+
+        // go to login if have not
+        if ( username.isNullOrEmpty() || username == "no user") {
+            return false
+        } else {
+            ui.userInfo.text = " $username / $gcos / $name"
+            return true
+        }
     }
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 class MainActivityUi: AnkoComponent<MainActivity> {
     lateinit var attBtn: Button
     lateinit var wifiInfo: TextView
+    lateinit var userInfo: TextView
     var attToastText = "出席！！！"
 
     ////////////////////////////////////////
     override fun createView(ui: AnkoContext<MainActivity>) = with(ui) {
         relativeLayout {
+            userInfo = textView("") {
+                textColor = Color.BLACK
+            }.lparams {
+                alignParentTop(); centerHorizontally()
+                topMargin = dip(5)
+            }
             attBtn = button("出席") {
                 textColor = Color.WHITE
                 textSize = 32f
                 background = ContextCompat.getDrawable(ctx, R.drawable.button_states)
                 onClick {
                     toast(attToastText)
-                    ui.owner.testfun(ui, "renew text")
+                    //ui.owner.testfun(ui, "renew text")
                 }
             }.lparams {
-                alignParentTop(); centerHorizontally()
+                centerHorizontally()
                 topMargin = dip(50); width = dip(250); height = dip(250)
             }
             verticalLayout {

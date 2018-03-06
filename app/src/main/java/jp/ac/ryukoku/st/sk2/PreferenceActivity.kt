@@ -1,8 +1,10 @@
 package jp.ac.ryukoku.st.sk2
 
+import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 ////////////////////////////////////////////////////////////////////////////////
 class PreferenceActivity : AppCompatActivity() {
@@ -13,6 +15,21 @@ class PreferenceActivity : AppCompatActivity() {
 
         setTitle("設定：龍大理工学部出欠システム")
         PreferenceActivityUi().setContentView(this)
+    }
+    ////////////////////////////////////////
+    fun Logout() {
+        val prefName = "st.ryukoku.sk2"
+        val pref = getSharedPreferences(prefName, Context.MODE_PRIVATE)
+        val e = pref.edit()
+        // Clear Preferences
+        e.putString("uid", "")
+        e.putString("key", "")
+        e.putString("gcos","")
+        e.putString("name","")
+        e.putLong("time", 0)
+        e.apply()
+
+        startActivity(intentFor<LoginActivity>().clearTop())
     }
 }
 
@@ -39,6 +56,14 @@ class PreferenceActivityUi: AnkoComponent<PreferenceActivity> {
             switch {
                 text = "デバッグモード"
                 textSize = 14f
+            }.lparams {
+                topMargin = dip(24); width = matchParent
+            }
+            button {
+                text = "ログアウト"
+                onClick {
+                    ui.owner.Logout()
+                }
             }.lparams {
                 topMargin = dip(24); width = matchParent
             }
