@@ -60,11 +60,25 @@ class RecordActivity : AppCompatActivity() {
     }
     ////////////////////////////////////////
     fun parseRecord(data: String): List<Map<String, Any>> {
-        var record = mutableListOf(Map<String, Any>(0))
+        var record = mutableListOf(mutableMapOf<String, String>().withDefault{""})
 
         if (data.isNullOrBlank()) {
-        }
+            record.add(Map("enUid" to "There is no record"))
+        } else {
+            val dataList = data.split('\n')
 
+            try {
+                dataList.forEach { r ->
+                    val vList = r.split(',')
+                    var vMap = mutableMapOf<String, String>().withDefault{""}
+
+                    // vList を value として vMap を生成する
+                }
+
+
+            }
+
+        }
         return record
 }
 
