@@ -70,9 +70,9 @@
 | 2 | ログタイプ | 1char [A/M/B]：Auto/Manual/BLE |
 | 3 | 日時 | yyyy-MM-dd HH-mm-ss |
 | 4 | AP1 SSID | e.g "ryu-wireless" |
-| 5 | AP1 BSSID | - |
-| 6 | AP1 信号強度 | - |
-| 7 | (Ap2 SSID) | - |
+| 5 | AP1 BSSID | e.g. "12:34:56:78:90:ab" |
+| 6 | AP1 信号強度 | e.g. "-43" |
+| 7 | (Ap2 SSID) | e.g. "ryu-wireless2" |
 | : | : | : |
 
 #### 受信データ ####
