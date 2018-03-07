@@ -16,7 +16,7 @@ class PreferenceActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setTitle("設定：龍大理工学部出欠システム")
+        title = "設定：龍大理工学部出欠システム sk2"
         PreferenceActivityUi().setContentView(this)
     }
     ////////////////////////////////////////

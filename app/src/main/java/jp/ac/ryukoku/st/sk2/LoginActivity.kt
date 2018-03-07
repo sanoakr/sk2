@@ -27,7 +27,7 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        title = ("ログイン：龍大理工学部出欠システム")
+        title = ("ログイン：龍大理工学部出欠システム sk2")
         val contentView = LoginActivityUi().setContentView(this)
 
         val androidId = getString(this.contentResolver, Settings.Secure.ANDROID_ID)
@@ -78,8 +78,8 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
             //connect with TimeOut
             sslsocket.connect(InetSocketAddress(serverHost, serverPort), timeOut)
 
-            val input = sslsocket.getInputStream()
-            val output = sslsocket.getOutputStream()
+            val input = sslsocket.inputStream
+            val output = sslsocket.outputStream
             val bufReader = BufferedReader(InputStreamReader(input, "UTF-8"))
             val bufWriter = BufferedWriter(OutputStreamWriter(output, "UTF-8"))
             // Send message
@@ -91,6 +91,7 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
 
         } catch (e: Exception) {
             result = replyFail
+            toast("サーバーに接続できません")
         }
         return result
     }

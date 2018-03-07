@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setTitle("龍大理工学部出欠システム")
+        title = "龍大理工学部出欠システム sk2"
         mainUi.setContentView(this)
     }
     ////////////////////////////////////////

@@ -9,7 +9,7 @@ class HelpActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setTitle("ヘルプ：龍大理工学部出欠システム")
+        title = "ヘルプ：龍大理工学部出欠システム sk2"
         HelpActivityUi().setContentView(this)
     }
 }
