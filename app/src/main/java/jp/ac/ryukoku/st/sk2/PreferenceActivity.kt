@@ -3,7 +3,10 @@ package jp.ac.ryukoku.st.sk2
 import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.CompoundButton
+import android.widget.RadioGroup
 import org.jetbrains.anko.*
+import org.jetbrains.anko.sdk25.coroutines.onCheckedChange
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,6 +59,9 @@ class PreferenceActivityUi: AnkoComponent<PreferenceActivity> {
             switch {
                 text = "デバッグモード"
                 textSize = 14f
+                onClick {
+                    toast("Debug ON")
+                }
             }.lparams {
                 topMargin = dip(24); width = matchParent
             }
