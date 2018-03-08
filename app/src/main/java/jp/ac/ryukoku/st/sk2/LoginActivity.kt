@@ -28,7 +28,7 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
         super.onCreate(savedInstanceState)
 
         title = ("ログイン：龍大理工学部出欠システム sk2")
-        val contentView = LoginActivityUi().setContentView(this)
+        LoginActivityUi().setContentView(this)
 
         val androidId = getString(this.contentResolver, Settings.Secure.ANDROID_ID)
         toast(androidId)
@@ -105,10 +105,14 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
             val pref = getSharedPreferences(prefName, Context.MODE_PRIVATE)
             val e = pref.edit()
 
+            val gList = v[1].split(Regex("[\\s\\h]+")).mapNotNull { it.capitalize() }
+            val clrGcos = gList.joinToString(" ")
+            val clrName = v[2].replace(Regex("[\\h]+"), "")
+
             e.putString("uid", user)
             e.putString("key", v[0])
-            e.putString("gcos", v[1])
-            e.putString("name", v[2])
+            e.putString("gcos", clrGcos)
+            e.putString("name", clrName)
             e.putLong("time", time)
             e.apply()
 
