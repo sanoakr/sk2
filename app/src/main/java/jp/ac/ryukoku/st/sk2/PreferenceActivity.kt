@@ -1,5 +1,6 @@
 package jp.ac.ryukoku.st.sk2
 
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -47,13 +48,28 @@ class PreferenceActivity : AppCompatActivity() {
         startActivity(intentFor<LoginActivity>().clearTop())
     }
     ////////////////////////////////////////
-    fun setPref(ui: AnkoContext<PreferenceActivity>, key: String, value: Boolean) {
+    fun setPref(key: String, value: Boolean) {
         val pref = getSharedPreferences(prefName, Context.MODE_PRIVATE)
         val e = pref.edit()
         e.putBoolean(key, value)
         e.apply()
     }
+    ////////////////////////////////////////
+    fun checkBT(): Boolean {
+        val btAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
 
+        if (btAdapter == null) {
+            toast("このデバイスのBluetoothアダプタが見つかりません")
+            prefUi.swBeacon.isChecked = false
+            return false
+        } else if (! btAdapter.isEnabled ) {
+            toast("Bluetoothをオンにしてください")
+            prefUi.swBeacon.isChecked = false
+            return false
+        } else {
+            return true
+        }
+     }
     ////////////////////////////////////////////////////////////////////////////////
     class PreferenceActivityUi : AnkoComponent<PreferenceActivity> {
         lateinit var swBeacon: Switch
@@ -69,9 +85,11 @@ class PreferenceActivity : AppCompatActivity() {
                     textSize = 14f
                     onClick {
                         if (isChecked) {
-                            ui.owner.setPref(ui, "beacon", true)
+                            if (ui.owner.checkBT()) {
+                                ui.owner.setPref("beacon", true)
+                            }
                         } else {
-                            ui.owner.setPref(ui, "beacon", false)
+                            ui.owner.setPref("beacon", false)
                         }
                     }
                 }.lparams {
@@ -82,9 +100,10 @@ class PreferenceActivity : AppCompatActivity() {
                     textSize = 14f
                     onClick {
                         if (isChecked) {
-                            ui.owner.setPref(ui, "auto", true)
+                            ui.owner.setPref("auto", true)
+
                         } else {
-                            ui.owner.setPref(ui, "auto", false)
+                            ui.owner.setPref("auto", false)
                         }
                     }
                 }.lparams {
@@ -95,9 +114,9 @@ class PreferenceActivity : AppCompatActivity() {
                     textSize = 14f
                     onClick {
                         if (isChecked) {
-                            ui.owner.setPref(ui, "debug", true)
+                            ui.owner.setPref("debug", true)
                         } else {
-                            ui.owner.setPref(ui, "debug", false)
+                            ui.owner.setPref("debug", false)
                         }
                     }
                 }.lparams {
