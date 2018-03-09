@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.wifi.ScanResult
 import android.net.wifi.WifiManager
 import android.os.Binder
+import android.os.Handler
 import android.os.IBinder
 import me.mattak.moment.Moment
 import org.jetbrains.anko.*
@@ -18,13 +19,22 @@ import javax.net.ssl.SSLSocketFactory
 
 ////////////////////////////////////////////////////////////////////////////////
 class ScanWifiService : Service(), AnkoLogger {
-
     ////////////////////////////////////////
     private val binder: IBinder = ScanWifiBinder()
     inner class ScanWifiBinder: Binder() {
         internal val inService: ScanWifiService
             get() = this@ScanWifiService
     }
+    ////////////////////////////////////////
+    private val handler = Handler()
+    private val timer = Runnable { interval() }
+    var period: Long = 10*60*1000
+    private fun interval() {
+        sendApInfo('A')
+        handler.postDelayed(timer, period)
+    }
+    fun startInterval(sec: Long) { period = sec*1000; handler.postDelayed(timer, period) }
+    fun stopInterval() { handler.removeCallbacks(timer) }
     ////////////////////////////////////////
     fun sendApInfo(marker: Char): String {
         val sk2 = this.application as Sk2Globals
@@ -109,11 +119,13 @@ class ScanWifiService : Service(), AnkoLogger {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         info("on StartCommand")
         return super.onStartCommand(intent, flags, startId)
+        //return START_STICKY
     }
     ////////////////////////////////////////
     override fun onDestroy() {
         super.onDestroy()
         info("on Destroy")
+        handler.removeCallbacks(timer)
         stopSelf()
     }
 }

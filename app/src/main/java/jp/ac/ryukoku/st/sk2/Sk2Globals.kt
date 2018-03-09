@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.ServiceConnection
 import org.jetbrains.anko.clearTop
 import org.jetbrains.anko.intentFor
+import org.jetbrains.anko.stopService
 
 ////////////////////////////////////////////////////////////////////////////////
 class Sk2Globals: Application() {
@@ -12,13 +13,14 @@ class Sk2Globals: Application() {
     val serverHost = "sk2.st.ryukoku.ac.jp"
     val serverPort = 4440
     val serverInfoPort = 4441
-    val timeOut = 5000
-
+    val timeOut = 5000                    // 5sec
     ////////////////////////////////////////
     val authWord = "AUTH"
     val authFail = "authfail"
     val recFail = "fail"
-
+    ////////////////////////////////////////
+    val autoIntervalSec: Long = 10*60     // 10min
+    val beaconIntervalSec: Long = 10      // 10sec
     ////////////////////////////////////////
     //var androidId = ""
     val prefName = "st.ryukoku.sk2"
@@ -74,8 +76,10 @@ class Sk2Globals: Application() {
         userMap["gcos"] = ""; userMap["name"] = "";
         userMap["time"] = 0L
 
+        stopService<ScanBeaconService>()
         if (wifiConnection != null) {
             unbindService(wifiConnection)
+            stopService<ScanWifiService>()
         }
         startActivity(intentFor<LoginActivity>().clearTop())
     }
