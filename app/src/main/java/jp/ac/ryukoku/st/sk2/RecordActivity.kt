@@ -1,6 +1,5 @@
 package jp.ac.ryukoku.st.sk2
 
-import android.content.Context
 import android.graphics.Typeface
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -16,28 +15,23 @@ import javax.net.ssl.SSLSocketFactory
 
 ////////////////////////////////////////////////////////////////////////////////
 class RecordActivity : AppCompatActivity(),AnkoLogger {
-    private lateinit var username: String
-    private lateinit var key: String
-    private val prefName = "st.ryukoku.sk2"
-
     ////////////////////////////////////////
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         title = "出席記録：龍大理工学部出欠システム sk2"
         RecordActivityUi().setContentView(this)
-
-        username = getSharedPreferences(prefName, Context.MODE_PRIVATE).getString("uid", "")
-        key = getSharedPreferences(prefName, Context.MODE_PRIVATE).getString("key", "")
     }
     ////////////////////////////////////////
     fun fetchRecord(): List<Map<String, String>> {
-        // sk2 info server
-        val serverHost = "sk2.st.ryukoku.ac.jp"
-        val serverPort = 4441
-        val timeOut = 5000
-        lateinit var rowRecord: String
+        val sk2 = this.application as Sk2Globals
+        val serverHost = sk2.serverHost
+        val serverPort = sk2.serverInfoPort
+        val timeOut = sk2.timeOut
+        val uid = sk2.userMap.getOrDefault("uid", "")
+        val key = sk2.userMap.getOrDefault("key", "")
 
+        lateinit var rowRecord: String
         try {
             val sslSocketFactory = SSLSocketFactory.getDefault()
             val sslsocket = sslSocketFactory.createSocket()
@@ -49,7 +43,7 @@ class RecordActivity : AppCompatActivity(),AnkoLogger {
             val bufReader = BufferedReader(InputStreamReader(input, "UTF-8"))
             val bufWriter = BufferedWriter(OutputStreamWriter(output, "UTF-8"))
             // Send message
-            val message = "$username,$key"
+            val message = "$uid,$key"
             bufWriter.write(message)
             bufWriter.flush()
             // Receive message
@@ -90,7 +84,7 @@ class RecordActivity : AppCompatActivity(),AnkoLogger {
                                 val match = Regex("(\\d+)-(\\d+)-(\\d+)\\s+(\\d+):(\\d+):(\\d+)").find(str)?.groupValues
                                 if (match?.size == 7) { // Null makes false
                                     val y = match[1].toInt()
-                                    val m = match[2].toInt()
+                                    val m = match[2].toInt()-1
                                     val d = match[3].toInt()
                                     //val th =  match[4].toInt()
                                     //val tm =  match[5].toInt()
@@ -165,11 +159,10 @@ class RecordAdapter(var activity: RecordActivity): BaseAdapter() {
                         textSize = 14f
                     }.lparams { horizontalGravity = right }
 
-                    textView("(" + item["signal0"] + "dB)") {
+                    textView("(" + item["signal0"] + " dB)") {
                         textSize = 14f
                     }.lparams { horizontalGravity = right; leftMargin = dip(5) }
                 }
-
                 linearLayout {
                     padding = dip(3)
 
@@ -181,7 +174,22 @@ class RecordAdapter(var activity: RecordActivity): BaseAdapter() {
                         textSize = 14f
                     }.lparams { horizontalGravity = right }
 
-                    textView("(" + item["signal1"] + "dB)") {
+                    textView("(" + item["signal1"] + " dB)") {
+                        textSize = 14f
+                    }.lparams { horizontalGravity = right; leftMargin = dip(5) }
+                }
+                linearLayout {
+                    padding = dip(3)
+
+                    textView(item["bssid2"]) {
+                        textSize = 14f
+                    }.lparams { horizontalGravity = left; weight = 1f }
+
+                    textView(item["ssid2"]) {
+                        textSize = 14f
+                    }.lparams { horizontalGravity = right }
+
+                    textView("(" + item["signal2"] + " dB)") {
                         textSize = 14f
                     }.lparams { horizontalGravity = right; leftMargin = dip(5) }
                 }

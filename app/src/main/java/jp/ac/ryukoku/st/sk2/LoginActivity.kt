@@ -20,9 +20,6 @@ import javax.net.ssl.SSLSocketFactory
 
 ////////////////////////////////////////////////////////////////////////////////
 class LoginActivity : AppCompatActivity(), AnkoLogger {
-    private val prefName = "st.ryukoku.sk2"
-    private val replyFail = "authfail"
-
     ////////////////////////////////////////
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,15 +33,14 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
     ////////////////////////////////////////
     override fun onResume() {
         super.onResume()
+        val sk2 = this.application as Sk2Globals
+        sk2.restoreUserData()
 
-        val pref = getSharedPreferences(prefName, Context.MODE_PRIVATE)
-        val user = pref.getString("uid", "")
-        val gcos = pref.getString("gcos", "")
-        val name = pref.getString("name", "")
-        val time = pref.getLong("time", 0)
-        if (! user.isNullOrBlank()) {
-            startActivity<MainActivity>()
-        }
+        val uid = sk2.userMap.getOrDefault("uid", "")
+        //val gcos = sk2.userMap.getOrDefault("gcos", "")
+        //val name = sk2.userMap.getOrDefault("name", "")
+        //val time = sk2.userMap.getOrDefault("name", 0L)
+        if (uid != "") { startActivity<MainActivity>() }
     }
     ////////////////////////////////////////
     fun attemptLogin(user: String, passwd: String) {
@@ -59,19 +55,20 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
         doAsync {
             val result = authServer(user, passwd)
             uiThread {
-                Login(user, result)
+                login(user, result)
             }
         }
     }
     ////////////////////////////////////////
     fun authServer(user: String, passwd: String): String {
-        // sk2 server
-        val serverHost = "sk2.st.ryukoku.ac.jp"
-        val serverPort = 4440
-        val timeOut = 5000
-        val authWord = "AUTH"
-        var result = ""
+        val sk2 = this.application as Sk2Globals
+        val serverHost = sk2.serverHost
+        val serverPort = sk2.serverPort
+        val timeOut = sk2.timeOut
+        val authWord = sk2.authWord
+        val authFail = sk2.authFail
 
+        lateinit var result: String
         try {
             val sslSocketFactory = SSLSocketFactory.getDefault()
             val sslsocket = sslSocketFactory.createSocket()
@@ -90,35 +87,34 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
             result = bufReader.use(BufferedReader::readText)
 
         } catch (e: Exception) {
-            result = replyFail
+            result = authFail
             toast("サーバーに接続できません")
         }
         return result
     }
-
     ////////////////////////////////////////
-    fun Login(user: String, result: String) {
-        if (result != replyFail) {
+    fun login(user: String, result: String) {
+        val sk2 = this.application as Sk2Globals
+        val authFail = sk2.authFail
+
+        if (result != authFail) {
             val v = result.split(",")
             val time = System.currentTimeMillis()
 
-            val pref = getSharedPreferences(prefName, Context.MODE_PRIVATE)
-            val e = pref.edit()
-
             val gList = v[1].split(Regex("[\\s\\h]+")).mapNotNull { it.capitalize() }
             val clrGcos = gList.joinToString(" ")
-            val clrName = v[2].replace(Regex("[\\h]+"), "")
+            val clrName = v[2].replace(Regex("[\\h]+"), " ")
 
-            e.putString("uid", user)
-            e.putString("key", v[0])
-            e.putString("gcos", clrGcos)
-            e.putString("name", clrName)
-            e.putLong("time", time)
-            e.apply()
+            sk2.userMap.put("uid", user)
+            sk2.userMap.put("key", v[0])
+            sk2.userMap.put("gcos", clrGcos)
+            sk2.userMap.put("name", clrName)
+            sk2.userMap.put("time", time)
 
             toast("ログインします")
-            startActivity<MainActivity>()
+            sk2.saveUserData()
 
+            startActivity<MainActivity>()
         } else {
             toast("ログインに失敗しました")
         }
