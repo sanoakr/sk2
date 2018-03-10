@@ -19,13 +19,13 @@ class Sk2Globals: Application() {
     val authFail = "authfail"
     val recFail = "fail"
     ////////////////////////////////////////
-    val autoIntervalSec: Long = 10*60     // 10min
+    val _autoitv: Int = 10*60            // 10min
     val beaconIntervalSec: Long = 10      // 10sec
     ////////////////////////////////////////
     //var androidId = ""
     val prefName = "st.ryukoku.sk2"
     var userMap: MutableMap<String, Any> = mutableMapOf()
-    var prefMap: MutableMap<String, Boolean> = mutableMapOf()
+    var prefMap: MutableMap<String, Any> = mutableMapOf()
 
     ////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////
@@ -51,6 +51,7 @@ class Sk2Globals: Application() {
         val e = pref.edit()
         e.putBoolean("beacon", prefMap["beacon"] as Boolean)
         e.putBoolean("auto", prefMap["auto"] as Boolean)
+        e.putInt("autoitv", prefMap["autoitv"] as Int)
         e.putBoolean("debug", prefMap["debug"] as Boolean)
         e.apply()
     }
@@ -68,6 +69,7 @@ class Sk2Globals: Application() {
         val pref = getSharedPreferences(prefName, Context.MODE_PRIVATE)
         prefMap["beacon"] = pref.getBoolean("beacon", false)
         prefMap["auto"] = pref.getBoolean("auto", false)
+        prefMap["autoitv"] = pref.getInt("autoitv", 0)
         prefMap["debug"] = pref.getBoolean("debug", false)
     }
     ////////////////////////////////////////
@@ -75,6 +77,7 @@ class Sk2Globals: Application() {
         userMap["uid"] = ""; userMap["key"] = "";
         userMap["gcos"] = ""; userMap["name"] = "";
         userMap["time"] = 0L
+        saveUserData()
 
         stopService<ScanBeaconService>()
         if (wifiConnection != null) {

@@ -114,7 +114,7 @@ class RecordActivityUi: AnkoComponent<RecordActivity> {
     override fun createView(ui: AnkoContext<RecordActivity>) = with(ui) {
         verticalLayout {
             padding = dip(10)
-
+            ////////////////////////////////////////
             listView {
                 doAsync {
                     val recAdapter = RecordAdapter(ui.owner)
@@ -133,62 +133,66 @@ class RecordAdapter(var activity: RecordActivity): BaseAdapter() {
     override fun getView(i : Int, v : View?, parent : ViewGroup?) : View {
         val item = getItem(i)
         return with(parent!!.context) {
+            ////////////////////////////////////////
             verticalLayout {
+                ////////////////////////////////////////
                 linearLayout {
                     padding = dip(5)
-
+                    ////////////////////////////////////////
                     textView(item["type"]) {
                         textSize = 18f
                         typeface = Typeface.DEFAULT_BOLD
                     }.lparams { width = matchParent; horizontalGravity = left; weight = 1f }
-
+                    ////////////////////////////////////////
                     textView(item["datetime"]) {
                         textSize = 18f
                         typeface = Typeface.DEFAULT_BOLD
                     }.lparams { horizontalGravity = right }
                 }.lparams { width = matchParent }
-
+                ////////////////////////////////////////
                 linearLayout {
                     padding = dip(3)
-
+                    ////////////////////////////////////////
                     textView(item["bssid0"]) {
                         textSize = 14f
                     }.lparams { horizontalGravity = left; weight = 1f }
-
+                    ////////////////////////////////////////
                     textView(item["ssid0"]) {
                         textSize = 14f
                     }.lparams { horizontalGravity = right }
-
+                    ////////////////////////////////////////
                     textView("(" + item["signal0"] + " dB)") {
                         textSize = 14f
                     }.lparams { horizontalGravity = right; leftMargin = dip(5) }
                 }
+                ////////////////////////////////////////
                 linearLayout {
                     padding = dip(3)
-
+                    ////////////////////////////////////////
                     textView(item["bssid1"]) {
                         textSize = 14f
                     }.lparams { horizontalGravity = left; weight = 1f }
-
+                    ////////////////////////////////////////
                     textView(item["ssid1"]) {
                         textSize = 14f
                     }.lparams { horizontalGravity = right }
-
+                    ////////////////////////////////////////
                     textView("(" + item["signal1"] + " dB)") {
                         textSize = 14f
                     }.lparams { horizontalGravity = right; leftMargin = dip(5) }
                 }
+                ////////////////////////////////////////
                 linearLayout {
                     padding = dip(3)
-
+                    ////////////////////////////////////////
                     textView(item["bssid2"]) {
                         textSize = 14f
                     }.lparams { horizontalGravity = left; weight = 1f }
-
+                    ////////////////////////////////////////
                     textView(item["ssid2"]) {
                         textSize = 14f
                     }.lparams { horizontalGravity = right }
-
+                    ////////////////////////////////////////
                     textView("(" + item["signal2"] + " dB)") {
                         textSize = 14f
                     }.lparams { horizontalGravity = right; leftMargin = dip(5) }

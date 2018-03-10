@@ -1,12 +1,18 @@
 package jp.ac.ryukoku.st.sk2
 
 import android.bluetooth.BluetoothAdapter
+import android.content.Context
 import android.content.pm.PackageManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Gravity
+import android.view.View
+import android.widget.SeekBar
 import android.widget.Switch
+import android.widget.TextView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk25.coroutines.onSeekBarChangeListener
 
 ////////////////////////////////////////////////////////////////////////////////
 class PreferenceActivity: AppCompatActivity(), AnkoLogger {
@@ -25,12 +31,16 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
         val sk2 = this.application as Sk2Globals
         sk2.restorePrefData()
 
-        prefUi.swBeacon.isChecked = sk2.prefMap.getOrDefault("beacon", false)
-        prefUi.swAuto.isChecked = sk2.prefMap.getOrDefault("auto", false)
-        prefUi.swDebug.isChecked = sk2.prefMap.getOrDefault("debug", false)
+        prefUi.swBeacon.isChecked = sk2.prefMap.getOrDefault("beacon", false) as Boolean
+        prefUi.swAuto.isChecked = sk2.prefMap.getOrDefault("auto", false) as Boolean
+        prefUi.swDebug.isChecked = sk2.prefMap.getOrDefault("debug", false) as Boolean
+        prefUi.seekIntv.progress = sk2.prefMap.getOrDefault("autoitv", 0L) as Int
+        prefUi.seekMin = if (prefUi.swDebug.isChecked) 1 else 10
+        prefUi.seekTextMinutes = prefUi.seekIntv.progress + prefUi.seekMin
+        prefUi.debugText.visibility = if (prefUi.swDebug.isChecked) View.VISIBLE else View.INVISIBLE
     }
     ////////////////////////////////////////
-    fun setPref(key: String, value: Boolean) {
+    fun setPref(key: String, value: Any) {
         val sk2 = this.application as Sk2Globals
         sk2.prefMap[key] = value
         sk2.savePrefData()
@@ -55,7 +65,7 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
         if ( btAdapter == null || !hasBLE() ) {
             toast("このデバイスのBLEアダプタが見つかりません")
             return false
-        } else if (! btAdapter?.isEnabled) {
+        } else if (! btAdapter.isEnabled) {
             toast("Bluetoothをオンにしてください")
             return false
         }
@@ -65,12 +75,17 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
     class PreferenceActivityUi : AnkoComponent<PreferenceActivity> {
         lateinit var swBeacon: Switch
         lateinit var swAuto: Switch
+        lateinit var seekText: TextView
+        lateinit var seekIntv: SeekBar
         lateinit var swDebug: Switch
+        var seekMin = 10
+        var seekTextMinutes = 10
+        lateinit var debugText: TextView
         ////////////////////////////////////////
         override fun createView(ui: AnkoContext<PreferenceActivity>) = with(ui) {
             verticalLayout {
                 padding = dip(16)
-
+                ////////////////////////////////////////
                 swBeacon = switch {
                     text = "Bluetoothビーコンによる出席記録をオンにする"
                     textSize = 14f
@@ -90,40 +105,87 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
                 }.lparams {
                     topMargin = dip(24); width = matchParent
                 }
+                ////////////////////////////////////////
                 swAuto = switch {
                     text = "出席記録をバックグラウンドで自動化する"
                     textSize = 14f
+                    ////////////////////////////////////////
                     onClick {
                         if (isChecked) {
                             if (ui.owner.checkWifi()) {
+                                seekIntv.isEnabled = true
                                 ui.owner.setPref("auto", true)
                             }
                         } else {
+                            seekIntv.isEnabled = false
                             ui.owner.setPref("auto", false)
                         }
                     }
                 }.lparams {
                     topMargin = dip(24); width = matchParent
                 }
-                swDebug = switch {
-                    text = "デバッグモード"
+                ////////////////////////////////////////
+                seekText = textView ("自動記録の間隔： ${seekTextMinutes} 分"){
                     textSize = 14f
-                    onClick {
-                        if (isChecked) {
-                            ui.owner.setPref("debug", true)
-                        } else {
-                            ui.owner.setPref("debug", false)
-                        }
-                    }
                 }.lparams {
                     topMargin = dip(24); width = matchParent
                 }
+                ////////////////////////////////////////
+                seekIntv = seekBar {
+                    progress = 0
+                    max = 90
+                    onSeekBarChangeListener {
+                        onProgressChanged { _, progress, _ ->
+                            seekTextMinutes = progress + seekMin
+                            seekText.text = "自動記録の間隔： ${seekTextMinutes} 分"
+                            ui.owner.setPref("autoitv", seekTextMinutes)
+                        }
+                    }
+                }.lparams {
+                    topMargin = dip(12); width = matchParent
+                }
+                ////////////////////////////////////////
                 button {
                     text = "ログアウト"
                     onClick {
                         val sk2 = ui.owner.application as Sk2Globals
                         sk2.logout(null)
                     }
+                }.lparams {
+                    topMargin = dip(24); width = matchParent
+                }
+                ////////////////////////////////////////
+                swDebug = switch {
+                    text = "デバッグモード"
+                    textSize = 14f
+                    onClick {
+                        if (isChecked) {
+                            seekMin = 1
+                            seekIntv.max = 199
+                            seekIntv.progress += 9
+                            ui.owner.setPref("debug", true)
+                            debugText.visibility = View.VISIBLE
+                        } else {
+                            seekMin = 10
+                            seekIntv.max = 50
+                            seekIntv.progress -= 9
+                            ui.owner.setPref("debug", false)
+                            debugText.visibility = View.INVISIBLE
+                        }
+                    }
+                }.lparams {
+                    topMargin = dip(24); width = matchParent
+                }
+                ////////////////////////////////////////
+                debugText = textView ("""
+* SSID を ryu-wiress のみに制限
+* BSSID と教室情報とのマップを拡充
+* key生成にデバイスID(GoogleID)を含める
+* MariaDB 上のデータ確認とWeb検索インターフェイス
+* ヘルプにスクリーンショット追加
+"""
+                ){
+                    textSize = 12f
                 }.lparams {
                     topMargin = dip(24); width = matchParent
                 }

@@ -1,6 +1,5 @@
 package jp.ac.ryukoku.st.sk2
 
-import android.content.Context
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -127,17 +126,17 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
     override fun createView(ui: AnkoContext<LoginActivity>) = with(ui) {
         verticalLayout {
             padding = dip(16)
-
+            ////////////////////////////////////////
             val user = editText {
                 hint = "学籍番号ID"
                 inputType = TYPE_TEXT_VARIATION_EMAIL_ADDRESS
             }
-
+            ////////////////////////////////////////
             val passwd = editText {
                 hint = "パスワード"
                 inputType = TYPE_CLASS_TEXT or TYPE_TEXT_VARIATION_PASSWORD
             }
-
+            ////////////////////////////////////////
             button("ログイン") {
                 textColor = Color.WHITE
                 backgroundColor = ContextCompat.getColor(ctx, R.color.colorPrimary)

@@ -11,6 +11,7 @@ import android.os.RemoteException
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import org.jetbrains.anko.*
@@ -54,40 +55,32 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         super.onResume()
         if (! CheckInfo(mainUi) ) { startActivity(intentFor<LoginActivity>().clearTop()) }
 
-        mainUi.wifiInfo.text = "" // clear debug text
+        val sk2 = this.application as Sk2Globals
+        //mainUi.wifiInfo.visibility = if (sk2.prefMap.getOrDefault("debug", false) as Boolean)
+        //    View.VISIBLE else View.INVISIBLE
         if (!wifiManager.isWifiEnabled()) {
             mainUi.attToastText ="無線LANをオンにしてください"
             mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
         } else {
             mainUi.attToastText = "出席！！！"
-            mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_states)
-
-            val sk2 = this.application as Sk2Globals
-            if (sk2.prefMap.getOrDefault("beacon", false)) {
+            ////////////////////////////////////////
+            if (sk2.prefMap.getOrDefault("beacon", false) as Boolean) {
                 filter.addAction("BEACON")
                 registerReceiver(receiver, filter)
+                mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
+            } else {
+                mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_red)
             }
-            if (sk2.prefMap.getOrDefault("auto", false)) {
-                scanWifiService?.startInterval(sk2.autoIntervalSec)
+            ////////////////////////////////////////
+            if (sk2.prefMap.getOrDefault("auto", false) as Boolean) {
+                scanWifiService?.startInterval((sk2.prefMap.getOrDefault("autoitv", sk2._autoitv) as Int).toLong())
+                mainUi.attBtn.text = "AUTO"
             } else {
                 scanWifiService?.stopInterval()
+                mainUi.attBtn.text = "出席"
             }
-            var btText = "出席"
-            if (sk2.prefMap.getOrDefault("auto", false)) btText += "a"
-            if (sk2.prefMap.getOrDefault("beacon", false)) btText += "b"
-            mainUi.attBtn.text = btText
-        }
-        val bg = if (b) R.drawable.button_states2 else R.drawable.button_states
-        mainUi.attBtn.background = ContextCompat.getDrawable(ctx, bg)
-        mainUi.attBtn.text = if (b) "出席b" else "出席"
-        mainUi.wifiInfo.text = if (d) "WiFi INFO" else ""
-
-        //if (!wifiManager.isWifiEnabled()) {
-        //    mainUi.attToastText ="無線LANをオンにしてください"
-        //    mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
-        //} else {
-        //    mainUi.attToastText ="出席！！！"
-        //}
+            ////////////////////////////////////////
+                    }
     }
     ////////////////////////////////////////
     override fun onBackPressed() { /* DO NOTHING */ }
@@ -145,7 +138,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
             bindWifiScanService()
             try {
                 val info = scanWifiService?.sendApInfo(marker)
-                if (sk2.prefMap.getOrDefault("debug", false)) {
+                if (sk2.prefMap.getOrDefault("debug", false) as Boolean) {
                     mainUi.wifiInfo.text = info
                 }
             } catch (e: RemoteException) {
@@ -205,16 +198,19 @@ class MainActivityUi: AnkoComponent<MainActivity> {
     ////////////////////////////////////////
     override fun createView(ui: AnkoContext<MainActivity>) = with(ui) {
         relativeLayout {
+            ////////////////////////////////////////
             userInfo = textView("") {
                 textColor = Color.BLACK
+                textSize = 18f
             }.lparams {
                 alignParentTop(); centerHorizontally()
                 topMargin = dip(5)
             }
+            ////////////////////////////////////////
             attBtn = button("出席") {
                 textColor = Color.WHITE
-                textSize = 32f
-                background = ContextCompat.getDrawable(ctx, R.drawable.button_states)
+                textSize = 36f
+                background = ContextCompat.getDrawable(ctx, R.drawable.button_states_red)
                 allCaps = false
                 onClick {
                     toast(attToastText)
@@ -224,15 +220,18 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                 centerHorizontally()
                 topMargin = dip(50); width = dip(250); height = dip(250)
             }
+            ////////////////////////////////////////
             verticalLayout {
+                ////////////////////////////////////////
                 wifiInfo = textView("") {
                     textSize = 12f
                 }.lparams {
                     bottomMargin = dip(5); padding = dip(5)
                     width = matchParent; gravity = Gravity.RIGHT
                 }
-
+                ////////////////////////////////////////
                 linearLayout {
+                    ////////////////////////////////////////
                     imageButton {
                         imageResource = R.drawable.ic_settings_32dp
                         background = ContextCompat.getDrawable(context, R.drawable.button_circle)
@@ -244,7 +243,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                         gravity = Gravity.CENTER_HORIZONTAL
                         margin = dip(16); width = dip(64); height = dip(64)
                     }
-
+                    ////////////////////////////////////////
                     imageButton {
                         imageResource = R.drawable.ic_history_32dp
                         background = ContextCompat.getDrawable(context, R.drawable.button_circle)
@@ -255,7 +254,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                         gravity = Gravity.CENTER_HORIZONTAL
                         margin = dip(16); width = dip(64); height = dip(64)
                     }
-
+                    ////////////////////////////////////////
                     imageButton {
                         imageResource = R.drawable.ic_live_help_32dp
                         background = ContextCompat.getDrawable(context, R.drawable.button_circle)

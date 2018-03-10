@@ -81,7 +81,7 @@ class ScanWifiService : Service(), AnkoLogger {
     ////////////////////////////////////////
     fun sortedWifiString(results: List<ScanResult>?, delim: String): String {
         var wifiString = ""
-        if ( results != null && results?.isNotEmpty() ) {
+        if ( results != null && results.isNotEmpty() ) {
             val sortedWifi = results.sortedWith(compareBy(ScanResult::level)).reversed()
             sortedWifi.forEach { ap ->
                 wifiString += "${ap.SSID},${ap.BSSID},${ap.level}${delim}"
