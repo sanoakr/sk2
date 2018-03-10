@@ -15,6 +15,9 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class MainActivity : AppCompatActivity() {
     private var mainUi = MainActivityUi()
     private var username = "no user"
+    private var gcos = ""
+    private var name = ""
+    val prefName = "st.ryukoku.sk2"
 
     ////////////////////////////////////////
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,38 +30,40 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        if (! SetUserInfo(mainUi) ) {
+        val (u, b, d) = CheckPrefInfo()
+        if (u) {
+            mainUi.userInfo.text = "$username / $gcos / $name"
+        } else {
             startActivity(intentFor<LoginActivity>().clearTop())
         }
-        if (!wifiManager.isWifiEnabled()) {
-            mainUi.attToastText ="無線LANをオンにしてください"
-            mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
-        } else {
-            mainUi.attToastText ="出席！！！"
-        }
+        val bg = if (b) R.drawable.button_states2 else R.drawable.button_states
+        mainUi.attBtn.background = ContextCompat.getDrawable(ctx, bg)
+        mainUi.attBtn.text = if (b) "出席b" else "出席"
+        mainUi.wifiInfo.text = if (d) "WiFi INFO" else ""
+
+        //if (!wifiManager.isWifiEnabled()) {
+        //    mainUi.attToastText ="無線LANをオンにしてください"
+        //    mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
+        //} else {
+        //    mainUi.attToastText ="出席！！！"
+        //}
     }
     ////////////////////////////////////////
-    fun SetUserInfo(ui: MainActivityUi): Boolean {
-        val prefName = "st.ryukoku.sk2"
-
-        // get uid & set title
+    fun CheckPrefInfo(): Triple<Boolean, Boolean, Boolean> {
         val pref = getSharedPreferences(prefName, Context.MODE_PRIVATE)
         username = pref.getString("uid", "no user")
-        val gcos = pref.getString("gcos", "")
-        val name = pref.getString("name", "")
-        val time = pref.getLong("time", 0)
-
+        gcos = pref.getString("gcos", "")
+        name = pref.getString("name", "")
+        //val time = pref.getLong("time", 0)
         // check key life
         //val now = System.currentTimeMillis()
         //val over = (now - time) > lifetime
 
-        // go to login if have not
-        if ( username.isNullOrEmpty() || username == "no user") {
-            return false
-        } else {
-            ui.userInfo.text = " $username / $gcos / $name"
-            return true
-        }
+        val u = !(username.isNullOrEmpty() || username == "no user")
+        val b = pref.getBoolean("beacon", false)
+        val d = pref.getBoolean("debug", false)
+
+        return Triple(u, b, d)
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
