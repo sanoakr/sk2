@@ -1,8 +1,13 @@
 package jp.ac.ryukoku.st.sk2
 
-import android.content.Context
+import android.Manifest
+import android.content.*
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
+import android.os.RemoteException
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
@@ -12,29 +17,65 @@ import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
 ////////////////////////////////////////////////////////////////////////////////
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), AnkoLogger {
+    private val PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION = 0
     private var mainUi = MainActivityUi()
-    private var username = "no user"
-    private var gcos = ""
-    private var name = ""
-    val prefName = "st.ryukoku.sk2"
 
     ////////////////////////////////////////
+    var scanWifiService: ScanWifiService? = null
+    private var isWifiBound = false
+
+    private val scanWifiConnection = object : ServiceConnection {
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            val binder = service as ScanWifiService.ScanWifiBinder
+            scanWifiService = binder.inService
+            isWifiBound = true
+        }
+        override fun onServiceDisconnected(className: ComponentName) {
+            isWifiBound = false
+        }
+    }
+    ////////////////////////////////////////
+    private val receiver = UpdateReceiver()
+    private val filter = IntentFilter()
+
+    ////////////////////////////////////////////////////////////////////////////////
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         title = "龍大理工学部出欠システム sk2"
         mainUi.setContentView(this)
+
+        startService<ScanWifiService>()
+        bindWifiScanService()
     }
     ////////////////////////////////////////
     override fun onResume() {
         super.onResume()
+        if (! CheckInfo(mainUi) ) { startActivity(intentFor<LoginActivity>().clearTop()) }
 
-        val (u, b, d) = CheckPrefInfo()
-        if (u) {
-            mainUi.userInfo.text = "$username / $gcos / $name"
+        mainUi.wifiInfo.text = "" // clear debug text
+        if (!wifiManager.isWifiEnabled()) {
+            mainUi.attToastText ="無線LANをオンにしてください"
+            mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
         } else {
-            startActivity(intentFor<LoginActivity>().clearTop())
+            mainUi.attToastText = "出席！！！"
+            mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_states)
+
+            val sk2 = this.application as Sk2Globals
+            if (sk2.prefMap.getOrDefault("beacon", false)) {
+                filter.addAction("BEACON")
+                registerReceiver(receiver, filter)
+            }
+            if (sk2.prefMap.getOrDefault("auto", false)) {
+                scanWifiService?.startInterval(sk2.autoIntervalSec)
+            } else {
+                scanWifiService?.stopInterval()
+            }
+            var btText = "出席"
+            if (sk2.prefMap.getOrDefault("auto", false)) btText += "a"
+            if (sk2.prefMap.getOrDefault("beacon", false)) btText += "b"
+            mainUi.attBtn.text = btText
         }
         val bg = if (b) R.drawable.button_states2 else R.drawable.button_states
         mainUi.attBtn.background = ContextCompat.getDrawable(ctx, bg)
@@ -49,21 +90,109 @@ class MainActivity : AppCompatActivity() {
         //}
     }
     ////////////////////////////////////////
-    fun CheckPrefInfo(): Triple<Boolean, Boolean, Boolean> {
-        val pref = getSharedPreferences(prefName, Context.MODE_PRIVATE)
-        username = pref.getString("uid", "no user")
-        gcos = pref.getString("gcos", "")
-        name = pref.getString("name", "")
-        //val time = pref.getLong("time", 0)
+    override fun onBackPressed() { /* DO NOTHING */ }
+    ////////////////////////////////////////
+    private fun askPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                val permission = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
+                requestPermissions(permission, PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION)
+                return
+            }
+        }
+    }
+    ////////////////////////////////////////
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            // 許可された場合
+        } else {
+            alert("このアプリは無線LANとBluetoothビーコンによる位置情報を利用します") {
+                yesButton { askPermission() }
+                noButton { Logout() }
+            }.show()
+        }
+    }
+    ////////////////////////////////////////
+    fun Logout() {
+        val sk2 = this.application as Sk2Globals
+        sk2.logout(scanWifiConnection)
+    }
+    ////////////////////////////////////////
+    fun CheckInfo(ui: MainActivityUi): Boolean {
+        val sk2 = this.application as Sk2Globals
+
+        val uid = sk2.userMap.getOrDefault("uid", "")
+        val gcos = sk2.userMap.getOrDefault("gcos", "")
+        val name = sk2.userMap.getOrDefault("name", "")
+        //val time = sk2.userMap.getOrDefault("name", 0L)
         // check key life
         //val now = System.currentTimeMillis()
         //val over = (now - time) > lifetime
 
-        val u = !(username.isNullOrEmpty() || username == "no user")
-        val b = pref.getBoolean("beacon", false)
-        val d = pref.getBoolean("debug", false)
+        if ( uid == "") {
+            return false
+        } else {
+            ui.userInfo.text = " $uid / $gcos / $name"
+            return true
+        }
+    }
+    ////////////////////////////////////////////////////////////////////////////////
+    fun sendWifi(marker: Char) {
+        val sk2 = this.application as Sk2Globals
 
-        return Triple(u, b, d)
+        if (wifiManager.isWifiEnabled()) {
+            bindWifiScanService()
+            try {
+                val info = scanWifiService?.sendApInfo(marker)
+                if (sk2.prefMap.getOrDefault("debug", false)) {
+                    mainUi.wifiInfo.text = info
+                }
+            } catch (e: RemoteException) {
+                toast("サービスに接続できません")
+                e.printStackTrace()
+            }
+        } else {
+            toast("無線LANをオンにしてください")
+        }
+        //unbindWifiScanService()
+    }
+    ////////////////////////////////////////
+    private fun bindWifiScanService() {
+        if (! isWifiBound) {
+            val scanWifiIntent = Intent(ctx, ScanWifiService::class.java)
+            bindService(scanWifiIntent, scanWifiConnection, Context.BIND_AUTO_CREATE)
+            isWifiBound = true
+        }
+    }
+    ////////////////////////////////////////
+    fun unbindWifiScanService() {
+        if (isWifiBound) {
+            unbindService(scanWifiConnection)
+            isWifiBound = false
+        }
+    }
+    ////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////
+    private inner class UpdateReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val extras = intent?.extras
+            val msg = extras?.getString("btmessage")
+            toast("ビーコン記録を送信します")
+            sendWifi('B')
+        }
+    }
+    ////////////////////////////////////////
+    override fun onDestroy() {
+        super.onDestroy()
+        val sk2 = this.application as Sk2Globals
+        sk2.prefMap["beacon"] = false
+        sk2.prefMap["auto"] = false
+        sk2.savePrefData()
+        stopService<ScanBeaconService>()
+        unbindWifiScanService()
+        stopService<ScanWifiService>()
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,9 +215,10 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                 textColor = Color.WHITE
                 textSize = 32f
                 background = ContextCompat.getDrawable(ctx, R.drawable.button_states)
+                allCaps = false
                 onClick {
                     toast(attToastText)
-                    //ui.owner.testfun(ui, "renew text")
+                    ui.owner.sendWifi('M')
                 }
             }.lparams {
                 centerHorizontally()
@@ -96,9 +226,9 @@ class MainActivityUi: AnkoComponent<MainActivity> {
             }
             verticalLayout {
                 wifiInfo = textView("") {
-                    textSize = 10f
+                    textSize = 12f
                 }.lparams {
-                    bottomMargin = dip(10)
+                    bottomMargin = dip(5); padding = dip(5)
                     width = matchParent; gravity = Gravity.RIGHT
                 }
 
@@ -107,6 +237,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                         imageResource = R.drawable.ic_settings_32dp
                         background = ContextCompat.getDrawable(context, R.drawable.button_circle)
                         onClick {
+                            ui.owner.unbindWifiScanService()
                             startActivity<PreferenceActivity>()
                         }
                     }.lparams {
@@ -136,9 +267,9 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                         margin = dip(16); width = dip(64); height = dip(64)
                     }
 
-                }
+                }.lparams { width = wrapContent; gravity = Gravity.CENTER_HORIZONTAL }
             }.lparams {
-                alignParentBottom(); centerHorizontally()
+                width = matchParent; alignParentBottom(); centerHorizontally()
             }
         }
     }
