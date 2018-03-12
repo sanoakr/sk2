@@ -22,7 +22,7 @@
 
 ## sk2 サーバ ##
 
-* 認証サーバ、出席データ登録用サーバ (attend_server.py)
+* 認証サーバ、出席データ登録用サーバ (ak2.py)
 * sk2.st.ryukoku.ac.jp:4440 (133.83.80.65:4440)
 * 送信データに改行を含んじゃダメ、送信データは(utf-8)バイト列で
 * byted utf-8 text csv
@@ -83,7 +83,7 @@
 ----
 
 ## sk2 info サーバ ##
-* 出席記録取得用サーバ(attend_infoServer.py)
+* 出席記録取得用サーバ(sk2info.py)
 * sk2.st.ryukoku.ac.jp:4441 (133.83.80.65:4441)
 * 送信データに改行を含んじゃダメ、送信データは(utf-8)バイト列で
 * byted utf-8 text csv
