@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+    <head>
+        <title>自動出欠ログシステムsk2</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <style type="text/css">
+            /*<![CDATA[*/
+            body {
+                background-color: #fff;
+                color: #000;
+                font-size: 0.6em;
+                font-family: sans-serif,helvetica;
+                margin: 0;
+                padding: 0;
+            }
+            :link {
+                color: #c00;
+            }
+            :visited {
+                color: #c00;
+            }
+            a:hover {
+                color: #f50;
+            }
+            h1 {
+                text-align: center;
+                margin: 0;
+                padding: 0.5em 1em 0.5em;
+                background-color: #294172;
+                color: #fff;
+                font-weight: normal;
+                font-size: 1.3em;
+                border-bottom: 1px solid #000;
+            }
+            h1 strong {
+                font-weight: bold;
+                font-size: 1em;
+            }
+            h2 {
+                text-align: center;
+                background-color: #3C6EB4;
+                font-size: 1em;
+                font-weight: bold;
+                color: #fff;
+                margin: 0;
+                padding: 0.3em;
+                border-bottom: 1px solid #294172;
+            }
+            hr {
+                display: none;
+            }
+            .content {
+                padding: 0.3em;
+            }
+            .alert {
+                border: 1px solid #000;
+            }
+
+            img {
+                border: 2px solid #fff;
+                padding: 2px;
+                margin: 2px;
+            }
+            a:hover img {
+                border: 1px solid #294172;
+            }
+            .logos {
+                margin: 1em;
+                text-align: center;
+            }
+            /*]]>*/
+        </style>
+    </head>
+
+    <body>
+        <h1>龍大理工学部自動出欠ログシステム<strong>sk2</strong>へようこそ</h1>
+
+        <div class="content">
+          <h2>sk2とは？</h2>
+          <p>学生のスマホアプリから、講義等への出席ログを自動で送信・記録するためのシステムです。理工学部で開発され、2018年度から理工学部内で試験運用をおこなっています。</p>
+
+	  <h2>何がうれしいの？</h2>
+	  <p>自分のスマホの<strong>sk2</strong>アプリを起動しておくだけで講義等への出席がサーバに記録され、自分の出席状況を把握したり講義への出席を証明したりすることが期待できます。自動送信機能では、特別な操作をしなくてもバックグラウンドで定期的に出席が記録できるため、スマホを持ち歩くだけで出席のための特別な操作をする必要がありません。また、教員にとっても出席カードのように講義時間を割いたり、集計作業をする必要がなくなります。</p>
+	  
+	  <h2>使い方は？</h2>
+	  <p><strong>sk2</strong>アプリのログイン画面から、全学認証IDでログインして下さい。ログインするとメイン画面の右上に、全学認証IDと氏名が表示されます。</p>
+	  <p>スマホの無線LANをオンにした状態で、<strong>出席ボタン</strong>を押すとサーバに記録が送信されます（手動送信）。インターネットに接続されていれば、無線LANに接続する必要はありません。</p>
+	  <p><strong>自動送信機能</strong>をオンにすると、約10分間隔で記録が自動送信されます。自動送信はアプリがバックグラウンドのときも実行されます。</p>
+	  <p>教員の持参するビーコン端末の電波をキャッチすると、自動で記録が送信されます。<sstrong>ビーコンによる自動送信</strong>は、スマホのBluetoothをオンにしておくと実行されます。</p>
+	  <p><strong>履歴ボタン</strong>を押すと、最近の送信記録を確認できます。</p>
+	  <p>全学認証へのログインは初回起動時と、認証の有効期限（180日）が切れた際に必要となります。</p>
+
+	  <h2>どうやって記録しているの？</h2>
+	  <p>龍大キャンパスの各教室内に設置された無線LANのアクセスポイント、あるいは教員が持参するBLEビーコン端末からの電波を受信することで、学生がいる教室情報と日時を学内のサーバに送信します。隣の教室の電波を拾っても大丈夫なように、複数のアクセスポイントの情報を記録しています。</p>
+
+	  <h2>プライバシーは大丈夫？</h2>
+	  <p>記録が送信されるのは、スマホが龍大の無線LANアクセスポイント(ryu-wireless)の電波を受信できるときだけです。送信される情報も龍大のアクセスポイント(ryu-wireless)の情報のみです。また、スマホとサーバ間の送受信は、全て暗号化されたSSL通信で行われています。学内に設置されているサーバ上の記録も、ユーザー名が特定されないように暗号化して保存されています。それでもなお、どうしても学内での所在を記録するということが気になる場合は、自動記録をオフにして必要な場合に手動での送信を行って下さい。自動更新がオフになっている間は、手動での送信を行わないと出席記録が行われないので注意して下さい。</p>
+
+	  <h2><strong>sk2</strong>の記録は講義への出席として認められるの？</h2>
+	  <p>将来的には全ての科目でそうなることを目指していますが、現在は各教員の判断に委ねられています。ビーコンを用いた出席記録はより精度が高く、教員も積極的に利用している証拠であり、出席記録として認められる可能性が高いと思います。しばらくは、システムの精度を確認するために、出席カードなど他の手段と併用されることが多いでしょう。科目毎の対応は、各担当教員にお尋ね下さい。</p>
+
+	  <h2>お問い合わせ先</h2>
+	  <p>理工学部教務課まで</p>
+	  <p>お問い合わせフォーム（準備中）</p>
+        </div>
+    </body>
+</html>
