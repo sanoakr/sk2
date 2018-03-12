@@ -48,16 +48,17 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         mainUi.setContentView(this)
 
         startService<ScanWifiService>()
-        bindWifiScanService()
     }
     ////////////////////////////////////////
     override fun onResume() {
         super.onResume()
         if (! CheckInfo(mainUi) ) { startActivity(intentFor<LoginActivity>().clearTop()) }
 
+        bindWifiScanService()
+
         val sk2 = this.application as Sk2Globals
-        //mainUi.wifiInfo.visibility = if (sk2.prefMap.getOrDefault("debug", false) as Boolean)
-        //    View.VISIBLE else View.INVISIBLE
+        mainUi.wifiInfo.visibility = if (sk2.prefMap.getOrDefault("debug", false) as Boolean)
+            View.VISIBLE else View.INVISIBLE
         if (!wifiManager.isWifiEnabled()) {
             mainUi.attToastText ="無線LANをオンにしてください"
             mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
@@ -67,8 +68,10 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
             if (sk2.prefMap.getOrDefault("beacon", false) as Boolean) {
                 filter.addAction("BEACON")
                 registerReceiver(receiver, filter)
+                startService<ScanBeaconService>()
                 mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
             } else {
+                stopService<ScanBeaconService>()
                 mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_red)
             }
             ////////////////////////////////////////
@@ -166,7 +169,6 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         }
     }
     ////////////////////////////////////////////////////////////////////////////////
-
     ////////////////////////////////////////
     private inner class UpdateReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -175,6 +177,12 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
             toast("ビーコン記録を送信します")
             sendWifi('B')
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        scanWifiService?.stopInterval()
+        unbindWifiScanService()
     }
     ////////////////////////////////////////
     override fun onDestroy() {
@@ -236,7 +244,6 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                         imageResource = R.drawable.ic_settings_32dp
                         background = ContextCompat.getDrawable(context, R.drawable.button_circle)
                         onClick {
-                            ui.owner.unbindWifiScanService()
                             startActivity<PreferenceActivity>()
                         }
                     }.lparams {
