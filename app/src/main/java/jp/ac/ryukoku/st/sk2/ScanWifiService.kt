@@ -33,7 +33,7 @@ class ScanWifiService : Service(), AnkoLogger {
         sendApInfo('A')
         handler.postDelayed(timer, period)
     }
-    fun startInterval(sec: Long) { period = sec*1000; handler.postDelayed(timer, period) }
+    fun startInterval(sec: Long) { period = sec*1000; info(period); handler.postDelayed(timer, period) }
     fun stopInterval() { handler.removeCallbacks(timer) }
     ////////////////////////////////////////
     fun sendApInfo(marker: Char): String {

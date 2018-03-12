@@ -34,9 +34,9 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
         prefUi.swBeacon.isChecked = sk2.prefMap.getOrDefault("beacon", false) as Boolean
         prefUi.swAuto.isChecked = sk2.prefMap.getOrDefault("auto", false) as Boolean
         prefUi.swDebug.isChecked = sk2.prefMap.getOrDefault("debug", false) as Boolean
-        prefUi.seekIntv.progress = sk2.prefMap.getOrDefault("autoitv", 0L) as Int
+        prefUi.seekTextMinutes = (sk2.prefMap.getOrDefault("autoitv", 0L) as Int)/60
         prefUi.seekMin = if (prefUi.swDebug.isChecked) 1 else 10
-        prefUi.seekTextMinutes = prefUi.seekIntv.progress + prefUi.seekMin
+        prefUi.seekIntv.progress = prefUi.seekTextMinutes - prefUi.seekMin
         prefUi.debugText.visibility = if (prefUi.swDebug.isChecked) View.VISIBLE else View.INVISIBLE
     }
     ////////////////////////////////////////
@@ -132,13 +132,12 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
                 }
                 ////////////////////////////////////////
                 seekIntv = seekBar {
-                    progress = 0
                     max = 90
                     onSeekBarChangeListener {
                         onProgressChanged { _, progress, _ ->
-                            seekTextMinutes = progress + seekMin
+                            seekTextMinutes = seekMin + progress
                             seekText.text = "自動記録の間隔： ${seekTextMinutes} 分"
-                            ui.owner.setPref("autoitv", seekTextMinutes)
+                            ui.owner.setPref("autoitv", seekTextMinutes*60)
                         }
                     }
                 }.lparams {

@@ -1,0 +1,13 @@
+[Unit]
+Description = sk2 attend Info server
+
+[Service]
+ExecStart = /usr/local/sk2/sk2info.py
+ExecStop = /bin/kill ${MAINPID}
+Restart = always
+Type = simple
+User = sk2
+Group = sk2
+
+[Install]
+WantedBy = multi-user.target

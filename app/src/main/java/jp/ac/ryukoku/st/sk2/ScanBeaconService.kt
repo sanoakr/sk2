@@ -58,7 +58,7 @@ class ScanBeaconService : Service(), BootstrapNotifier, AnkoLogger {
     }
     ////////////////////////////////////////
     override fun didEnterRegion(region: Region) {
-        toast("ビーコン領域に入りました")
+        //toast("ビーコン領域に入りました")
         sendMessage("ENTER iBeacon Region")
         startActivity<MainActivity>()
         try {
@@ -69,7 +69,7 @@ class ScanBeaconService : Service(), BootstrapNotifier, AnkoLogger {
     }
     ////////////////////////////////////////
     override fun didExitRegion(region: Region) {
-        toast("ビーコン領域から出ました")
+        //toast("ビーコン領域から出ました")
         try {
             btManager?.stopRangingBeaconsInRegion(region)
         } catch (e: RemoteException) {
