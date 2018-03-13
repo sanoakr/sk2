@@ -80,91 +80,126 @@
         <h1>自動出欠ログ検索フォーム</h1>
         <div class="form"><p>
         <?php
-        $server = "localhost";
-        $user = "sk2";
-        $pass = "sk2loglog";
-        $dbname = "sk2";
-        $dbchar = "UTF-8";
-        $dbtbl = "test";
+$server = "localhost";
+$user = "sk2";
+$pass = "sk2loglog";
+$dbname = "sk2";
+$dbchar = "UTF-8";
+$dbtbl = "test";
 
-        $farr = array('id', 'type', 'datetime', 'ssid0', 'bssid0', 'signal0', 'ssid1', 'bssid1', 'signal1', 'ssid2', 'bssid2', 'signal2');
+$farr = array('id', 'type', 'datetime');
+$aparr = array('ssid', 'bssid', 'signal');
+$apnum = 5;
 
-        //////////////////////////////    
-        $link = new mysqli($server, $user, $pass, $dbname);
-        if ($sql_error = $link->connect_error){
-            error_log($sql_error);
-            die($sql_error);
-        } else {
-            $link->set_charset($dbchar);
-            //echo "connect and use success!<br>\n";
+//////////////////////////////
+$link = new mysqli($server, $user, $pass, $dbname);
+if ($sql_error = $link->connect_error) {
+    error_log($sql_error);
+    die($sql_error);
+} else {
+    $link->set_charset($dbchar);
+    //echo "connect and use success!<br>\n";
+}
+$sql = "SELECT COUNT(*) FROM $dbtbl";
+if ($result = $link->query($sql)) {
+    $row = $result->fetch_row();
+    echo "<p>sk2 has " . $row[0] . " records.</p><br>\n";
+}
+
+//////////////////////////////
+echo "<div name='form'><form action='search.php' method ='post'>\n";
+foreach ($farr as $key) {
+    echo "$key ";
+    makeSelector($link, $dbtbl, $key);
+}
+unset($key);
+foreach ($aparr as $key) {
+    echo "$key ";
+    makeApSelector($link, $dbtbl, $key, $apnum);
+}
+
+unset($key);
+echo "<br><p><input type='submit' value='search'></p></div><br>\n";
+
+//////////////////////////////
+if ($_SERVER["REQUEST_METHOD"] == 'POST') {
+    echo "<h2>Search Result</h2>\n";
+    foreach ($farr as $key) {
+         $$key = $_POST[$key];
+         echo " $key=" . $$key;
+         }
+    unset($key);
+    foreach ($aparr as $key) {
+         $$key = $_POST[$key];
+         echo " $key=" . $$key;
+         }
+    unset($key);
+
+    echo "<h2></h2>\n";
+    $sql = "SELECT * FROM $dbtbl WHERE ";
+    foreach ($farr as $key) {
+        if ($$key != '*') {
+            $sql .= "$key='" . $$key . "' AND ";
         }
-        $sql = "SELECT COUNT(*) FROM $dbtbl";
-        if ($result = $link->query($sql)) {
-            $row = $result->fetch_row();
-            echo "<p>sk2 has " . $row[0] . " records.</p><br>\n";
+    }
+    foreach ($aparr as $key) {
+        if ($$key != '*') {
+            $sql .= '(';
+            for ($w = 0; $w < $apnum; $w++) {
+                $sql .= "  $key$w='" . $$key . "' OR ";
+            }
+        $sql .= 'False) AND ';
         }
+    }
+    $sql .= "True";
+    echo "$sql<h2></h2>\n";
 
-        //////////////////////////////
-        echo "<div name='form'><form action='search.php' method ='post'>\n";
-        foreach($farr as $key) {
-            echo "$key ";
-            makeSelector($link, $dbtbl, $key);
+    if ($result = $link->query($sql)) {
+        while ($row = $result->fetch_assoc()) {
+            echo "<div><pre>\n";
+            foreach ($row as $key => $value) {
+                echo "$value, ";
+            }
+            echo "\n";
         }
-        unset($key);
-        
-        echo "<br><p><input type='submit' value='search'></p></div><br>\n";
-        if ($_SERVER["REQUEST_METHOD"] == 'POST') {
-            echo "<h2>Search Result</h2>\n";
-            foreach($farr as $key) {
-                $$key = $_POST[$key];
-            }
-            unset($key);
-
-            foreach($farr as $key) {
-                echo " $key=". $$key;
-            }
-            unset($key);
-            echo "<h2></h2>\n";
-            $sql = "SELECT * FROM $dbtbl WHERE";
-            foreach($farr as $key) {
-                if ($$key != '*') {
-                    $sql .= " $key='" . $$key . "' AND ";
-                }
-            }
-            $sql .= "True";
-            echo "$sql<h2></h2>\n";
-
-            if ($result = $link->query($sql)) {
-                while ($row = $result->fetch_assoc()) {
-                    echo "<div><pre>\n";
-                    foreach( $row as $key => $value ) {
-                        echo "$value, ";
-                    }
-                    echo "\n";
-                }
-                echo "</pre></div>\n";
-            } else {
-                echo "<p>Query Error</p><br>\n";
-            }
-        }
-        $link->close();
-   ?>
+        echo "</pre></div>\n";
+    } else {
+        echo "<p>Query Error</p><br>\n";
+    }
+}
+$link->close();
+?>
    </div></p>
   </body>
 </html>
 <!--//////////////////////////////////////////////////-->
 <?php
-    function makeSelector($link, $tbl, $name) {
-        $sql = "SELECT DISTINCT $name FROM $tbl";
-        echo '<select name="' . $name . '">\n';
-        $selector = '<select name="' . $name . '">\n';
-        echo '<option value="*">' . $name . ': *</option>\n';
-        if ($result = $link->query($sql)) {
-            while ($row = $result->fetch_array()) {
-                echo '<option value=' . $row[$name] . '>' . $row[$name] . '</option>\n';
-            }
+function makeSelector($link, $tbl, $name)
+{
+    $sql = "SELECT DISTINCT $name FROM $tbl";
+    echo '<select name="' . $name . '">\n';
+    echo '<option value="*">' . $name . ': *</option>\n';
+    if ($result = $link->query($sql)) {
+        while ($row = $result->fetch_array()) {
+            echo '<option value=' . $row[$name] . '>' . $row[$name] . '</option>\n';
         }
-        echo "</select>\n";
-        return $selector;
     }
-?>  
+    echo "</select>\n";
+}
+function makeApSelector($link, $tbl, $key, $num)
+{
+    $sw = $key . '0';
+    $sql = "SELECT DISTINCT $sw FROM $tbl ";
+    for ($w = 1; $w < $num; $w++) {
+        $sql .= "UNION SELECT DISTINCT $key$w FROM $tbl ";
+    }
+    echo '<select name="' . $key . '">\n';
+    echo '<option value="*">' . $key . ': *</option>\n';
+    if ($result = $link->query($sql)) {
+        while ($row = $result->fetch_array()) {
+            echo '<option value=' . $row[$sw] . '>' . $row[$sw] . '</option>\n';
+        }
+    }
+    echo "</select>\n";
+}
+?>
