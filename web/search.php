@@ -51,6 +51,7 @@
                 display: none;
             }
             .form {
+                font-size: 1em;
                 padding: 2em;
             }
             .content {
@@ -59,7 +60,10 @@
             .alert {
                 border: 1px solid #000;
             }
-
+            select {
+                font-size: 1em;
+                border: 1px;
+            }
             img {
                 border: 2px solid #fff;
                 padding: 2px;
@@ -103,39 +107,39 @@ if ($sql_error = $link->connect_error) {
 $sql = "SELECT COUNT(*) FROM $dbtbl";
 if ($result = $link->query($sql)) {
     $row = $result->fetch_row();
-    echo "<p>sk2 has " . $row[0] . " records.</p><br>\n";
+    echo "<p>sk2 has " . $row[0] . " records.</p>\n";
 }
-
-//////////////////////////////
-echo "<div name='form'><form action='search.php' method ='post'>\n";
-foreach ($farr as $key) {
-    echo "$key ";
-    makeSelector($link, $dbtbl, $key);
-}
-unset($key);
-foreach ($aparr as $key) {
-    echo "$key ";
-    makeApSelector($link, $dbtbl, $key, $apnum);
-}
-
-unset($key);
-echo "<br><p><input type='submit' value='search'></p></div><br>\n";
-
+echo "<h2></h2><br>\n";
 //////////////////////////////
 if ($_SERVER["REQUEST_METHOD"] == 'POST') {
-    echo "<h2>Search Result</h2>\n";
     foreach ($farr as $key) {
          $$key = $_POST[$key];
-         echo " $key=" . $$key;
+         //echo " $key=" . $$key;
          }
     unset($key);
     foreach ($aparr as $key) {
          $$key = $_POST[$key];
-         echo " $key=" . $$key;
+         //echo " $key=" . $$key;
          }
     unset($key);
+}
+//////////////////////////////
+echo "<div name='form'><form action='search.php' method ='post'>\n";
+foreach ($farr as $key) {
+    echo "$key ";
+    makeSelector($link, $dbtbl, $key, $$key);
+}
+unset($key);
+foreach ($aparr as $key) {
+    echo "$key ";
+    makeApSelector($link, $dbtbl, $key, $apnum, $$key);
+}
+unset($key);
+echo "<br><p><input type='submit' value='search'></p></form></div>\n";
 
-    echo "<h2></h2>\n";
+//////////////////////////////
+if ($_SERVER["REQUEST_METHOD"] == 'POST') {
+    echo "<h2>Search Result</h2>\n";
     $sql = "SELECT * FROM $dbtbl WHERE ";
     foreach ($farr as $key) {
         if ($$key != '*') {
@@ -174,19 +178,24 @@ $link->close();
 </html>
 <!--//////////////////////////////////////////////////-->
 <?php
-function makeSelector($link, $tbl, $name)
+function makeSelector($link, $tbl, $name, $init='*')
 {
     $sql = "SELECT DISTINCT $name FROM $tbl";
     echo '<select name="' . $name . '">\n';
-    echo '<option value="*">' . $name . ': *</option>\n';
+    echo '<option value="*">*</option>\n';
     if ($result = $link->query($sql)) {
         while ($row = $result->fetch_array()) {
-            echo '<option value=' . $row[$name] . '>' . $row[$name] . '</option>\n';
+            echo '<option value=' . $row[$name];
+            if ($row[$name] == $init)
+                echo ' selected>';
+            else
+                echo '>';
+            echo $row[$name] . '</option>\n';
         }
     }
     echo "</select>\n";
 }
-function makeApSelector($link, $tbl, $key, $num)
+function makeApSelector($link, $tbl, $key, $num, $init='*')
 {
     $sw = $key . '0';
     $sql = "SELECT DISTINCT $sw FROM $tbl ";
@@ -194,10 +203,15 @@ function makeApSelector($link, $tbl, $key, $num)
         $sql .= "UNION SELECT DISTINCT $key$w FROM $tbl ";
     }
     echo '<select name="' . $key . '">\n';
-    echo '<option value="*">' . $key . ': *</option>\n';
+    echo '<option value="*">*</option>\n';
     if ($result = $link->query($sql)) {
         while ($row = $result->fetch_array()) {
-            echo '<option value=' . $row[$sw] . '>' . $row[$sw] . '</option>\n';
+            echo '<option value=' . $row[$sw];
+            if ($row[$sw] == $init)
+                echo ' selected>';
+            else
+                echo '>';
+            echo $row[$sw] . '</option>\n';
         }
     }
     echo "</select>\n";
