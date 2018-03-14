@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.widget.Button
 import android.widget.SeekBar
 import android.widget.Switch
 import android.widget.TextView
@@ -33,11 +34,13 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
 
         prefUi.swBeacon.isChecked = sk2.prefMap.getOrDefault("beacon", false) as Boolean
         prefUi.swAuto.isChecked = sk2.prefMap.getOrDefault("auto", false) as Boolean
+        prefUi.seekIntv.isEnabled = if (prefUi.swAuto.isChecked) true else false
         prefUi.swDebug.isChecked = sk2.prefMap.getOrDefault("debug", false) as Boolean
         prefUi.seekTextMinutes = (sk2.prefMap.getOrDefault("autoitv", 0L) as Int)/60
         prefUi.seekMin = if (prefUi.swDebug.isChecked) 1 else 10
         prefUi.seekIntv.progress = prefUi.seekTextMinutes - prefUi.seekMin
         prefUi.debugText.visibility = if (prefUi.swDebug.isChecked) View.VISIBLE else View.INVISIBLE
+        prefUi.btSearch.visibility = if (prefUi.swDebug.isChecked) View.VISIBLE else View.INVISIBLE
     }
     ////////////////////////////////////////
     fun setPref(key: String, value: Any) {
@@ -81,6 +84,7 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
         var seekMin = 10
         var seekTextMinutes = 10
         lateinit var debugText: TextView
+        lateinit var btSearch: Button
         ////////////////////////////////////////
         override fun createView(ui: AnkoContext<PreferenceActivity>) = with(ui) {
             verticalLayout {
@@ -164,12 +168,14 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
                             seekIntv.progress += 9
                             ui.owner.setPref("debug", true)
                             debugText.visibility = View.VISIBLE
+                            btSearch.visibility = View.VISIBLE
                         } else {
                             seekMin = 10
                             seekIntv.max = 50
                             seekIntv.progress -= 9
                             ui.owner.setPref("debug", false)
                             debugText.visibility = View.INVISIBLE
+                            btSearch.visibility = View.INVISIBLE
                         }
                     }
                 }.lparams {
@@ -179,15 +185,22 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
                 debugText = textView ("""
 * SSID を ryu-wiress のみに制限
 * BSSID と教室情報とのマップを拡充
-* key生成にデバイスID(GoogleID)を含める
-* MariaDB 上のデータ確認とWeb検索インターフェイス
-* ヘルプにスクリーンショット追加
+* key生成にデバイスID(GoogleID)を含める?
 """
                 ){
                     textSize = 12f
                 }.lparams {
                     topMargin = dip(24); width = matchParent
                 }
+                btSearch = button {
+                    text = "Web検索"
+                    onClick {
+                        browse("https://sk2.st.ryukoku.ac.jp/search.php")
+                    }
+                }.lparams {
+                    topMargin = dip(24); width = matchParent
+                }
+
             }
         }
     }
