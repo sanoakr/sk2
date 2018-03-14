@@ -91,7 +91,10 @@ $dbname = "sk2";
 $dbchar = "UTF-8";
 $dbtbl = "test";
 
-$farr = array('id', 'type', 'datetime');
+$farr = array('id', 'type');
+$fdt = 'datetime';
+$date_from = 'from';
+$date_to = 'to';
 $aparr = array('ssid', 'bssid', 'signal');
 $apnum = 5;
 
@@ -113,14 +116,16 @@ echo "<h2></h2><br>\n";
 //////////////////////////////
 if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     foreach ($farr as $key) {
-         $$key = $_POST[$key];
-         //echo " $key=" . $$key;
-         }
+        $$key = $_POST[$key];
+        //echo " $key=" . $$key;
+    }
     unset($key);
+    $$date_from = $_POST[$date_from];
+    $$date_to = $_POST[$date_to];
     foreach ($aparr as $key) {
-         $$key = $_POST[$key];
-         //echo " $key=" . $$key;
-         }
+        $$key = $_POST[$key];
+        //echo " $key=" . $$key;
+    }
     unset($key);
 }
 //////////////////////////////
@@ -130,6 +135,10 @@ foreach ($farr as $key) {
     makeSelector($link, $dbtbl, $key, $$key);
 }
 unset($key);
+
+echo "date ";
+makeDtSelector($link, $dbtbl, $fdt, $date_from, $date_to, $$date_from, $$date_to);
+
 foreach ($aparr as $key) {
     echo "$key ";
     makeApSelector($link, $dbtbl, $key, $apnum, $$key);
@@ -146,13 +155,14 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
             $sql .= "$key='" . $$key . "' AND ";
         }
     }
+    $sql .= "( $fdt BETWEEN '" . $$date_from . " 00:00:00' AND '" . $$date_to . " 23:59:59') AND ";
     foreach ($aparr as $key) {
         if ($$key != '*') {
             $sql .= '(';
             for ($w = 0; $w < $apnum; $w++) {
                 $sql .= "  $key$w='" . $$key . "' OR ";
             }
-        $sql .= 'False) AND ';
+            $sql .= 'False) AND ';
         }
     }
     $sql .= "True";
@@ -178,40 +188,85 @@ $link->close();
 </html>
 <!--//////////////////////////////////////////////////-->
 <?php
-function makeSelector($link, $tbl, $name, $init='*')
+function makeSelector($link, $tbl, $name, $init = '*')
 {
     $sql = "SELECT DISTINCT $name FROM $tbl";
-    echo '<select name="' . $name . '">\n';
-    echo '<option value="*">*</option>\n';
+    echo '<select name="' . $name . '">' . "\n";
+    echo '<option value="*">*</option>' . "\n";
     if ($result = $link->query($sql)) {
         while ($row = $result->fetch_array()) {
             echo '<option value=' . $row[$name];
-            if ($row[$name] == $init)
+            if ($row[$name] == $init) {
                 echo ' selected>';
-            else
+            } else {
                 echo '>';
-            echo $row[$name] . '</option>\n';
+            }
+
+            echo $row[$name] . "</option>\n";
         }
     }
     echo "</select>\n";
 }
-function makeApSelector($link, $tbl, $key, $num, $init='*')
+function makeApSelector($link, $tbl, $key, $num, $init = '*')
 {
     $sw = $key . '0';
     $sql = "SELECT DISTINCT $sw FROM $tbl ";
     for ($w = 1; $w < $num; $w++) {
         $sql .= "UNION SELECT DISTINCT $key$w FROM $tbl ";
     }
-    echo '<select name="' . $key . '">\n';
-    echo '<option value="*">*</option>\n';
+    echo '<select name="' . $key . '">' . "\n";
+    echo '<option value="*">*</option>' . "\n";
     if ($result = $link->query($sql)) {
         while ($row = $result->fetch_array()) {
             echo '<option value=' . $row[$sw];
-            if ($row[$sw] == $init)
+            if ($row[$sw] == $init) {
                 echo ' selected>';
-            else
+            } else {
                 echo '>';
-            echo $row[$sw] . '</option>\n';
+            }
+            echo $row[$sw] . "</option>\n";
+        }
+    }
+    echo "</select>\n";
+}
+function makeDtSelector($link, $tbl, $key, $key_from, $key_to, $from = '*', $to = '*')
+{
+    $date = 'date';
+
+    $sql = "SELECT min(date_format($key, '%Y-%m-%d') AS $date) FROM $tbl";
+    if ($result = $link->query($sql)) {
+        $min = $result->fetch_array()[0];
+    }
+    $sql = "SELECT max(date_format($key, '%Y-%m-%d') AS $date) FROM $tbl";
+    if ($result = $link->query($sql)) {
+        $max = $result->fetch_array()[0];
+    }
+    echo '<select name="' . $key_from . '">' . "\n";
+    $sql = "SELECT DISTINCT date_format($key, '%Y-%m-%d') AS $date FROM $tbl";
+    if ($result = $link->query($sql)) {
+        while ($row = $result->fetch_array()) {
+            echo '<option value=' . $row[$date];
+            if ($row[$date] == $from) {
+                echo ' selected>';
+            } else {
+                echo '>';
+            }
+            echo $row[$date] . "</option>\n";
+        }
+    }
+    echo "</select>\n";
+
+    echo ' 〜 <select name="' . $key_to . '">' . "\n";
+    $sql = "SELECT DISTINCT date_format($key, '%Y-%m-%d') AS $date FROM $tbl";
+    if ($result = $link->query($sql)) {
+        while ($row = $result->fetch_array()) {
+            echo '<option value=' . $row[$date];
+            if ($row[$date] == $to) {
+                echo ' selected>';
+            } else {
+                echo '>';
+            }
+            echo $row[$date] . "</option>\n";
         }
     }
     echo "</select>\n";
