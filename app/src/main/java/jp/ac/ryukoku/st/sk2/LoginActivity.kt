@@ -8,6 +8,8 @@ import android.provider.Settings.Secure.getString
 import android.support.v4.content.ContextCompat
 import android.text.InputType.*
 import android.view.Gravity
+import android.view.View
+import android.widget.Button
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.io.BufferedReader
@@ -19,12 +21,14 @@ import javax.net.ssl.SSLSocketFactory
 
 ////////////////////////////////////////////////////////////////////////////////
 class LoginActivity : AppCompatActivity(), AnkoLogger {
+    private var loginUi = LoginActivityUi()
+
     ////////////////////////////////////////
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         title = ("ログイン：龍大理工学部出欠システム sk2")
-        LoginActivityUi().setContentView(this)
+        loginUi.setContentView(this)
 
         val androidId = getString(this.contentResolver, Settings.Secure.ANDROID_ID)
         toast(androidId)
@@ -34,6 +38,9 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
         super.onResume()
         val sk2 = this.application as Sk2Globals
         sk2.restoreUserData()
+
+        loginUi.testBt.visibility = if (sk2.prefMap.getOrDefault("debug", false) as Boolean)
+            View.VISIBLE else View.INVISIBLE
 
         val uid = sk2.userMap.getOrDefault("uid", "")
         //val gcos = sk2.userMap.getOrDefault("gcos", "")
@@ -121,7 +128,7 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
 }
 ////////////////////////////////////////////////////////////////////////////////
 class LoginActivityUi: AnkoComponent<LoginActivity> {
-
+    lateinit var testBt: Button
     ////////////////////////////////////////
     override fun createView(ui: AnkoContext<LoginActivity>) = with(ui) {
         verticalLayout {
@@ -145,6 +152,14 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
                 }
             }.lparams{
                 gravity = Gravity.CENTER_HORIZONTAL; topMargin = dip(16)
+            }
+            ////////////////////////////////////////
+            testBt = button("テストログイン") {
+                onClick {
+                    ui.owner.attemptLogin("testuser", "testuser")
+                }
+            }.lparams{
+                gravity = Gravity.CENTER_HORIZONTAL; topMargin = dip(128)
             }
         }
     }
