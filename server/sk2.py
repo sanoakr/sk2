@@ -27,7 +27,7 @@ db_tbl = "test"
 sk2_dir = "/usr/local/sk2/"
 data_dir = sk2_dir + "data/"
 salt_dir = sk2_dir + "key/"
-log = r"/usr/local/sk2/log/attend_server.log"
+log = r"/usr/local/sk2/log/sk2.log"
 
 # EDS
 eds = "setaeds.seta.ryukoku.ac.jp"
