@@ -40,6 +40,9 @@ Saltfile = salt_dir + "user.salt"
 # replying info key salt
 replySaltfile = salt_dir + "reply.salt"
 
+# for test
+testuser = "testuser"
+
 
 class AsyncClient(asyncio.Protocol):
     def connection_made(self, transport):
@@ -56,7 +59,10 @@ class AsyncClient(asyncio.Protocol):
         if len(pieces) == 3 and pieces[0] == "AUTH":
             user = pieces[1]
             pwd = pieces[2]
-            auth = self.ldapAuth(user, pwd)
+            if (user == testuser):
+                auth = (testuser, "テストユーザ")
+            else:
+                auth = self.ldapAuth(user, pwd)
 
             if auth:
                 (gcos, name) = auth # md5 encode with reply.salt
