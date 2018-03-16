@@ -18,7 +18,7 @@ server_port = 4441
 sk2_dir = "/usr/local/sk2/"
 data_dir = sk2_dir + "data/"
 salt_dir = sk2_dir + "key/"
-log = r"/usr/local/sk2/log/attend_infoServer.log"
+log = r"/usr/local/sk2/log/sk2info.log"
 
 Certfile = "/etc/letsencrypt/live/sk2.st.ryukoku.ac.jp/fullchain.pem"
 Keyfile = "/etc/letsencrypt/live/sk2.st.ryukoku.ac.jp/privkey.pem"
