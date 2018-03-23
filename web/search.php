@@ -95,6 +95,12 @@ $farr = array('id', 'type');
 $fdt = 'datetime';
 $date_from = 'from';
 $date_to = 'to';
+$fwd = 'wday';
+$warray = array('*', '日', '月', '火', '水', '木', '金', '土');
+$fhour = 'priod';
+$parray = array('*', '1講時', '2講時', '3講時', '4講時', '5講時', '6講時', '昼休み');
+$parray_from = array('*', '09:20', '11:05', '13:35', '15:20', '17:00', '18:40', '12:40');
+$parray_to = array('*', '10:05', '12:35', '15:05', '16:50', '18:30', '20:10', '13:30');
 $aparr = array('ssid', 'bssid', 'signal');
 $apnum = 5;
 
@@ -122,6 +128,8 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     unset($key);
     $$date_from = $_POST[$date_from];
     $$date_to = $_POST[$date_to];
+    $$fwd = $_POST[$fwd];
+    $$fhour = $_POST[$fhour];
     foreach ($aparr as $key) {
         $$key = $_POST[$key];
         //echo " $key=" . $$key;
@@ -131,16 +139,20 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
 //////////////////////////////
 echo "<div name='form'><form action='search.php' method ='post'>\n";
 foreach ($farr as $key) {
-    echo "$key ";
+    echo "&emsp;&emsp;$key:";
     makeSelector($link, $dbtbl, $key, $$key);
 }
 unset($key);
 
-echo "date ";
+echo "&emsp;&emsp;date:";
 makeDtSelector($link, $dbtbl, $fdt, $date_from, $date_to, $$date_from, $$date_to);
+echo "&emsp;&emsp;weekday:";
+makeWdSelector($link, $dbtbl, $fwd, $warray, $$fwd);
+echo "&emsp;&emsp;period:";
+makeHpSelector($link, $dbtbl, $fhour, $parray, $parray_from, $parray_to, $$fhour);
 
 foreach ($aparr as $key) {
-    echo "$key ";
+    echo "&emsp;&emsp;$key:";
     makeApSelector($link, $dbtbl, $key, $apnum, $$key);
 }
 unset($key);
@@ -150,12 +162,15 @@ echo "<br><p><input type='submit' value='search'></p></form></div>\n";
 if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     echo "<h2>Search Result</h2>\n";
     $sql = "SELECT * FROM $dbtbl WHERE ";
+    //////////////////////////////
     foreach ($farr as $key) {
         if ($$key != '*') {
             $sql .= "$key='" . $$key . "' AND ";
         }
     }
+    //////////////////////////////
     $sql .= "( $fdt BETWEEN '" . $$date_from . " 00:00:00' AND '" . $$date_to . " 23:59:59') AND ";
+    //////////////////////////////
     foreach ($aparr as $key) {
         if ($$key != '*') {
             $sql .= '(';
@@ -165,10 +180,20 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
             $sql .= 'False) AND ';
         }
     }
-    $sql .= "True";
+    //////////////////////////////
+    if ($$fwd != 0) {
+        $sql .= "dayofweek($fdt)=" . $$fwd . " AND ";
+    }
+    //////////////////////////////
+    if ($$fhour != 0) {
+        $sql .= "( date_format(datetime, '%h:%m:%s') between '" . $parray_from[$$fhour] . ":00' AND '" . $parray_to[$$fhour] . ":00') AND ";
+    }
+    //////////////////////////////
+    $sql .= "True Limit 9999";
     echo "$sql<h2></h2>\n";
 
     if ($result = $link->query($sql)) {
+        echo "<h3>$result->num_rows records found.</h3>";
         while ($row = $result->fetch_assoc()) {
             echo "<div><pre>\n";
             foreach ($row as $key => $value) {
@@ -229,18 +254,22 @@ function makeApSelector($link, $tbl, $key, $num, $init = '*')
     }
     echo "</select>\n";
 }
-function makeDtSelector($link, $tbl, $key, $key_from, $key_to, $from = '*', $to = '*')
+function makeDtSelector($link, $tbl, $key, $key_from, $key_to, $from = '', $to = '')
 {
     $date = 'date';
 
-    $sql = "SELECT min(date_format($key, '%Y-%m-%d') AS $date) FROM $tbl";
+    $sql = "SELECT min(date_format($key, '%Y-%m-%d')) AS $date FROM $tbl";
     if ($result = $link->query($sql)) {
         $min = $result->fetch_array()[0];
     }
-    $sql = "SELECT max(date_format($key, '%Y-%m-%d') AS $date) FROM $tbl";
+    if ($from == '') {$from = $min;}
+
+    $sql = "SELECT max(date_format($key, '%Y-%m-%d')) AS $date FROM $tbl";
     if ($result = $link->query($sql)) {
-        $max = $result->fetch_array()[0];
+        $max = $result->fetch_array()[$date];
     }
+    if ($to == '') {$to = $max;}
+
     echo '<select name="' . $key_from . '">' . "\n";
     $sql = "SELECT DISTINCT date_format($key, '%Y-%m-%d') AS $date FROM $tbl";
     if ($result = $link->query($sql)) {
@@ -271,4 +300,38 @@ function makeDtSelector($link, $tbl, $key, $key_from, $key_to, $from = '*', $to 
     }
     echo "</select>\n";
 }
+function makeWdSelector($link, $tbl, $key, $warray, $init = 0)
+{
+    $sql = "SELECT DISTINCT dayofweek(datetime) AS $key FROM $tbl";
+    echo '<select name="' . $key . '">' . "\n";
+    echo '<option value=0>*</option>' . "\n";
+    if ($result = $link->query($sql)) {
+        while ($row = $result->fetch_array()) {
+            echo '<option value=' . $row[$key];
+            if ($row[$key] == $init) {
+                echo ' selected>';
+            } else {
+                echo '>';
+            }
+            echo $warray[$row[$key]] . "</option>\n";
+        }
+    }
+    echo "</select>\n";
+}
+function makeHpSelector($link, $tbl, $key, $pary, $fromary, $toary, $init = 0)
+{
+    echo '<select name="' . $key . '">' . "\n";
+    echo "<option value=0>*</option>\n";
+    for ($i = 1; $i <= 7; $i++) {
+        echo '<option value=' . $i;
+        if ($i == $init) {
+            echo ' selected>';
+        } else {
+            echo '>';
+        }
+        echo "$pary[$i] ($fromary[$i]〜$toary[$i])</option>\n";
+    }
+    echo "</select>\n";
+}
+
 ?>
