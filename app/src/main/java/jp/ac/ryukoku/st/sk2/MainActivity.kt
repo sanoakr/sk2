@@ -76,7 +76,8 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
             }
             ////////////////////////////////////////
             if (sk2.prefMap.getOrDefault("auto", false) as Boolean) {
-                scanWifiService?.startInterval((sk2.prefMap.getOrDefault("autoitv", sk2._autoitv) as Int).toLong())
+                scanWifiService?.startInterval((sk2.prefMap.getOrDefault("autoitv", sk2._autoitv) as Int).toLong(),
+                        sk2.prefMap.getOrDefault("swtap", false) as Boolean)
                 mainUi.attBtn.text = "AUTO"
             } else {
                 scanWifiService?.stopInterval()

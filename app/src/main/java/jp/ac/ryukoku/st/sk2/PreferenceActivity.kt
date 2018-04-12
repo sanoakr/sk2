@@ -1,11 +1,9 @@
 package jp.ac.ryukoku.st.sk2
 
 import android.bluetooth.BluetoothAdapter
-import android.content.Context
 import android.content.pm.PackageManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.SeekBar
@@ -35,6 +33,7 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
         prefUi.swBeacon.isChecked = sk2.prefMap.getOrDefault("beacon", false) as Boolean
         prefUi.swAuto.isChecked = sk2.prefMap.getOrDefault("auto", false) as Boolean
         prefUi.seekIntv.isEnabled = if (prefUi.swAuto.isChecked) true else false
+        prefUi.swChangeAP.isChecked = sk2.prefMap.getOrDefault("swtap", false) as Boolean
         prefUi.swDebug.isChecked = sk2.prefMap.getOrDefault("debug", false) as Boolean
         prefUi.seekTextMinutes = (sk2.prefMap.getOrDefault("autoitv", 0L) as Int)/60
         prefUi.seekMin = if (prefUi.swDebug.isChecked) 1 else 10
@@ -80,6 +79,7 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
         lateinit var swAuto: Switch
         lateinit var seekText: TextView
         lateinit var seekIntv: SeekBar
+        lateinit var swChangeAP: Switch
         lateinit var swDebug: Switch
         var seekMin = 10
         var seekTextMinutes = 10
@@ -118,10 +118,12 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
                         if (isChecked) {
                             if (ui.owner.checkWifi()) {
                                 seekIntv.isEnabled = true
+                                swChangeAP.isEnabled = true
                                 ui.owner.setPref("auto", true)
                             }
                         } else {
                             seekIntv.isEnabled = false
+                            swChangeAP.isEnabled = false
                             ui.owner.setPref("auto", false)
                         }
                     }
@@ -147,6 +149,25 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
                 }.lparams {
                     topMargin = dip(12); width = matchParent
                 }
+                ////////////////////////////////////////
+                swChangeAP = switch {
+                    text = "最適な龍大無線LANに自動接続する（1分毎）"
+                    textSize = 14f
+                    ////////////////////////////////////////
+                    onClick {
+                        if (isChecked) {
+                            if (ui.owner.checkWifi()) {
+                                ui.owner.setPref("swtap", true)
+                            }
+                        } else {
+                            ui.owner.setPref("swtap", false)
+                        }
+                    }
+                }.lparams {
+                    topMargin = dip(24); width = matchParent
+                }
+                ////////////////////////////////////////
+
                 ////////////////////////////////////////
                 button {
                     text = "ログアウト"
@@ -193,7 +214,7 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
                     topMargin = dip(24); width = matchParent
                 }
                 btSearch = button {
-                    text = "Web検索"
+                    text = "記録検索ページへ"
                     onClick {
                         browse("https://sk2.st.ryukoku.ac.jp/search.php")
                     }

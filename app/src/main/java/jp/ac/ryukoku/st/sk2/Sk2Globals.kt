@@ -19,8 +19,11 @@ class Sk2Globals: Application() {
     val authFail = "authfail"
     val recFail = "fail"
     ////////////////////////////////////////
-    val _autoitv: Int = 10*60            // 10min
+    val ryuid = "ryu-wirelass"
+    ////////////////////////////////////////
+    val _autoitv: Int = 10*60             // 10min
     val beaconIntervalSec: Long = 10      // 10sec
+    val switchApInterval: Long = 60       // 60sec
     ////////////////////////////////////////
     //var androidId = ""
     val prefName = "st.ryukoku.sk2"
@@ -52,6 +55,7 @@ class Sk2Globals: Application() {
         e.putBoolean("beacon", prefMap["beacon"] as Boolean)
         e.putBoolean("auto", prefMap["auto"] as Boolean)
         e.putInt("autoitv", prefMap["autoitv"] as Int)
+        e.putBoolean("swtap", prefMap["swtap"] as Boolean)
         e.putBoolean("debug", prefMap["debug"] as Boolean)
         e.apply()
     }
@@ -70,6 +74,7 @@ class Sk2Globals: Application() {
         prefMap["beacon"] = pref.getBoolean("beacon", false)
         prefMap["auto"] = pref.getBoolean("auto", false)
         prefMap["autoitv"] = pref.getInt("autoitv", 0)
+        prefMap["swtap"] = pref.getBoolean("swtap", false)
         prefMap["debug"] = pref.getBoolean("debug", false)
     }
     ////////////////////////////////////////

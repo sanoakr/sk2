@@ -3,7 +3,10 @@ package jp.ac.ryukoku.st.sk2
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.net.NetworkInfo
 import android.net.wifi.ScanResult
+import android.net.wifi.WifiConfiguration
+import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.Binder
 import android.os.Handler
@@ -15,6 +18,7 @@ import java.io.BufferedWriter
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.net.InetSocketAddress
+import java.net.NetworkInterface
 import javax.net.ssl.SSLSocketFactory
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -26,14 +30,32 @@ class ScanWifiService : Service(), AnkoLogger {
             get() = this@ScanWifiService
     }
     ////////////////////////////////////////
+    var ryuid: String = (this.application as Sk2Globals).ryuid
+    ////////////////////////////////////////
     private val handler = Handler()
     private val timer = Runnable { interval() }
-    var period: Long = 10*60*1000
+    var period: Long = 10*60*1000 // temporaly initialized to 10min
     private fun interval() {
         sendApInfo('A')
         handler.postDelayed(timer, period)
     }
-    fun startInterval(sec: Long) { period = sec*1000; info(period); handler.postDelayed(timer, period) }
+    ////////////////////////////////////////
+    private val handlerAP = Handler()
+    private val timerAP = Runnable { intervalAP() }
+    var periodAP: Long = (this.application as Sk2Globals).switchApInterval
+    private fun intervalAP() {
+        switchAP()
+        handlerAP.postDelayed(timerAP, periodAP)
+    }
+    ////////////////////////////////////////
+    fun startInterval(sec: Long, swtap: Boolean) {
+        period = sec*1000;
+        info(period);
+        handler.postDelayed(timer, period)
+        if (swtap) {
+            handler.postDelayed(timerAP, periodAP)
+        }
+    }
     fun stopInterval() { handler.removeCallbacks(timer) }
     ////////////////////////////////////////
     fun sendApInfo(marker: Char): String {
@@ -99,6 +121,46 @@ class ScanWifiService : Service(), AnkoLogger {
             return result
         }
         return null
+    }
+    ////////////////////////////////////////
+    private fun scanNearAP(): String? {
+        val results = scanWifi()
+        if (results != null && results.isNotEmpty()) {
+            val sortedWifi = results.sortedWith(compareBy(ScanResult::level)).reversed()
+            sortedWifi.forEach { ap ->
+                if (ap.SSID == '"' + ryuid + '"') {
+                    return ap.BSSID
+                }
+            }
+        }
+        return null
+    }
+    ////////////////////////////////////////
+    private fun switchAP() {
+        val conInfo = wifiManager.connectionInfo
+        val state = WifiInfo.getDetailedStateOf(conInfo?.supplicantState)
+        var curBSSID: String? = null
+        if (state == NetworkInfo.DetailedState.CONNECTED || state == NetworkInfo.DetailedState.OBTAINING_IPADDR) {
+            curBSSID = wifiManager.connectionInfo.bssid
+        }
+
+        wifiManager.configuredNetworks.forEach { cfg ->
+            if (cfg.SSID == '"' + ryuid + '"') {
+                val nearBSSID = scanNearAP()
+                if (nearBSSID == null) {
+                    toast("$ryuid が見つかりません")
+                } else if (nearBSSID != curBSSID) {
+                    toast("最適な $ryuid に再接続します")
+                    var targetCfg = cfg
+                    targetCfg.BSSID = nearBSSID
+                    wifiManager.disconnect()
+                    wifiManager.enableNetwork(targetCfg.networkId, true)
+                    wifiManager.reconnect()
+                    toast("$ryuid に接続しました")
+                    return
+                }
+            }
+        }
     }
     ////////////////////////////////////////
     override fun onBind(p0: Intent?): IBinder {
