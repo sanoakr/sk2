@@ -34,6 +34,7 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
         prefUi.swAuto.isChecked = sk2.prefMap.getOrDefault("auto", false) as Boolean
         prefUi.seekIntv.isEnabled = if (prefUi.swAuto.isChecked) true else false
         prefUi.swChangeAP.isChecked = sk2.prefMap.getOrDefault("swtap", false) as Boolean
+        prefUi.swChangeAP.isEnabled = if (prefUi.swAuto.isChecked) true else false
         prefUi.swDebug.isChecked = sk2.prefMap.getOrDefault("debug", false) as Boolean
         prefUi.seekTextMinutes = (sk2.prefMap.getOrDefault("autoitv", 0L) as Int)/60
         prefUi.seekMin = if (prefUi.swDebug.isChecked) 1 else 10

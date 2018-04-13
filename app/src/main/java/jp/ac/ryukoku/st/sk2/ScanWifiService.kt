@@ -30,7 +30,8 @@ class ScanWifiService : Service(), AnkoLogger {
             get() = this@ScanWifiService
     }
     ////////////////////////////////////////
-    var ryuid: String = (this.application as Sk2Globals).ryuid
+    //val sk2: Sk2Globals? = this.application as? Sk2Globals
+    val ryuid = "ryu-wireless"
     ////////////////////////////////////////
     private val handler = Handler()
     private val timer = Runnable { interval() }
@@ -42,7 +43,7 @@ class ScanWifiService : Service(), AnkoLogger {
     ////////////////////////////////////////
     private val handlerAP = Handler()
     private val timerAP = Runnable { intervalAP() }
-    var periodAP: Long = (this.application as Sk2Globals).switchApInterval
+    val periodAP: Long = 1*60*1000 // 1min
     private fun intervalAP() {
         switchAP()
         handlerAP.postDelayed(timerAP, periodAP)
@@ -123,13 +124,13 @@ class ScanWifiService : Service(), AnkoLogger {
         return null
     }
     ////////////////////////////////////////
-    private fun scanNearAP(): String? {
+    private fun scanNearAP(): Pair<String, Int>? {
         val results = scanWifi()
         if (results != null && results.isNotEmpty()) {
             val sortedWifi = results.sortedWith(compareBy(ScanResult::level)).reversed()
             sortedWifi.forEach { ap ->
-                if (ap.SSID == '"' + ryuid + '"') {
-                    return ap.BSSID
+                if (ap.SSID == "\"$ryuid\"") {
+                    return Pair(ap.BSSID, ap.level)
                 }
             }
         }
@@ -139,28 +140,40 @@ class ScanWifiService : Service(), AnkoLogger {
     private fun switchAP() {
         val conInfo = wifiManager.connectionInfo
         val state = WifiInfo.getDetailedStateOf(conInfo?.supplicantState)
+        var curSSID: String? = null
         var curBSSID: String? = null
+        var curLevel: Int = -100
         if (state == NetworkInfo.DetailedState.CONNECTED || state == NetworkInfo.DetailedState.OBTAINING_IPADDR) {
+            curSSID = wifiManager.connectionInfo.ssid
             curBSSID = wifiManager.connectionInfo.bssid
+            curLevel = wifiManager.connectionInfo.rssi
         }
 
-        wifiManager.configuredNetworks.forEach { cfg ->
-            if (cfg.SSID == '"' + ryuid + '"') {
-                val nearBSSID = scanNearAP()
-                if (nearBSSID == null) {
-                    toast("$ryuid が見つかりません")
-                } else if (nearBSSID != curBSSID) {
-                    toast("最適な $ryuid に再接続します")
-                    var targetCfg = cfg
-                    targetCfg.BSSID = nearBSSID
-                    wifiManager.disconnect()
-                    wifiManager.enableNetwork(targetCfg.networkId, true)
-                    wifiManager.reconnect()
-                    toast("$ryuid に接続しました")
-                    return
+        if (curSSID == "\"$ryuid\"") {
+            toast("$ryuid に接続中です")
+            wifiManager.configuredNetworks.forEach { cfg ->
+                //if (cfg.SSID == "\"$ryuid\"") {
+                    //toast("$ryuid の接続情報があります")
+                val nearAP = scanNearAP()
+                if (nearAP == null) {
+                    //toast("他の $ryuid は見つかりません")
+                } else {
+                    //toast("他の $ryuid が見つかりました")
+                    if (nearAP.first != curBSSID && nearAP.second > curLevel) {
+                        toast("最適な $ryuid に再接続します")
+                        var targetCfg = cfg
+                        targetCfg.BSSID = nearAP.first
+                        wifiManager.disconnect()
+                        wifiManager.enableNetwork(targetCfg.networkId, true)
+                        wifiManager.reconnect()
+                        toast("最適な $ryuid に再接続しました")
+                        return
+                    }
                 }
+                //}
             }
         }
+        return
     }
     ////////////////////////////////////////
     override fun onBind(p0: Intent?): IBinder {

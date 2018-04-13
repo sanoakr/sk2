@@ -19,11 +19,11 @@ class Sk2Globals: Application() {
     val authFail = "authfail"
     val recFail = "fail"
     ////////////////////////////////////////
-    val ryuid = "ryu-wirelass"
+    //val ryuid = "ryu-wireless"
     ////////////////////////////////////////
     val _autoitv: Int = 10*60             // 10min
     val beaconIntervalSec: Long = 10      // 10sec
-    val switchApInterval: Long = 60       // 60sec
+    //val switchApInterval: Long = 60       // 60sec
     ////////////////////////////////////////
     //var androidId = ""
     val prefName = "st.ryukoku.sk2"
