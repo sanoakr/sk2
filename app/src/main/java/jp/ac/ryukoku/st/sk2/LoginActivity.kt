@@ -39,10 +39,12 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
         val sk2 = this.application as Sk2Globals
         sk2.restoreUserData()
 
-        loginUi.testBt.visibility = if (sk2.prefMap.getOrDefault("debug", false) as Boolean)
+        //loginUi.testBt.visibility = if (sk2.prefMap.getOrDefault("debug", false) as Boolean)
+        loginUi.testBt.visibility = if (sk2.prefMap["debug"] as Boolean ?: false)
             View.VISIBLE else View.INVISIBLE
 
-        val uid = sk2.userMap.getOrDefault("uid", "")
+        //val uid = sk2.userMap.getOrDefault("uid", "")
+        val uid = sk2.userMap["uid"] ?: ""
         //val gcos = sk2.userMap.getOrDefault("gcos", "")
         //val name = sk2.userMap.getOrDefault("name", "")
         //val time = sk2.userMap.getOrDefault("name", 0L)
@@ -107,9 +109,9 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
             val v = result.split(",")
             val time = System.currentTimeMillis()
 
-            val gList = v[1].split(Regex("[\\s\\h]+")).mapNotNull { it.capitalize() }
+            val gList = v[1].split(Regex("\\s+")).mapNotNull { it.capitalize() }
             val clrGcos = gList.joinToString(" ")
-            val clrName = v[2].replace(Regex("[\\h]+"), " ")
+            val clrName = v[2].replace(Regex("\\s+"), " ")
 
             sk2.userMap.put("uid", user)
             sk2.userMap.put("key", v[0])

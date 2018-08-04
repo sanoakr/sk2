@@ -30,13 +30,13 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
         val sk2 = this.application as Sk2Globals
         sk2.restorePrefData()
 
-        prefUi.swBeacon.isChecked = sk2.prefMap.getOrDefault("beacon", false) as Boolean
-        prefUi.swAuto.isChecked = sk2.prefMap.getOrDefault("auto", false) as Boolean
+        prefUi.swBeacon.isChecked = sk2.prefMap["beacon"] as Boolean ?: false
+        prefUi.swAuto.isChecked = sk2.prefMap["auto"] as Boolean ?: false
         prefUi.seekIntv.isEnabled = if (prefUi.swAuto.isChecked) true else false
-        prefUi.swChangeAP.isChecked = sk2.prefMap.getOrDefault("swtap", false) as Boolean
+        prefUi.swChangeAP.isChecked = sk2.prefMap["swtap"] as Boolean ?: false
         prefUi.swChangeAP.isEnabled = if (prefUi.swAuto.isChecked) true else false
-        prefUi.swDebug.isChecked = sk2.prefMap.getOrDefault("debug", false) as Boolean
-        prefUi.seekTextMinutes = (sk2.prefMap.getOrDefault("autoitv", 0L) as Int)/60
+        prefUi.swDebug.isChecked = sk2.prefMap["debug"] as Boolean ?: false
+        prefUi.seekTextMinutes = (sk2.prefMap["autoitv"] as Int ?: 0)/60
         prefUi.seekMin = if (prefUi.swDebug.isChecked) 1 else 10
         prefUi.seekIntv.progress = prefUi.seekTextMinutes - prefUi.seekMin
         prefUi.debugText.visibility = if (prefUi.swDebug.isChecked) View.VISIBLE else View.INVISIBLE

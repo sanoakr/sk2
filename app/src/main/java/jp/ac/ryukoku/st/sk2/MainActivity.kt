@@ -54,10 +54,13 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         super.onResume()
         if (! CheckInfo(mainUi) ) { startActivity(intentFor<LoginActivity>().clearTop()) }
 
+        /*
         bindWifiScanService()
+        */
 
         val sk2 = this.application as Sk2Globals
-        mainUi.wifiInfo.visibility = if (sk2.prefMap.getOrDefault("debug", false) as Boolean)
+        //mainUi.wifiInfo.visibility = if (sk2.prefMap.getOrDefault("debug", false) as Boolean)
+        mainUi.wifiInfo.visibility = if (sk2.prefMap["debug"] as Boolean ?: false)
             View.VISIBLE else View.INVISIBLE
         if (!wifiManager.isWifiEnabled()) {
             mainUi.attToastText ="無線LANをオンにしてください"
@@ -65,7 +68,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         } else {
             mainUi.attToastText = "出席！！！"
             ////////////////////////////////////////
-            if (sk2.prefMap.getOrDefault("beacon", false) as Boolean) {
+            if (sk2.prefMap["beacon"] as Boolean ?: false) {
                 filter.addAction("BEACON")
                 registerReceiver(receiver, filter)
                 startService<ScanBeaconService>()
@@ -75,9 +78,9 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
                 mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_red)
             }
             ////////////////////////////////////////
-            if (sk2.prefMap.getOrDefault("auto", false) as Boolean) {
-                scanWifiService?.startInterval((sk2.prefMap.getOrDefault("autoitv", sk2._autoitv) as Int).toLong(),
-                        sk2.prefMap.getOrDefault("swtap", false) as Boolean)
+            if (sk2.prefMap["auto"] as Boolean ?: false) {
+                scanWifiService?.startInterval((sk2.prefMap["autoitv"] as Int ?: sk2._autoitv).toLong(),
+                        sk2.prefMap["swtap"] as Boolean ?: false)
                 mainUi.attBtn.text = "AUTO"
             } else {
                 scanWifiService?.stopInterval()
@@ -119,9 +122,13 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
     fun CheckInfo(ui: MainActivityUi): Boolean {
         val sk2 = this.application as Sk2Globals
 
-        val uid = sk2.userMap.getOrDefault("uid", "")
-        val gcos = sk2.userMap.getOrDefault("gcos", "")
-        val name = sk2.userMap.getOrDefault("name", "")
+        val uid = sk2.userMap["uid"] ?: ""
+        val gcos = sk2.userMap["gcos"] ?: ""
+        val name = sk2.userMap["name"] ?: ""
+        //val uid = sk2.userMap.getOrDefault("uid", "")
+        //val gcos = sk2.userMap.getOrDefault("gcos", "")
+        //val name = sk2.userMap.getOrDefault("name", "")
+
         //val time = sk2.userMap.getOrDefault("name", 0L)
         // check key life
         //val now = System.currentTimeMillis()
@@ -142,7 +149,8 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
             bindWifiScanService()
             try {
                 val info = scanWifiService?.sendApInfo(marker)
-                if (sk2.prefMap.getOrDefault("debug", false) as Boolean) {
+                if (sk2.prefMap["debug"] as Boolean ?: false) {
+                //if (sk2.prefMap.getOrDefault("debug", false) as Boolean) {
                     mainUi.wifiInfo.text = info
                 }
             } catch (e: RemoteException) {
