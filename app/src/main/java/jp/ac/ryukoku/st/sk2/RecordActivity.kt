@@ -1,5 +1,6 @@
 package jp.ac.ryukoku.st.sk2
 
+import android.graphics.Color
 import android.graphics.Typeface
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -19,7 +20,8 @@ class RecordActivity : AppCompatActivity(),AnkoLogger {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        title = "出席記録：龍大理工学部出欠システム sk2"
+        val sk2 = this.application as Sk2Globals
+        title = "記録：${sk2.app_title} ${sk2.app_name}"
         RecordActivityUi().setContentView(this)
     }
     ////////////////////////////////////////
@@ -28,8 +30,8 @@ class RecordActivity : AppCompatActivity(),AnkoLogger {
         val serverHost = sk2.serverHost
         val serverPort = sk2.serverInfoPort
         val timeOut = sk2.timeOut
-        val uid = sk2.userMap.getOrDefault("uid", "")
-        val key = sk2.userMap.getOrDefault("key", "")
+        val uid = sk2.userMap["uid"] ?: ""
+        val key = sk2.userMap["key"] ?: ""
 
         lateinit var rowRecord: String
         try {
@@ -60,7 +62,7 @@ class RecordActivity : AppCompatActivity(),AnkoLogger {
         val keys = listOf("encUid", "type", "datetime", "ssid0", "bssid0", "signal0",
                 "ssid1", "bssid1", "signal1", "ssid2", "bssid2", "signal2",
                 "ssid3", "bssid3", "signal3", "ssid4", "bssid4", "signal4")
-        var record: MutableList<MutableMap<String, String>> = mutableListOf()
+        val record: MutableList<MutableMap<String, String>> = mutableListOf()
 
         if (data.isNullOrBlank()) {
             record.add(mutableMapOf("enUid" to "There is no record"))
@@ -128,7 +130,7 @@ class RecordActivityUi: AnkoComponent<RecordActivity> {
 }
 ////////////////////////////////////////////////////////////////////////////////
 class RecordAdapter(var activity: RecordActivity): BaseAdapter() {
-    var list : List<Map<String, String>> = activity.fetchRecord()
+    val list : List<Map<String, String>> = activity.fetchRecord()
     ////////////////////////////////////////
     override fun getView(i : Int, v : View?, parent : ViewGroup?) : View {
         val item = getItem(i)
@@ -141,11 +143,14 @@ class RecordAdapter(var activity: RecordActivity): BaseAdapter() {
                     ////////////////////////////////////////
                     textView(item["type"]) {
                         textSize = 18f
+                        //textColor = Color.BLACK
+                        backgroundColor = Color.WHITE // for Huwai's initAdditionalStyle default Error.
                         typeface = Typeface.DEFAULT_BOLD
                     }.lparams { width = matchParent; horizontalGravity = left; weight = 1f }
                     ////////////////////////////////////////
                     textView(item["datetime"]) {
                         textSize = 18f
+                        backgroundColor = Color.WHITE // for Huwai's initAdditionalStyle default Error.
                         typeface = Typeface.DEFAULT_BOLD
                     }.lparams { horizontalGravity = right }
                 }.lparams { width = matchParent }

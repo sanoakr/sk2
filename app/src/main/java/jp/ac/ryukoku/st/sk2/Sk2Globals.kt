@@ -10,6 +10,8 @@ import org.jetbrains.anko.stopService
 ////////////////////////////////////////////////////////////////////////////////
 class Sk2Globals: Application() {
     ////////////////////////////////////////
+    val app_name = "sk2"
+    val app_title = "龍大理工学部出欠システム"
     val serverHost = "sk2.st.ryukoku.ac.jp"
     val serverPort = 4440
     val serverInfoPort = 4441
@@ -52,10 +54,10 @@ class Sk2Globals: Application() {
     fun savePrefData() {
         val pref = getSharedPreferences(prefName, Context.MODE_PRIVATE)
         val e = pref.edit()
-        e.putBoolean("beacon", prefMap["beacon"] as Boolean)
+        //e.putBoolean("beacon", prefMap["beacon"] as Boolean)
         e.putBoolean("auto", prefMap["auto"] as Boolean)
         e.putInt("autoitv", prefMap["autoitv"] as Int)
-        e.putBoolean("swtap", prefMap["swtap"] as Boolean)
+        //e.putBoolean("swtap", prefMap["swtap"] as Boolean)
         e.putBoolean("debug", prefMap["debug"] as Boolean)
         e.apply()
     }
@@ -71,10 +73,10 @@ class Sk2Globals: Application() {
     ////////////////////////////////////////
     fun restorePrefData() {
         val pref = getSharedPreferences(prefName, Context.MODE_PRIVATE)
-        prefMap["beacon"] = pref.getBoolean("beacon", false)
+        //prefMap["beacon"] = pref.getBoolean("beacon", false)
         prefMap["auto"] = pref.getBoolean("auto", false)
         prefMap["autoitv"] = pref.getInt("autoitv", 0)
-        prefMap["swtap"] = pref.getBoolean("swtap", false)
+        //prefMap["swtap"] = pref.getBoolean("swtap", false)
         prefMap["debug"] = pref.getBoolean("debug", false)
     }
     ////////////////////////////////////////
@@ -92,4 +94,3 @@ class Sk2Globals: Application() {
         startActivity(intentFor<LoginActivity>().clearTop())
     }
 }
-

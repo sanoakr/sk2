@@ -44,7 +44,8 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        title = "龍大理工学部出欠システム sk2"
+        val sk2 = this.application as Sk2Globals
+        title = "${sk2.app_title} ${sk2.app_name}"
         mainUi.setContentView(this)
 
         startService<ScanWifiService>()
@@ -58,8 +59,8 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         bindWifiScanService()
         */
 
-        val sk2 = this.application as Sk2Globals
         //mainUi.wifiInfo.visibility = if (sk2.prefMap.getOrDefault("debug", false) as Boolean)
+        val sk2 = this.application as Sk2Globals
         mainUi.wifiInfo.visibility = if (sk2.prefMap["debug"] as Boolean ?: false)
             View.VISIBLE else View.INVISIBLE
         if (!wifiManager.isWifiEnabled()) {
@@ -107,7 +108,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         if (requestCode == PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             // 許可された場合
         } else {
-            alert("このアプリは無線LANとBluetoothビーコンによる位置情報を利用します") {
+            alert("このアプリはBluetoothビーコンによる位置情報を利用します") {
                 yesButton { askPermission() }
                 noButton { Logout() }
             }.show()
@@ -197,7 +198,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
     override fun onDestroy() {
         super.onDestroy()
         val sk2 = this.application as Sk2Globals
-        sk2.prefMap["beacon"] = false
+        //sk2.prefMap["beacon"] = false
         sk2.prefMap["auto"] = false
         sk2.savePrefData()
         stopService<ScanBeaconService>()
@@ -234,7 +235,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                     ui.owner.sendWifi('M')
                 }
             }.lparams {
-                centerHorizontally()
+                centerHorizontally(); centerVertically()
                 topMargin = dip(50); width = dip(250); height = dip(250)
             }
             ////////////////////////////////////////
@@ -257,7 +258,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                         }
                     }.lparams {
                         gravity = Gravity.CENTER_HORIZONTAL
-                        margin = dip(16); width = dip(64); height = dip(64)
+                        margin = dip(8); width = dip(64); height = dip(64)
                     }
                     ////////////////////////////////////////
                     imageButton {
@@ -268,7 +269,18 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                         }
                     }.lparams {
                         gravity = Gravity.CENTER_HORIZONTAL
-                        margin = dip(16); width = dip(64); height = dip(64)
+                        margin = dip(8); width = dip(64); height = dip(64)
+                    }
+                    ////////////////////////////////////////
+                    imageButton {
+                        imageResource = R.drawable.ic_history_local_32dp
+                        background = ContextCompat.getDrawable(context, R.drawable.button_circle)
+                        onClick {
+                            startActivity<RecordActivity>()
+                        }
+                    }.lparams {
+                        gravity = Gravity.CENTER_HORIZONTAL
+                        margin = dip(8); width = dip(64); height = dip(64)
                     }
                     ////////////////////////////////////////
                     imageButton {
@@ -279,7 +291,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                         }
                     }.lparams {
                         gravity = Gravity.CENTER_HORIZONTAL
-                        margin = dip(16); width = dip(64); height = dip(64)
+                        margin = dip(8); width = dip(64); height = dip(64)
                     }
 
                 }.lparams { width = wrapContent; gravity = Gravity.CENTER_HORIZONTAL }

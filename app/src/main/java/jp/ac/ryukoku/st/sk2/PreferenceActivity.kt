@@ -21,7 +21,8 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        title = "設定：龍大理工学部出欠システム sk2"
+        val sk2 = this.application as Sk2Globals
+        title = "設定：${sk2.app_title} ${sk2.app_name}"
         prefUi.setContentView(this)
     }
     ////////////////////////////////////////
@@ -30,11 +31,11 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
         val sk2 = this.application as Sk2Globals
         sk2.restorePrefData()
 
-        prefUi.swBeacon.isChecked = sk2.prefMap["beacon"] as Boolean ?: false
+        //prefUi.swBeacon.isChecked = sk2.prefMap["beacon"] as Boolean ?: false
         prefUi.swAuto.isChecked = sk2.prefMap["auto"] as Boolean ?: false
         prefUi.seekIntv.isEnabled = if (prefUi.swAuto.isChecked) true else false
-        prefUi.swChangeAP.isChecked = sk2.prefMap["swtap"] as Boolean ?: false
-        prefUi.swChangeAP.isEnabled = if (prefUi.swAuto.isChecked) true else false
+        //prefUi.swChangeAP.isChecked = sk2.prefMap["swtap"] as Boolean ?: false
+        //prefUi.swChangeAP.isEnabled = if (prefUi.swAuto.isChecked) true else false
         prefUi.swDebug.isChecked = sk2.prefMap["debug"] as Boolean ?: false
         prefUi.seekTextMinutes = (sk2.prefMap["autoitv"] as Int ?: 0)/60
         prefUi.seekMin = if (prefUi.swDebug.isChecked) 1 else 10
@@ -48,6 +49,7 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
         sk2.prefMap[key] = value
         sk2.savePrefData()
     }
+    /*
     ////////////////////////////////////////
     fun checkWifi(): Boolean {
         if (wifiManager.isWifiEnabled()) {
@@ -59,6 +61,7 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
         }
     }
     ////////////////////////////////////////
+    */
     private fun hasBLE(): Boolean {
         return getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)
     }
@@ -76,11 +79,11 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
     }
     ////////////////////////////////////////////////////////////////////////////////
     class PreferenceActivityUi : AnkoComponent<PreferenceActivity> {
-        lateinit var swBeacon: Switch
+        //lateinit var swBeacon: Switch
         lateinit var swAuto: Switch
         lateinit var seekText: TextView
         lateinit var seekIntv: SeekBar
-        lateinit var swChangeAP: Switch
+        //lateinit var swChangeAP: Switch
         lateinit var swDebug: Switch
         var seekMin = 10
         var seekTextMinutes = 10
@@ -90,6 +93,7 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
         override fun createView(ui: AnkoContext<PreferenceActivity>) = with(ui) {
             verticalLayout {
                 padding = dip(16)
+                /*
                 ////////////////////////////////////////
                 swBeacon = switch {
                     text = "Bluetoothビーコンによる出席記録をオンにする"
@@ -110,6 +114,7 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
                 }.lparams {
                     topMargin = dip(24); width = matchParent
                 }
+                */
                 ////////////////////////////////////////
                 swAuto = switch {
                     text = "出席記録をバックグラウンドで自動化する"
@@ -117,14 +122,14 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
                     ////////////////////////////////////////
                     onClick {
                         if (isChecked) {
-                            if (ui.owner.checkWifi()) {
+                            if (ui.owner.checkBt()) {
                                 seekIntv.isEnabled = true
-                                swChangeAP.isEnabled = true
+                                //swChangeAP.isEnabled = true
                                 ui.owner.setPref("auto", true)
                             }
                         } else {
                             seekIntv.isEnabled = false
-                            swChangeAP.isEnabled = false
+                            //swChangeAP.isEnabled = false
                             ui.owner.setPref("auto", false)
                         }
                     }
@@ -150,6 +155,7 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
                 }.lparams {
                     topMargin = dip(12); width = matchParent
                 }
+                /*
                 ////////////////////////////////////////
                 swChangeAP = switch {
                     text = "最適な龍大無線LANに自動接続する（1分毎）"
@@ -166,7 +172,7 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
                     }
                 }.lparams {
                     topMargin = dip(24); width = matchParent
-                }
+                }*/
                 ////////////////////////////////////////
 
                 ////////////////////////////////////////

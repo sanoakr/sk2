@@ -27,7 +27,8 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        title = ("ログイン：龍大理工学部出欠システム sk2")
+        val sk2 = this.application as Sk2Globals
+        title = "ログイン：${sk2.app_title} ${sk2.app_name}"
         loginUi.setContentView(this)
 
         val androidId = getString(this.contentResolver, Settings.Secure.ANDROID_ID)

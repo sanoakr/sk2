@@ -9,7 +9,8 @@ class HelpActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        title = "ヘルプ：龍大理工学部出欠システム sk2"
+        val sk2 = this.application as Sk2Globals
+        title = "ヘルプ：${sk2.app_title} ${sk2.app_name}"
         HelpActivityUi().setContentView(this)
     }
 }
