@@ -1,7 +1,5 @@
 package jp.ac.ryukoku.st.sk2
 
-import android.bluetooth.BluetoothAdapter
-import android.content.pm.PackageManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View

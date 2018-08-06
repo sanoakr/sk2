@@ -18,9 +18,6 @@ import android.widget.Button
 import android.widget.TextView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import android.content.DialogInterface
-import android.support.v4.app.FragmentActivity
-
 
 ////////////////////////////////////////////////////////////////////////////////
 class MainActivity : AppCompatActivity(), AnkoLogger {

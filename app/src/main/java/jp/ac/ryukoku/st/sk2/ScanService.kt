@@ -3,8 +3,6 @@ package jp.ac.ryukoku.st.sk2
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.net.wifi.ScanResult
-import android.net.wifi.WifiManager
 import android.os.Binder
 import android.os.Handler
 import android.os.IBinder
