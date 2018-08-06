@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.os.IBinder
 import android.os.RemoteException
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
 import android.view.View
@@ -17,10 +18,13 @@ import android.widget.Button
 import android.widget.TextView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import android.content.DialogInterface
+import android.support.v4.app.FragmentActivity
+
 
 ////////////////////////////////////////////////////////////////////////////////
 class MainActivity : AppCompatActivity(), AnkoLogger {
-    private val PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION = 0
+    private val PERMISSIONS_REQUEST_COARSE_LOCATION = 456
     private var mainUi = MainActivityUi()
 
     ////////////////////////////////////////
@@ -49,6 +53,11 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         title = "${sk2.app_title} ${sk2.app_name}"
         mainUi.setContentView(this)
 
+        ////////////////////////////////////////
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val permission = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
+            requestPermissions(permission, PERMISSIONS_REQUEST_COARSE_LOCATION)
+        }
         startService<ScanService>()
     }
     ////////////////////////////////////////
@@ -77,30 +86,26 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
                 mainUi.attBtn.text = "出席"
             }
             ////////////////////////////////////////
-                    }
+        }
     }
     ////////////////////////////////////////
     override fun onBackPressed() { /* DO NOTHING */ }
     ////////////////////////////////////////
-    private fun askPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                val permission = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
-                requestPermissions(permission, PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION)
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSIONS_REQUEST_COARSE_LOCATION -> {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    info("ACCESS_COARSE_LOCATION Permitted.")
+                } else {
+                    val builder = AlertDialog.Builder(this)
+                    builder.setTitle("機能の制限")
+                    builder.setMessage("位置情報へのアクセスが許可されるまでBLEビーコンへのアクセスは制限されます。")
+                    builder.setPositiveButton(android.R.string.ok, null)
+                    builder.setOnDismissListener { }
+                    builder.show()
+                }
                 return
             }
-        }
-    }
-    ////////////////////////////////////////
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            // 許可された場合
-        } else {
-            alert("このアプリはBluetoothビーコンによる位置情報を利用します") {
-                yesButton { askPermission() }
-                noButton { logout() }
-            }.show()
         }
     }
     ////////////////////////////////////////
@@ -122,7 +127,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         if ( uid == "") {
             return false
         } else {
-            val utext =  " $uid / $gcos / $name"
+            val utext = " $uid / $gcos / $name"
             ui.userInfo.text = utext
             return true
         }

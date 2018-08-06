@@ -73,15 +73,15 @@ class Sk2Globals: Application() {
         prefMap["debug"] = pref.getBoolean("debug", false)
     }
     ////////////////////////////////////////
-    fun logout(wifiConnection: ServiceConnection?) {
+    fun logout(connection: ServiceConnection?) {
         userMap["uid"] = ""; userMap["key"] = "";
         userMap["gcos"] = ""; userMap["name"] = "";
         userMap["time"] = 0L
         saveUserData()
 
         stopService<ScanService>()
-        if (wifiConnection != null) {
-            unbindService(wifiConnection)
+        if (connection != null) {
+            unbindService(connection)
             stopService<ScanService>()
         }
         startActivity(intentFor<LoginActivity>().clearTop())
