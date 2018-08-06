@@ -32,12 +32,10 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
         sk2.restorePrefData()
 
         //prefUi.swBeacon.isChecked = sk2.prefMap["beacon"] as Boolean ?: false
-        prefUi.swAuto.isChecked = sk2.prefMap["auto"] as Boolean ?: false
+        prefUi.swAuto.isChecked = (sk2.prefMap["auto"] ?: false) as Boolean
         prefUi.seekIntv.isEnabled = if (prefUi.swAuto.isChecked) true else false
-        //prefUi.swChangeAP.isChecked = sk2.prefMap["swtap"] as Boolean ?: false
-        //prefUi.swChangeAP.isEnabled = if (prefUi.swAuto.isChecked) true else false
-        prefUi.swDebug.isChecked = sk2.prefMap["debug"] as Boolean ?: false
-        prefUi.seekTextMinutes = (sk2.prefMap["autoitv"] as Int ?: 0)/60
+        prefUi.swDebug.isChecked = (sk2.prefMap["debug"] ?: false) as Boolean
+        prefUi.seekTextMinutes = ((sk2.prefMap["autoitv"] ?: 0) as Int)/60
         prefUi.seekMin = if (prefUi.swDebug.isChecked) 1 else 10
         prefUi.seekIntv.progress = prefUi.seekTextMinutes - prefUi.seekMin
         prefUi.debugText.visibility = if (prefUi.swDebug.isChecked) View.VISIBLE else View.INVISIBLE
@@ -62,21 +60,7 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
     }
     ////////////////////////////////////////
     */
-    private fun hasBLE(): Boolean {
-        return getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)
-    }
-    ////////////////////////////////////////
-    fun checkBt(): Boolean {
-        val btAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
-        if ( btAdapter == null || !hasBLE() ) {
-            toast("このデバイスのBLEアダプタが見つかりません")
-            return false
-        } else if (! btAdapter.isEnabled) {
-            toast("Bluetoothをオンにしてください")
-            return false
-        }
-        return true
-    }
+
     ////////////////////////////////////////////////////////////////////////////////
     class PreferenceActivityUi : AnkoComponent<PreferenceActivity> {
         //lateinit var swBeacon: Switch
@@ -122,11 +106,9 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
                     ////////////////////////////////////////
                     onClick {
                         if (isChecked) {
-                            if (ui.owner.checkBt()) {
-                                seekIntv.isEnabled = true
-                                //swChangeAP.isEnabled = true
-                                ui.owner.setPref("auto", true)
-                            }
+                            seekIntv.isEnabled = true
+                            //swChangeAP.isEnabled = true
+                            ui.owner.setPref("auto", true)
                         } else {
                             seekIntv.isEnabled = false
                             //swChangeAP.isEnabled = false

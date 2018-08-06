@@ -1,6 +1,7 @@
 package jp.ac.ryukoku.st.sk2
 
 import android.Manifest
+import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -23,22 +24,22 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
     private var mainUi = MainActivityUi()
 
     ////////////////////////////////////////
-    var scanWifiService: ScanWifiService? = null
-    private var isWifiBound = false
+    var scanService: ScanService? = null
+    private var isBound = false
 
-    private val scanWifiConnection = object : ServiceConnection {
+    private val scanConnection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            val binder = service as ScanWifiService.ScanWifiBinder
-            scanWifiService = binder.inService
-            isWifiBound = true
+            val binder = service as ScanService.ScanBinder
+            scanService = binder.inService
+            isBound = true
         }
         override fun onServiceDisconnected(className: ComponentName) {
-            isWifiBound = false
+            isBound = false
         }
     }
     ////////////////////////////////////////
-    private val receiver = UpdateReceiver()
-    private val filter = IntentFilter()
+    //private val receiver = UpdateReceiver()
+    //private val filter = IntentFilter()
 
     ////////////////////////////////////////////////////////////////////////////////
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,43 +49,31 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         title = "${sk2.app_title} ${sk2.app_name}"
         mainUi.setContentView(this)
 
-        startService<ScanWifiService>()
+        startService<ScanService>()
     }
     ////////////////////////////////////////
     override fun onResume() {
         super.onResume()
-        if (! CheckInfo(mainUi) ) { startActivity(intentFor<LoginActivity>().clearTop()) }
+        if (! checkInfo(mainUi) ) { startActivity(intentFor<LoginActivity>().clearTop()) }
 
-        /*
-        bindWifiScanService()
-        */
-
-        //mainUi.wifiInfo.visibility = if (sk2.prefMap.getOrDefault("debug", false) as Boolean)
         val sk2 = this.application as Sk2Globals
-        mainUi.wifiInfo.visibility = if (sk2.prefMap["debug"] as Boolean ?: false)
+        mainUi.scanInfo.visibility = if ((sk2.prefMap["debug"] ?: false) as Boolean)
             View.VISIBLE else View.INVISIBLE
-        if (!wifiManager.isWifiEnabled()) {
-            mainUi.attToastText ="無線LANをオンにしてください"
+
+        if (!checkBLE()) {
+            mainUi.attToastText ="Bloothoothオンにしてください"
             mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
         } else {
-            mainUi.attToastText = "出席！！！"
+            mainUi.attToastText = "出席！！"
+            mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
+            //mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_red)
             ////////////////////////////////////////
-            if (sk2.prefMap["beacon"] as Boolean ?: false) {
-                filter.addAction("BEACON")
-                registerReceiver(receiver, filter)
-                startService<ScanBeaconService>()
-                mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
+            if ((sk2.prefMap["auto"] ?: false) as Boolean) {
+                val scanitv = ((sk2.prefMap["autoitv"] ?: sk2._autoitv) as Int).toLong()
+                scanService?.startInterval(scanitv)
+                mainUi.attBtn.text = "自動"
             } else {
-                stopService<ScanBeaconService>()
-                mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_red)
-            }
-            ////////////////////////////////////////
-            if (sk2.prefMap["auto"] as Boolean ?: false) {
-                scanWifiService?.startInterval((sk2.prefMap["autoitv"] as Int ?: sk2._autoitv).toLong(),
-                        sk2.prefMap["swtap"] as Boolean ?: false)
-                mainUi.attBtn.text = "AUTO"
-            } else {
-                scanWifiService?.stopInterval()
+                scanService?.stopInterval()
                 mainUi.attBtn.text = "出席"
             }
             ////////////////////////////////////////
@@ -110,25 +99,20 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         } else {
             alert("このアプリはBluetoothビーコンによる位置情報を利用します") {
                 yesButton { askPermission() }
-                noButton { Logout() }
+                noButton { logout() }
             }.show()
         }
     }
     ////////////////////////////////////////
-    fun Logout() {
-        val sk2 = this.application as Sk2Globals
-        sk2.logout(scanWifiConnection)
+    private fun logout() {
+        (this.application as Sk2Globals).logout(scanConnection)
     }
     ////////////////////////////////////////
-    fun CheckInfo(ui: MainActivityUi): Boolean {
+    private fun checkInfo(ui: MainActivityUi): Boolean {
         val sk2 = this.application as Sk2Globals
-
-        val uid = sk2.userMap["uid"] ?: ""
-        val gcos = sk2.userMap["gcos"] ?: ""
-        val name = sk2.userMap["name"] ?: ""
-        //val uid = sk2.userMap.getOrDefault("uid", "")
-        //val gcos = sk2.userMap.getOrDefault("gcos", "")
-        //val name = sk2.userMap.getOrDefault("name", "")
+        val uid = (sk2.userMap["uid"] ?: "") as String
+        val gcos = (sk2.userMap["gcos"] ?: "") as String
+        val name = (sk2.userMap["name"] ?: "") as String
 
         //val time = sk2.userMap.getOrDefault("name", 0L)
         // check key life
@@ -138,80 +122,92 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         if ( uid == "") {
             return false
         } else {
-            ui.userInfo.text = " $uid / $gcos / $name"
+            val utext =  " $uid / $gcos / $name"
+            ui.userInfo.text = utext
             return true
         }
     }
     ////////////////////////////////////////////////////////////////////////////////
-    fun sendWifi(marker: Char) {
+    fun sendInfo(marker: Char) {
         val sk2 = this.application as Sk2Globals
 
-        if (wifiManager.isWifiEnabled()) {
-            bindWifiScanService()
+        if (checkBLE()) {
+            bindScanService()
             try {
-                val info = scanWifiService?.sendApInfo(marker)
-                if (sk2.prefMap["debug"] as Boolean ?: false) {
-                //if (sk2.prefMap.getOrDefault("debug", false) as Boolean) {
-                    mainUi.wifiInfo.text = info
+                val info = scanService?.sendInfo(marker)
+                if ((sk2.prefMap["debug"] ?: false) as Boolean) {
+                    mainUi.scanInfo.text = info
                 }
             } catch (e: RemoteException) {
                 toast("サービスに接続できません")
                 e.printStackTrace()
             }
-        } else {
-            toast("無線LANをオンにしてください")
         }
-        //unbindWifiScanService()
+        ////unbindWifiScanService()
     }
     ////////////////////////////////////////
-    private fun bindWifiScanService() {
-        if (! isWifiBound) {
-            val scanWifiIntent = Intent(ctx, ScanWifiService::class.java)
-            bindService(scanWifiIntent, scanWifiConnection, Context.BIND_AUTO_CREATE)
-            isWifiBound = true
+    private fun bindScanService() {
+        if (! isBound) {
+            val scanIntent = Intent(ctx, ScanService::class.java)
+            bindService(scanIntent, scanConnection, Context.BIND_AUTO_CREATE)
+            isBound = true
         }
     }
     ////////////////////////////////////////
-    fun unbindWifiScanService() {
-        if (isWifiBound) {
-            unbindService(scanWifiConnection)
-            isWifiBound = false
+    fun unbindScanService() {
+        if (isBound) {
+            unbindService(scanConnection)
+            isBound = false
         }
     }
     ////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////
+    /*
     private inner class UpdateReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val extras = intent?.extras
             val msg = extras?.getString("btmessage")
             toast("ビーコン記録を送信します")
-            sendWifi('B')
+            sendInfo('B')
         }
-    }
-
+    }*/
+    ////////////////////////////////////////
     override fun onPause() {
         super.onPause()
-        scanWifiService?.stopInterval()
-        unbindWifiScanService()
+        scanService?.stopInterval()
+        unbindScanService()
     }
     ////////////////////////////////////////
     override fun onDestroy() {
         super.onDestroy()
         val sk2 = this.application as Sk2Globals
-        //sk2.prefMap["beacon"] = false
         sk2.prefMap["auto"] = false
         sk2.savePrefData()
-        stopService<ScanBeaconService>()
-        unbindWifiScanService()
-        stopService<ScanWifiService>()
+        unbindScanService()
+        stopService<ScanService>()
+    }
+    ////////////////////////////////////////
+    private fun hasBLE(): Boolean {
+        return packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)
+    }
+    ////////////////////////////////////////
+    private fun checkBLE(): Boolean {
+        val btAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
+        if ( btAdapter == null || !hasBLE() ) {
+            toast("このデバイスのBLEアダプタが見つかりません")
+            return false
+        } else if (! btAdapter.isEnabled) {
+            toast("Bluetoothをオンにしてください")
+            return false
+        }
+        return true
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
 class MainActivityUi: AnkoComponent<MainActivity> {
     lateinit var attBtn: Button
-    lateinit var wifiInfo: TextView
+    lateinit var scanInfo: TextView
     lateinit var userInfo: TextView
-    var attToastText = "出席！！！"
+    var attToastText = "出席！！"
 
     ////////////////////////////////////////
     override fun createView(ui: AnkoContext<MainActivity>) = with(ui) {
@@ -232,7 +228,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                 allCaps = false
                 onClick {
                     toast(attToastText)
-                    ui.owner.sendWifi('M')
+                    ui.owner.sendInfo('M')
                 }
             }.lparams {
                 centerHorizontally(); centerVertically()
@@ -241,7 +237,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
             ////////////////////////////////////////
             verticalLayout {
                 ////////////////////////////////////////
-                wifiInfo = textView("") {
+                scanInfo = textView("") {
                     textSize = 12f
                 }.lparams {
                     bottomMargin = dip(5); padding = dip(5)

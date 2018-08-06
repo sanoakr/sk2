@@ -21,11 +21,8 @@ class Sk2Globals: Application() {
     val authFail = "authfail"
     val recFail = "fail"
     ////////////////////////////////////////
-    //val ryuid = "ryu-wireless"
-    ////////////////////////////////////////
     val _autoitv: Int = 10*60             // 10min
     val beaconIntervalSec: Long = 10      // 10sec
-    //val switchApInterval: Long = 60       // 60sec
     ////////////////////////////////////////
     //var androidId = ""
     val prefName = "st.ryukoku.sk2"
@@ -54,10 +51,8 @@ class Sk2Globals: Application() {
     fun savePrefData() {
         val pref = getSharedPreferences(prefName, Context.MODE_PRIVATE)
         val e = pref.edit()
-        //e.putBoolean("beacon", prefMap["beacon"] as Boolean)
         e.putBoolean("auto", prefMap["auto"] as Boolean)
         e.putInt("autoitv", prefMap["autoitv"] as Int)
-        //e.putBoolean("swtap", prefMap["swtap"] as Boolean)
         e.putBoolean("debug", prefMap["debug"] as Boolean)
         e.apply()
     }
@@ -73,10 +68,8 @@ class Sk2Globals: Application() {
     ////////////////////////////////////////
     fun restorePrefData() {
         val pref = getSharedPreferences(prefName, Context.MODE_PRIVATE)
-        //prefMap["beacon"] = pref.getBoolean("beacon", false)
         prefMap["auto"] = pref.getBoolean("auto", false)
         prefMap["autoitv"] = pref.getInt("autoitv", 0)
-        //prefMap["swtap"] = pref.getBoolean("swtap", false)
         prefMap["debug"] = pref.getBoolean("debug", false)
     }
     ////////////////////////////////////////
@@ -86,10 +79,10 @@ class Sk2Globals: Application() {
         userMap["time"] = 0L
         saveUserData()
 
-        stopService<ScanBeaconService>()
+        stopService<ScanService>()
         if (wifiConnection != null) {
             unbindService(wifiConnection)
-            stopService<ScanWifiService>()
+            stopService<ScanService>()
         }
         startActivity(intentFor<LoginActivity>().clearTop())
     }
