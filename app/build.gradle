@@ -38,6 +38,5 @@ dependencies {
     implementation 'me.mattak:moment:0.0.4'
     implementation 'org.altbeacon:android-beacon-library:2.13.1'
 
-    //sourceCompatibility JavaVersion.VERSION_1_8
-    //targetCompatibility JavaVersion.VERSION_1_8
+    implementation 'com.google.code.gson:gson:2.8.5'
 }

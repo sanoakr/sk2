@@ -3,6 +3,7 @@ package jp.ac.ryukoku.st.sk2
 import android.app.Application
 import android.content.Context
 import android.content.ServiceConnection
+import com.google.gson.Gson
 import org.jetbrains.anko.clearTop
 import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.stopService
@@ -21,16 +22,16 @@ class Sk2Globals: Application() {
     val authFail = "authfail"
     val recFail = "fail"
     ////////////////////////////////////////
-    val _autoitv: Int = 10*60             // 10min
-    val beaconIntervalSec: Long = 10      // 10sec
+    val _autoitv: Int = 10*60            // 10min
+    val beaconIntervalSec: Long = 10      // 1sec
     ////////////////////////////////////////
     //var androidId = ""
     val prefName = "st.ryukoku.sk2"
     var userMap: MutableMap<String, Any> = mutableMapOf()
     var prefMap: MutableMap<String, Any> = mutableMapOf()
-
-    ////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////
+    var localQueue = Queue<String>(mutableListOf(), 100)
+    ////////////////////////////////////////////////////////////////////////////////
     override fun onCreate() {
         super.onCreate()
         restoreUserData()
@@ -54,6 +55,9 @@ class Sk2Globals: Application() {
         e.putBoolean("auto", prefMap["auto"] as Boolean)
         e.putInt("autoitv", prefMap["autoitv"] as Int)
         e.putBoolean("debug", prefMap["debug"] as Boolean)
+        val gson = Gson()
+        val jsonQueueString = gson.toJson(localQueue)
+        e.putString("queue", jsonQueueString as String)
         e.apply()
     }
     ////////////////////////////////////////
@@ -71,6 +75,9 @@ class Sk2Globals: Application() {
         prefMap["auto"] = pref.getBoolean("auto", false)
         prefMap["autoitv"] = pref.getInt("autoitv", 0)
         prefMap["debug"] = pref.getBoolean("debug", false)
+        val gson = Gson()
+        val jsonQueueString = pref.getString("queue", gson.toJson(localQueue))
+        localQueue = gson.fromJson(jsonQueueString, localQueue::class.java)
     }
     ////////////////////////////////////////
     fun logout(connection: ServiceConnection?) {

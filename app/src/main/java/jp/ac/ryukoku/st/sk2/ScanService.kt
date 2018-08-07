@@ -28,6 +28,7 @@ class ScanService: Service(), BootstrapNotifier, AnkoLogger {
 
     private lateinit var bgPowerSaver: BackgroundPowerSaver
     private var btManager: BeaconManager? = null
+    private var latest: MutableMap<String, String> = mutableMapOf()
     companion object {
         val UNQID = "sk2"
         val IBEACON_FORMAT = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"
@@ -75,9 +76,17 @@ class ScanService: Service(), BootstrapNotifier, AnkoLogger {
             RegionBootstrap(this, region)
 
             btManager?.addRangeNotifier { beacons, _ ->
-                for (b in sortedBeaconString(beacons)) {
-                    info("UUID:${b.id1}, major:${b.id2}, minor:${b.id3}, " +
+                val moment = Moment()
+                val m: String = moment.format("yyy-MM-dd HH:mm:ss")
+                latest["datetime"] = m
+
+                for ((ix, b) in sortedBeaconString(beacons).withIndex()) {
+                    info("${m}, UUID:${b.id1}, major:${b.id2}, minor:${b.id3}, " +
                             "Distance:${b.distance} meters, RSSI:${b.rssi}, TxPower:${b.txPower}")
+                    latest["UUID$ix"] = b.id1.toString()
+                    latest["major$ix"] = b.id2.toString()
+                    latest["minor$ix"] = b.id3.toString()
+                    latest["dist$ix"] = b.distance.toString()
                 }
             }
         } catch (e: RemoteException) { e.printStackTrace() }
@@ -118,14 +127,12 @@ class ScanService: Service(), BootstrapNotifier, AnkoLogger {
     ////////////////////////////////////////
     fun sendInfo(marker: Char): String {
         val sk2 = this.application as Sk2Globals
-        val user = sk2.userMap.getOrDefault("uid", "")
-
-        //val info = sortedWifiString(scanWifi(), ",")
-
-        val moment = Moment()
-        val m = moment.format("yyy-MM-dd HH:mm:ss")
-        //val message = "$user,$marker,$m,$info"
-
+        val user = (sk2.userMap["uid"] ?: "") as String
+        val info: String = "${user},${latest["datetime"]}," +
+                "${latest["UUID0"]},${latest["major0"]},${latest["minor0"]},${latest["dist0"]}," +
+                "${latest["UUID1"]},${latest["major1"]},${latest["minor1"]},${latest["dist1"]}," +
+                "${latest["UUID2"]},${latest["major2"]},${latest["minor2"]},${latest["dist2"]}"
+        sk2.localQueue.push(info)
         var toastMsg: String
         /*
         doAsync {
@@ -155,7 +162,7 @@ class ScanService: Service(), BootstrapNotifier, AnkoLogger {
             }
             uiThread { toast(toastMsg) }
         }*/
-        return "abc"
+        return info
     }
     ////////////////////////////////////////
     override fun onBind(p0: Intent?): IBinder {
