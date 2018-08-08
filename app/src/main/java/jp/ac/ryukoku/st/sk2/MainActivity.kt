@@ -1,6 +1,7 @@
 package jp.ac.ryukoku.st.sk2
 
 import android.Manifest
+import android.app.ActivityManager
 import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.content.pm.PackageManager
@@ -18,6 +19,7 @@ import android.widget.Button
 import android.widget.TextView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import android.content.Intent
 
 ////////////////////////////////////////////////////////////////////////////////
 class MainActivity : AppCompatActivity(), AnkoLogger {
@@ -55,7 +57,11 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
             val permission = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
             requestPermissions(permission, PERMISSIONS_REQUEST_COARSE_LOCATION)
         }
-        startService<ScanService>()
+        if (! isServiceWorking(ScanService::class.java)) {
+            startService<ScanService>()
+            Thread.sleep(100)
+        }
+        //bindScanService()
     }
     ////////////////////////////////////////
     override fun onResume() {
@@ -67,22 +73,23 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
             View.VISIBLE else View.INVISIBLE
 
         if (!checkBLE()) {
-            mainUi.attToastText ="Bloothoothオンにしてください"
+            toast("Bloothoothオンにしてください")
             mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
         } else {
-            mainUi.attToastText = "出席！！"
+            //mainUi.attToastText = "出席！！"
             mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
             //mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_red)
             ////////////////////////////////////////
             if ((sk2.prefMap["auto"] ?: false) as Boolean) {
                 val scanitv = ((sk2.prefMap["autoitv"] ?: sk2._autoitv) as Int).toLong()
                 scanService?.startInterval(scanitv)
-                mainUi.attBtn.text = "自動"
+                mainUi.attBtn.text = "AUTO"
             } else {
                 scanService?.stopInterval()
                 mainUi.attBtn.text = "出席"
             }
             ////////////////////////////////////////
+            //bindScanService()
         }
     }
     ////////////////////////////////////////
@@ -106,9 +113,9 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         }
     }
     ////////////////////////////////////////
-    private fun logout() {
-        (this.application as Sk2Globals).logout(scanConnection)
-    }
+    //private fun logout() {
+    //    (this.application as Sk2Globals).logout(scanConnection)
+    //}
     ////////////////////////////////////////
     private fun checkInfo(ui: MainActivityUi): Boolean {
         val sk2 = this.application as Sk2Globals
@@ -134,33 +141,47 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         val sk2 = this.application as Sk2Globals
 
         if (checkBLE()) {
-            bindScanService()
+            //while (! isBound) {
+                bindScanService()
+            //    Thread.sleep(100) }
             try {
                 val info = scanService?.sendInfo(marker)
+
                 if ((sk2.prefMap["debug"] ?: false) as Boolean) {
-                    mainUi.scanInfo.text = info
+                    if (info.isNullOrBlank()) {
+                        mainUi.scanInfo.text = "Couldn't find Beacons"
+                        toast("ビーコンが見つかりません。")
+                    } else {
+                        mainUi.scanInfo.text = info
+                        toast("出席！！")
+                    }
                 }
             } catch (e: RemoteException) {
                 toast("サービスに接続できません")
                 e.printStackTrace()
             }
         }
-        ////unbindWifiScanService()
+        //unbindScanService()
     }
     ////////////////////////////////////////
     private fun bindScanService() {
-        if (! isBound) {
+        if (! isBound && isServiceWorking(ScanService::class.java)) {
             val scanIntent = Intent(ctx, ScanService::class.java)
             bindService(scanIntent, scanConnection, Context.BIND_AUTO_CREATE)
             isBound = true
         }
     }
     ////////////////////////////////////////
-    fun unbindScanService() {
-        if (isBound) {
+    private fun unbindScanService() {
+        if (isBound && isServiceWorking(ScanService::class.java)) {
             unbindService(scanConnection)
             isBound = false
         }
+    }
+    ////////////////////////////////////////
+    private fun isServiceWorking(clazz: Class<*>): Boolean {
+        val manager = this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        return manager.getRunningServices(Integer.MAX_VALUE).any { clazz.name == it.service.className }
     }
     ////////////////////////////////////////////////////////////////////////////////
     /*
@@ -186,6 +207,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         sk2.savePrefData()
         unbindScanService()
         stopService<ScanService>()
+        //BluetoothAdapter.getDefaultAdapter().disable()
     }
     ////////////////////////////////////////
     private fun hasBLE(): Boolean {
@@ -199,6 +221,9 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
             return false
         } else if (! btAdapter.isEnabled) {
             toast("Bluetoothをオンにしてください")
+            val REQUEST_ENABLE_BT = 1
+            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
             return false
         }
         return true
@@ -209,7 +234,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
     lateinit var attBtn: Button
     lateinit var scanInfo: TextView
     lateinit var userInfo: TextView
-    var attToastText = "出席！！"
+    //var attToastText = "出席！！"
 
     ////////////////////////////////////////
     override fun createView(ui: AnkoContext<MainActivity>) = with(ui) {
@@ -229,7 +254,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                 background = ContextCompat.getDrawable(ctx, R.drawable.button_states_red)
                 allCaps = false
                 onClick {
-                    toast(attToastText)
+                    //toast(attToastText)
                     ui.owner.sendInfo('M')
                 }
             }.lparams {
@@ -274,7 +299,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                         imageResource = R.drawable.ic_history_local_32dp
                         background = ContextCompat.getDrawable(context, R.drawable.button_circle)
                         onClick {
-                            startActivity<RecordActivity>()
+                            startActivity<LocalRecordActivity>()
                         }
                     }.lparams {
                         gravity = Gravity.CENTER_HORIZONTAL

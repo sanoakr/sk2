@@ -1,7 +1,6 @@
 package jp.ac.ryukoku.st.sk2
 
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.Handler
@@ -28,9 +27,9 @@ class ScanService: Service(), BootstrapNotifier, AnkoLogger {
 
     private lateinit var bgPowerSaver: BackgroundPowerSaver
     private var btManager: BeaconManager? = null
+    private var region = Region("",null,null,null)
     private var latest: MutableMap<String, String> = mutableMapOf()
     companion object {
-        val UNQID = "sk2"
         val IBEACON_FORMAT = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"
         //val ALTBEACON_FORMAT = "m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"
         //val EDDYSTONE_FORMAT = "s:0-1=feaa,m:2-2=10,p:3-3:-41,i:4-20v"
@@ -62,23 +61,42 @@ class ScanService: Service(), BootstrapNotifier, AnkoLogger {
     ////////////////////////////////////////////////////////////////////////////////
     override fun onCreate() {
         super.onCreate()
+        /*
+        val btAdapter = BluetoothAdapter.getDefaultAdapter()
+        if (btAdapter.isEnabled) {
+            btAdapter.disable()
+            while (!btAdapter.isEnabled) {
+                btAdapter.enable()
+                Thread.sleep(100)
+            }
+        }
+        */
         bgPowerSaver = BackgroundPowerSaver(this)
 
         val sk2 = this.application as Sk2Globals
-        val interval = sk2.beaconIntervalSec * 1000 // msec
+        val fgInterval = sk2.fgBeaconIntervalSec * 1000 // msec
+        val bgInterval = sk2.bgBeaconIntervalSec * 1000 // msec
+        val UNQID = "sk2-" + System.currentTimeMillis().toString() // for reconnecttion to BleAdapter
         try {
             btManager = BeaconManager.getInstanceForApplication(this)
             btManager?.beaconParsers?.add(BeaconParser().setBeaconLayout(IBEACON_FORMAT))
-            btManager?.foregroundBetweenScanPeriod = interval
-            btManager?.backgroundBetweenScanPeriod = interval
+            btManager?.foregroundBetweenScanPeriod = fgInterval
+            btManager?.backgroundBetweenScanPeriod = bgInterval
             //val identifier = Identifier.parse(UUID)
-            val region = Region(UNQID, null, null, null)
+            region = Region(UNQID, null, null, null)
             RegionBootstrap(this, region)
+            info("Region:${UNQID}")
 
             btManager?.addRangeNotifier { beacons, _ ->
+                latest.clear()
+                val sk2 = this.application as Sk2Globals
+                val user = (sk2.userMap["uid"] ?: "") as String
+                latest["user"] = user
+
                 val moment = Moment()
                 val m: String = moment.format("yyy-MM-dd HH:mm:ss")
                 latest["datetime"] = m
+                latest["weekday"] = moment.weekdayName
 
                 for ((ix, b) in sortedBeaconString(beacons).withIndex()) {
                     info("${m}, UUID:${b.id1}, major:${b.id2}, minor:${b.id3}, " +
@@ -90,11 +108,12 @@ class ScanService: Service(), BootstrapNotifier, AnkoLogger {
                 }
             }
         } catch (e: RemoteException) { e.printStackTrace() }
-        info("on Create")
+        //info("on Create")
     }
     //////////////////////////////////////// ////////////////////////////////////////
     override fun didEnterRegion(region: Region) {
-        doAsync{uiThread{toast("ビーコン領域に入りました")}}
+        //doAsync{uiThread{toast("ビーコン領域に入りました")}}
+
         //sendMessage("ENTER iBeacon Region")
         //startActivity<MainActivity>()
         try {
@@ -105,7 +124,7 @@ class ScanService: Service(), BootstrapNotifier, AnkoLogger {
     }
     ////////////////////////////////////////
     override fun didExitRegion(region: Region) {
-        doAsync{uiThread{toast("ビーコン領域から出ました")}}
+        //doAsync{uiThread{toast("ビーコン領域から出ました")}}
         try {
             btManager?.stopRangingBeaconsInRegion(region)
         } catch (e: RemoteException) {
@@ -114,7 +133,7 @@ class ScanService: Service(), BootstrapNotifier, AnkoLogger {
     }
     ////////////////////////////////////////
     override fun didDetermineStateForRegion(i: Int, region: Region) {
-        info("Determine State: ${Integer.toString(i)}")
+        //info("Determine State: ${Integer.toString(i)}")
     }
     ////////////////////////////////////////
     fun sortedBeaconString(beacons: Collection<Beacon>): Collection<Beacon> {
@@ -127,62 +146,71 @@ class ScanService: Service(), BootstrapNotifier, AnkoLogger {
     ////////////////////////////////////////
     fun sendInfo(marker: Char): String {
         val sk2 = this.application as Sk2Globals
-        val user = (sk2.userMap["uid"] ?: "") as String
-        val info: String = "${user},${latest["datetime"]}," +
-                "${latest["UUID0"]},${latest["major0"]},${latest["minor0"]},${latest["dist0"]}," +
-                "${latest["UUID1"]},${latest["major1"]},${latest["minor1"]},${latest["dist1"]}," +
-                "${latest["UUID2"]},${latest["major2"]},${latest["minor2"]},${latest["dist2"]}"
-        sk2.localQueue.push(info)
-        var toastMsg: String
-        /*
-        doAsync {
-            try {
-                val sslSocketFactory = SSLSocketFactory.getDefault()
-                val sslsocket = sslSocketFactory.createSocket()
-                sslsocket.connect(InetSocketAddress(sk2.serverHost, sk2.serverPort), sk2.timeOut)
+        var info = ""
+        var toastMsg = "データが取得できません"
 
-                val input = sslsocket.inputStream
-                val output = sslsocket.outputStream
-                val bufReader = BufferedReader(InputStreamReader(input, "UTF-8"))
-                val bufWriter = BufferedWriter(OutputStreamWriter(output, "UTF-8"))
+        //info("${latest["major0"]}")
+        if (! latest["major0"].isNullOrBlank()) {
+            sk2.localQueue.push(latest)
+            info = "${latest["user"]},${marker},${latest["datetime"]}," +
+            //"${latest["UUID0"] ?: ""}," +
+            "${latest["major0"] ?: ""},${latest["minor0"] ?: ""},${latest["dist0"] ?: ""}," +
+            //"${latest["UUID1"] ?: ""},
+            "${latest["major1"] ?: ""},${latest["minor1"] ?: ""},${latest["dist1"] ?: ""}," +
+            //"${latest["UUID2"] ?: ""},
+            "${latest["major2"] ?: ""},${latest["minor2"] ?: ""},${latest["dist2"] ?: ""}"
 
-                // Send message
-                bufWriter.write(message)
-                bufWriter.flush()
-                // Receive message
-                val recMessage = bufReader.use(BufferedReader::readText)
-                if (recMessage == sk2.recFail) {
-                    toastMsg = "データが記録できません"
-                } else {
-                    toastMsg = "データを記録しました"
+            doAsync {
+                try {
+                    val sslSocketFactory = SSLSocketFactory.getDefault()
+                    val sslsocket = sslSocketFactory.createSocket()
+                    sslsocket.connect(InetSocketAddress(sk2.serverHost, sk2.serverPort), sk2.timeOut)
+
+                    val input = sslsocket.inputStream
+                    val output = sslsocket.outputStream
+                    val bufReader = BufferedReader(InputStreamReader(input, "UTF-8"))
+                    val bufWriter = BufferedWriter(OutputStreamWriter(output, "UTF-8"))
+
+                    // Send message
+                    bufWriter.write(info)
+                    bufWriter.flush()
+                    // Receive message
+                    val recMessage = bufReader.use(BufferedReader::readText)
+                    if (recMessage == sk2.recFail) {
+                        toastMsg = "データが記録できません"
+                    } else {
+                        toastMsg = "データを記録しました"
+                    }
+                } catch (e: Exception) {
+                    //e.printStackTrace()
+                    toastMsg = "サーバに接続できません"
                 }
-            } catch (e: Exception) {
-                //e.printStackTrace()
-                toastMsg = "サーバに接続できません"
+                uiThread { toast(toastMsg) }
             }
-            uiThread { toast(toastMsg) }
-        }*/
+        }
         return info
     }
     ////////////////////////////////////////
     override fun onBind(p0: Intent?): IBinder {
-        info("on Bind")
+        //info("on Bind")
         return binder
     }
     ////////////////////////////////////////
     override fun onUnbind(intent: Intent?): Boolean {
-        info("on Unbind")
+        //info("on Unbind")
+        btManager?.stopRangingBeaconsInRegion(region)
         return super.onUnbind(intent)
     }
     ////////////////////////////////////////
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        info("on StartCommand")
+        //info("on StartCommand")
         return super.onStartCommand(intent, flags, startId)
     }
     ////////////////////////////////////////
     override fun onDestroy() {
         super.onDestroy()
         info("on Destroy")
+        btManager?.stopRangingBeaconsInRegion(region)
         handler.removeCallbacks(timer)
         stopSelf()
     }

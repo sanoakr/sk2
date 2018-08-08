@@ -1,6 +1,7 @@
 package jp.ac.ryukoku.st.sk2
 
 import android.app.Application
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.ServiceConnection
 import com.google.gson.Gson
@@ -21,16 +22,18 @@ class Sk2Globals: Application() {
     val authWord = "AUTH"
     val authFail = "authfail"
     val recFail = "fail"
-    ////////////////////////////////////////
-    val _autoitv: Int = 10*60            // 10min
-    val beaconIntervalSec: Long = 10      // 1sec
-    ////////////////////////////////////////
+    ///////////////////////////////////////
+    val _autoitv: Int = 10*60            // sec
+    val fgBeaconIntervalSec: Long = 2    // sec
+    val bgBeaconIntervalSec: Long = 10   // sec
+    ///////////////////////////////////////
     //var androidId = ""
     val prefName = "st.ryukoku.sk2"
     var userMap: MutableMap<String, Any> = mutableMapOf()
     var prefMap: MutableMap<String, Any> = mutableMapOf()
     ////////////////////////////////////////
-    var localQueue = Queue<String>(mutableListOf(), 100)
+    //var latest: MutableMap<String, String> = mutableMapOf()
+    var localQueue = Queue<MutableMap<String, String>>(mutableListOf(), 100)
     ////////////////////////////////////////////////////////////////////////////////
     override fun onCreate() {
         super.onCreate()
@@ -90,6 +93,7 @@ class Sk2Globals: Application() {
         if (connection != null) {
             unbindService(connection)
             stopService<ScanService>()
+            //BluetoothAdapter.getDefaultAdapter().disable()
         }
         startActivity(intentFor<LoginActivity>().clearTop())
     }

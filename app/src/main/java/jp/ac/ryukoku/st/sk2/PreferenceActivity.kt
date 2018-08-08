@@ -24,11 +24,11 @@ class PreferenceActivity: AppCompatActivity(), AnkoLogger {
         prefUi.setContentView(this)
     }
     ////////////////////////////////////////
+
     override fun onResume() {
         super.onResume()
         val sk2 = this.application as Sk2Globals
-        sk2.restorePrefData()
-
+        //sk2.restorePrefData()
         //prefUi.swBeacon.isChecked = sk2.prefMap["beacon"] as Boolean ?: false
         prefUi.swAuto.isChecked = (sk2.prefMap["auto"] ?: false) as Boolean
         prefUi.seekIntv.isEnabled = if (prefUi.swAuto.isChecked) true else false

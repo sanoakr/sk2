@@ -36,6 +36,8 @@
             android:screenOrientation="portrait" />
         <activity android:name=".RecordActivity"
             android:screenOrientation="portrait" />
+        <activity android:name=".LocalRecordActivity"
+            android:screenOrientation="portrait" />
 
         <service android:name=".ScanService" />
         <!--<service android:name=".ScanBeaconService" />-->

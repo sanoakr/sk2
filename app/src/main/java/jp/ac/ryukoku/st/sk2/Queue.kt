@@ -1,31 +1,29 @@
 package jp.ac.ryukoku.st.sk2
 
 class Queue <T>(list: MutableList<T>, size: Int = 100) {
-    var items: MutableList<T> = list
-    val maxsize = size
+    private var items: MutableList<T> = list
+    private val maxsize = size
 
-    fun isEmpty():Boolean = this.items.isEmpty()
+    fun isEmpty():Boolean = items.isEmpty()
+    fun count():Int = items.count()
+    fun getItem(postion: Int):T = items[postion]
 
-    fun count():Int = this.items.count()
-
-    override fun toString() = this.items.toString()
+    override fun toString() = items.toString()
 
     fun push(element: T){
-        this.items.add(element)
-        if (this.count() > this.maxsize) {
-            this.items.removeAt(0)
+        items.add(0, element)
+        if (count() > maxsize) {
+            pop()
         }
     }
-
     fun pop():T?{
-        if (this.isEmpty()){
+        if (isEmpty()){
             return null
         } else {
-            return this.items.removeAt(0)
+            return items.removeAt(items.lastIndex)
         }
     }
-
     fun peek():T?{
-        return this.items[0]
+        return items.last()
     }
 }
