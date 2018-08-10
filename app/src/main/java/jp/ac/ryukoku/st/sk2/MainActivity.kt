@@ -2,14 +2,12 @@ package jp.ac.ryukoku.st.sk2
 
 import android.Manifest
 import android.app.ActivityManager
+import android.app.Notification
+import android.app.NotificationManager
 import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.os.Build
-import android.os.Bundle
-import android.os.IBinder
-import android.os.RemoteException
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
@@ -20,16 +18,22 @@ import android.widget.TextView
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import android.content.Intent
+import android.os.*
+import java.io.*
+import java.net.InetSocketAddress
+import javax.net.ssl.SSLSocketFactory
 
 ////////////////////////////////////////////////////////////////////////////////
 class MainActivity : AppCompatActivity(), AnkoLogger {
     private val PERMISSIONS_REQUEST_COARSE_LOCATION = 456
     private var mainUi = MainActivityUi()
+    private var latest: String? = null
+    //private var latest: MutableMap<String, String> = mutableMapOf()
 
     ////////////////////////////////////////
-    var scanService: ScanService? = null
-    private var isBound = false
-
+    //var scanService: ScanService? = null
+    //private var isBound = false
+    /*
     private val scanConnection = object : ServiceConnection {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             val binder = service as ScanService.ScanBinder
@@ -39,10 +43,23 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         override fun onServiceDisconnected(className: ComponentName) {
             isBound = false
         }
-    }
+    }*/
     ////////////////////////////////////////
-    //private val receiver = UpdateReceiver()
-    //private val filter = IntentFilter()
+    private val handler = Handler()
+    private val timer = Runnable { interval() }
+    var period: Long = 10*60*1000 // initialize 10min
+    private fun interval() {
+        sendServer('A')
+        handler.postDelayed(timer, period)
+    }
+    fun startInterval(sec: Long) {
+        period = sec *1000
+        handler.postDelayed(timer, period)
+    }
+    fun stopInterval() { handler.removeCallbacks(timer) }
+    ////////////////////////////////////////
+    private val receiver = UpdateReceiver()
+    private val filter = IntentFilter()
 
     ////////////////////////////////////////////////////////////////////////////////
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,17 +68,21 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         val sk2 = this.application as Sk2Globals
         title = "${sk2.app_title} ${sk2.app_name}"
         mainUi.setContentView(this)
-
+        ////////////////////////////////////////
+        filter.addAction("BEACON")
+        registerReceiver(receiver, filter)
+        if (! isServiceWorking(ScanService::class.java)) {
+            if (Build.VERSION.SDK_INT >= 26) {
+                this.startForegroundService(Intent(this, ScanService::class.java))
+            } else {
+                startService<ScanService>()
+            }
+        }
         ////////////////////////////////////////
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val permission = arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)
             requestPermissions(permission, PERMISSIONS_REQUEST_COARSE_LOCATION)
         }
-        if (! isServiceWorking(ScanService::class.java)) {
-            startService<ScanService>()
-            Thread.sleep(100)
-        }
-        //bindScanService()
     }
     ////////////////////////////////////////
     override fun onResume() {
@@ -76,40 +97,24 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
             toast("Bloothoothオンにしてください")
             mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
         } else {
-            //mainUi.attToastText = "出席！！"
-            mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
-            //mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_red)
-            ////////////////////////////////////////
             if ((sk2.prefMap["auto"] ?: false) as Boolean) {
-                val scanitv = ((sk2.prefMap["autoitv"] ?: sk2._autoitv) as Int).toLong()
-                scanService?.startInterval(scanitv)
+                val sendItv = ((sk2.prefMap["autoitv"] ?: sk2._autoitv) as Int).toLong()
+                startInterval(sendItv)
                 mainUi.attBtn.text = "AUTO"
+                mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_red)
             } else {
-                scanService?.stopInterval()
+                stopInterval()
                 mainUi.attBtn.text = "出席"
+                mainUi.attBtn.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
             }
             ////////////////////////////////////////
-            //bindScanService()
         }
     }
     ////////////////////////////////////////
-    override fun onBackPressed() { /* DO NOTHING */ }
-    ////////////////////////////////////////
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        when (requestCode) {
-            PERMISSIONS_REQUEST_COARSE_LOCATION -> {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    info("ACCESS_COARSE_LOCATION Permitted.")
-                } else {
-                    val builder = AlertDialog.Builder(this)
-                    builder.setTitle("機能の制限")
-                    builder.setMessage("位置情報へのアクセスが許可されるまでBLEビーコンへのアクセスは制限されます。")
-                    builder.setPositiveButton(android.R.string.ok, null)
-                    builder.setOnDismissListener { }
-                    builder.show()
-                }
-                return
-            }
+    private inner class UpdateReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val extras = intent?.extras
+            latest = extras?.getString("scaninfo")
         }
     }
     ////////////////////////////////////////
@@ -137,77 +142,83 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         }
     }
     ////////////////////////////////////////////////////////////////////////////////
-    fun sendInfo(marker: Char) {
+    fun sendServer(marker: Char) {
+        var toastMsg = "スキャン情報がありません"
+
+        if (latest.isNullOrEmpty()) {
+            doAsync { uiThread {toast(toastMsg)} }
+            mainUi.scanInfo.text = "no Scan Messages"
+            return
+        }
         val sk2 = this.application as Sk2Globals
+        val user = (sk2.userMap["uid"] ?: "") as String
+        val info = "${user},${marker}," + latest
+        mainUi.scanInfo.text = latest
 
-        if (checkBLE()) {
-            //while (! isBound) {
-                bindScanService()
-            //    Thread.sleep(100) }
+        doAsync {
             try {
-                val info = scanService?.sendInfo(marker)
+                val sslSocketFactory = SSLSocketFactory.getDefault()
+                val sslsocket = sslSocketFactory.createSocket()
+                sslsocket.connect(InetSocketAddress(sk2.serverHost, sk2.serverPort), sk2.timeOut)
 
-                if ((sk2.prefMap["debug"] ?: false) as Boolean) {
-                    if (info.isNullOrBlank()) {
-                        mainUi.scanInfo.text = "Couldn't find Beacons"
-                        toast("ビーコンが見つかりません。")
-                    } else {
-                        mainUi.scanInfo.text = info
-                        toast("出席！！")
-                    }
+                val input = sslsocket.inputStream
+                val output = sslsocket.outputStream
+                val bufReader = BufferedReader(InputStreamReader(input, "UTF-8"))
+                val bufWriter = BufferedWriter(OutputStreamWriter(output, "UTF-8"))
+
+                // Send message
+                bufWriter.write(info)
+                bufWriter.flush()
+                // Receive message
+                val recMessage = bufReader.use(BufferedReader::readText)
+                toastMsg = if (recMessage == sk2.recFail) {
+                    "データが記録できません"
+                } else {
+                    "データを記録しました"
                 }
-            } catch (e: RemoteException) {
-                toast("サービスに接続できません")
-                e.printStackTrace()
+            } catch (e: Exception) {
+                //e.printStackTrace()
+                toastMsg = "サーバに接続できません"
             }
+            uiThread { toast(toastMsg) }
         }
+        return
+    }
+    ////////////////////////////////////////////////////////////////////////////////
+    override fun onDestroy() {
+        super.onDestroy()
+        val sk2 = this.application as Sk2Globals
+        sk2.prefMap["auto"] = false
+        sk2.savePrefData()
         //unbindScanService()
+        unregisterReceiver(receiver)
+        stopService<ScanService>()
+        //BluetoothAdapter.getDefaultAdapter().disable()
     }
     ////////////////////////////////////////
-    private fun bindScanService() {
-        if (! isBound && isServiceWorking(ScanService::class.java)) {
-            val scanIntent = Intent(ctx, ScanService::class.java)
-            bindService(scanIntent, scanConnection, Context.BIND_AUTO_CREATE)
-            isBound = true
-        }
-    }
+    override fun onBackPressed() { /* DO NOTHING */ }
     ////////////////////////////////////////
-    private fun unbindScanService() {
-        if (isBound && isServiceWorking(ScanService::class.java)) {
-            unbindService(scanConnection)
-            isBound = false
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSIONS_REQUEST_COARSE_LOCATION -> {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    info("ACCESS_COARSE_LOCATION Permitted.")
+                } else {
+                    val builder = AlertDialog.Builder(this)
+                    builder.setTitle("機能の制限")
+                    builder.setMessage("位置情報へのアクセスが許可されるまでBLEビーコンへのアクセスは制限されます。")
+                    builder.setPositiveButton(android.R.string.ok, null)
+                    builder.setOnDismissListener { }
+                    builder.show()
+                }
+                return
+            }
         }
     }
     ////////////////////////////////////////
     private fun isServiceWorking(clazz: Class<*>): Boolean {
         val manager = this.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         return manager.getRunningServices(Integer.MAX_VALUE).any { clazz.name == it.service.className }
-    }
-    ////////////////////////////////////////////////////////////////////////////////
-    /*
-    private inner class UpdateReceiver : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            val extras = intent?.extras
-            val msg = extras?.getString("btmessage")
-            toast("ビーコン記録を送信します")
-            sendInfo('B')
-        }
-    }*/
-    ////////////////////////////////////////
-    override fun onPause() {
-        super.onPause()
-        scanService?.stopInterval()
-        unbindScanService()
-    }
-    ////////////////////////////////////////
-    override fun onDestroy() {
-        super.onDestroy()
-        val sk2 = this.application as Sk2Globals
-        sk2.prefMap["auto"] = false
-        sk2.savePrefData()
-        unbindScanService()
-        stopService<ScanService>()
-        //BluetoothAdapter.getDefaultAdapter().disable()
     }
     ////////////////////////////////////////
     private fun hasBLE(): Boolean {
@@ -217,7 +228,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
     private fun checkBLE(): Boolean {
         val btAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
         if ( btAdapter == null || !hasBLE() ) {
-            toast("このデバイスのBLEアダプタが見つかりません")
+            toast("BLEアダプタが見つかりません")
             return false
         } else if (! btAdapter.isEnabled) {
             toast("Bluetoothをオンにしてください")
@@ -255,7 +266,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                 allCaps = false
                 onClick {
                     //toast(attToastText)
-                    ui.owner.sendInfo('M')
+                    ui.owner.sendServer('M')
                 }
             }.lparams {
                 centerHorizontally(); centerVertically()
@@ -268,7 +279,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                     textSize = 12f
                 }.lparams {
                     bottomMargin = dip(5); padding = dip(5)
-                    width = matchParent; gravity = Gravity.RIGHT
+                    width = matchParent; gravity = Gravity.END
                 }
                 ////////////////////////////////////////
                 linearLayout {

@@ -39,8 +39,8 @@
         <activity android:name=".LocalRecordActivity"
             android:screenOrientation="portrait" />
 
-        <service android:name=".ScanService" />
-        <!--<service android:name=".ScanBeaconService" />-->
+        <service android:name=".ScanService"
+            android:launchMode="singleInstance"/>
     </application>
 
 </manifest>

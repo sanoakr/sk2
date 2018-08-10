@@ -1,13 +1,14 @@
 package jp.ac.ryukoku.st.sk2
 
 import android.app.Application
-import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.ServiceConnection
 import com.google.gson.Gson
+import me.mattak.moment.Moment
 import org.jetbrains.anko.clearTop
 import org.jetbrains.anko.intentFor
 import org.jetbrains.anko.stopService
+import java.util.*
 
 ////////////////////////////////////////////////////////////////////////////////
 class Sk2Globals: Application() {
@@ -24,16 +25,14 @@ class Sk2Globals: Application() {
     val recFail = "fail"
     ///////////////////////////////////////
     val _autoitv: Int = 10*60            // sec
-    val fgBeaconIntervalSec: Long = 2    // sec
-    val bgBeaconIntervalSec: Long = 10   // sec
     ///////////////////////////////////////
     //var androidId = ""
     val prefName = "st.ryukoku.sk2"
     var userMap: MutableMap<String, Any> = mutableMapOf()
     var prefMap: MutableMap<String, Any> = mutableMapOf()
     ////////////////////////////////////////
-    //var latest: MutableMap<String, String> = mutableMapOf()
     var localQueue = Queue<MutableMap<String, String>>(mutableListOf(), 100)
+
     ////////////////////////////////////////////////////////////////////////////////
     override fun onCreate() {
         super.onCreate()
@@ -76,7 +75,7 @@ class Sk2Globals: Application() {
     fun restorePrefData() {
         val pref = getSharedPreferences(prefName, Context.MODE_PRIVATE)
         prefMap["auto"] = pref.getBoolean("auto", false)
-        prefMap["autoitv"] = pref.getInt("autoitv", 0)
+        prefMap["autoitv"] = pref.getInt("autoitv", _autoitv)
         prefMap["debug"] = pref.getBoolean("debug", false)
         val gson = Gson()
         val jsonQueueString = pref.getString("queue", gson.toJson(localQueue))
@@ -88,13 +87,36 @@ class Sk2Globals: Application() {
         userMap["gcos"] = ""; userMap["name"] = "";
         userMap["time"] = 0L
         saveUserData()
-
         stopService<ScanService>()
+        /*
         if (connection != null) {
             unbindService(connection)
             stopService<ScanService>()
             //BluetoothAdapter.getDefaultAdapter().disable()
         }
+        */
         startActivity(intentFor<LoginActivity>().clearTop())
+    }
+    ////////////////////////////////////////
+    fun addWeekday(dt: String): String {
+        var dwt = dt
+        try {
+            val calendar = Calendar.getInstance()
+            val match = Regex("(\\d+)-(\\d+)-(\\d+)\\s+(\\d+):(\\d+):(\\d+)").find(dt)?.groupValues
+            if (match?.size == 7) { // Null makes false
+                val y = match[1].toInt()
+                val m = match[2].toInt()-1
+                val d = match[3].toInt()
+                //val th =  match[4].toInt()
+                //val tm =  match[5].toInt()
+                //val ts =  match[6].toInt()
+                calendar.set(y, m, d, 0, 0, 0)
+                val wday = Moment(calendar.time, TimeZone.getDefault(), Locale.JAPAN).weekdayName
+                dwt = dt.replace(" ", " $wday ")
+            }
+        }
+        catch(e: Exception) { }
+
+        return dwt
     }
 }

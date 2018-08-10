@@ -7,11 +7,9 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import me.mattak.moment.Moment
 import org.jetbrains.anko.*
 import java.io.*
 import java.net.InetSocketAddress
-import java.util.*
 import javax.net.ssl.SSLSocketFactory
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -79,30 +77,10 @@ class RecordActivity : AppCompatActivity(),AnkoLogger {
                     for (i in vList.indices) {
                         if (!(i < keySize)) break
 
-                        // add weekday?
                         if (keys[i] == "datetime") {
-                            var str = vList[i]
-                            try {
-                                val calendar = Calendar.getInstance()
-                                val match = Regex("(\\d+)-(\\d+)-(\\d+)\\s+(\\d+):(\\d+):(\\d+)").find(str)?.groupValues
-                                if (match?.size == 7) { // Null makes false
-                                    val y = match[1].toInt()
-                                    val m = match[2].toInt()-1
-                                    val d = match[3].toInt()
-                                    //val th =  match[4].toInt()
-                                    //val tm =  match[5].toInt()
-                                    //val ts =  match[6].toInt()
-                                    calendar.set(y, m, d, 0, 0, 0)
-                                    val wday = Moment(calendar.time, TimeZone.getDefault(), Locale.JAPAN).weekdayName
-                                    str = vList[i].replace(" ", " $wday ")
-                                }
-                                else { str = vList[i] }
-                            }
-                            catch(e: Exception) { str = vList[i] }
-
-                            vMap.put(keys[i], str)
+                            val sk2 = this.application as Sk2Globals
+                            vMap.put(keys[i], sk2.addWeekday(vList[i]))
                         }
-                        else { vMap.put(keys[i], vList[i]) }
                     }
                     record.add(vMap)
                 }
