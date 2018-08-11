@@ -3,7 +3,9 @@ package jp.ac.ryukoku.st.sk2
 import android.app.IntentService
 import android.app.Notification
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Intent
+import android.os.Build
 import android.os.IBinder
 import android.os.RemoteException
 import me.mattak.moment.Moment
@@ -15,6 +17,11 @@ import org.altbeacon.beacon.powersave.BackgroundPowerSaver
 import org.altbeacon.beacon.startup.BootstrapNotifier
 import org.altbeacon.beacon.startup.RegionBootstrap
 import org.jetbrains.anko.*
+import android.content.Context.NOTIFICATION_SERVICE
+import android.content.Context
+import android.content.ContextWrapper
+import android.support.v4.app.NotificationCompat
+
 
 ////////////////////////////////////////////////////////////////////////////////
 class ScanService: IntentService("ScanService"), BootstrapNotifier, AnkoLogger {
@@ -57,11 +64,6 @@ class ScanService: IntentService("ScanService"), BootstrapNotifier, AnkoLogger {
     ////////////////////////////////////////////////////////////////////////////////
     override fun onCreate() {
         super.onCreate()
-
-        val notification = Notification.Builder(this).apply {
-        }.build()
-        startForeground(1, notification)
-
         /*
         val btAdapter = BluetoothAdapter.getDefaultAdapter()
         if (btAdapter.isEnabled) {
@@ -193,13 +195,14 @@ class ScanService: IntentService("ScanService"), BootstrapNotifier, AnkoLogger {
     }
     */
     ////////////////////////////////////////
-    /*
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        //info("on StartCommand")
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        //    startForeground(1, notification)
+        //}
         return super.onStartCommand(intent, flags, startId)
-    }*/
+    }
     override fun onHandleIntent(intent: Intent) {
-        info("on HandleIntent")
+        //info("on HandleIntent")
     }
     ////////////////////////////////////////
     override fun onDestroy() {

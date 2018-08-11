@@ -21,6 +21,8 @@ import java.io.*
 import java.net.InetSocketAddress
 import javax.net.ssl.SSLSocketFactory
 
+
+
 ////////////////////////////////////////////////////////////////////////////////
 class MainActivity : AppCompatActivity(), AnkoLogger {
     private val PERMISSIONS_REQUEST_COARSE_LOCATION = 456
@@ -69,12 +71,13 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         ////////////////////////////////////////
         filter.addAction("BEACON")
         registerReceiver(receiver, filter)
+        ////////////////////////////////////////
         if (! isServiceWorking(ScanService::class.java)) {
-            if (Build.VERSION.SDK_INT >= 26) {
-                this.startForegroundService(Intent(this, ScanService::class.java))
-            } else {
+            //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            //    this.startForegroundService(Intent(this, ScanService::class.java))
+            //} else {
                 startService<ScanService>()
-            }
+            //}
         }
         ////////////////////////////////////////
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
