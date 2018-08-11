@@ -96,9 +96,9 @@ class ScanService: IntentService("ScanService"), BootstrapNotifier, AnkoLogger {
 
                 var info = "${m},"
                 for ((ix, b) in sortedBeaconString(beacons).withIndex()) {
-                    info += "${b.id1},${b.id2},${b.id3},${b.distance},"
+                    info += "${b.id2},${b.id3},${b.distance},"
+                    //info += "${b.id1},${b.id2},${b.id3},${b.distance},"
                 }
-                info(info)
                 sendMessage(info)
             }
         } catch (e: RemoteException) { e.printStackTrace() }

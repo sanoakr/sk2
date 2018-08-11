@@ -10,7 +10,7 @@ import android.widget.BaseAdapter
 import org.jetbrains.anko.*
 
 ////////////////////////////////////////////////////////////////////////////////
-class LocalRecordActivity : AppCompatActivity(),AnkoLogger {
+class LocalRecordActivity : AppCompatActivity(), AnkoLogger {
     ////////////////////////////////////////
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,6 +18,32 @@ class LocalRecordActivity : AppCompatActivity(),AnkoLogger {
         val sk2 = this.application as Sk2Globals
         title = "ローカル記録：${sk2.app_title} ${sk2.app_name}"
         LocalRecordActivityUi().setContentView(this)
+    }
+    ////////////////////////////////////////
+    fun parseQueue(qdata: List<String>): List<Map<String, String>> {
+        val keys = listOf("user", "type", "datetime",
+                "major0", "minor0", "dist0",
+                "major1", "minor1", "dist1", "major2", "minor2", "dist2",
+                "major3", "minor3", "dist3", "major4", "minor4", "dist4")
+        val record: MutableList<MutableMap<String, String>> = mutableListOf()
+
+        qdata.forEach { r ->
+            val vMap = mutableMapOf<String, String>().withDefault { "" }
+            val vList = r.split(',')
+
+            val keySize = keys.size
+            for (i in vList.indices) {
+                if (!(i < keySize)) break
+                var value = vList[i]
+                if (keys[i] == "datetime") {
+                    val sk2 = this.application as Sk2Globals
+                    value = sk2.addWeekday(vList[i])
+                }
+                vMap.put(keys[i], value)
+            }
+            record.add(vMap)
+        }
+        return record
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -40,7 +66,8 @@ class LocalRecordActivityUi: AnkoComponent<LocalRecordActivity> {
 }
 ////////////////////////////////////////////////////////////////////////////////
 class LocalRecordAdapter(val activity: LocalRecordActivity): BaseAdapter() {
-    val list = (activity.application as Sk2Globals).localQueue
+    val sk2 = activity.application as Sk2Globals
+    val list: List<Map<String, String>> = activity.parseQueue(sk2.localQueue.getList())
     ////////////////////////////////////////
     override fun getView(i: Int, v: View?, parent: ViewGroup?): View {
         val item = getItem(i)
@@ -59,12 +86,6 @@ class LocalRecordAdapter(val activity: LocalRecordActivity): BaseAdapter() {
                     }.lparams { width = matchParent; horizontalGravity = left; weight = 1f }
                     ////////////////////////////////////////
                     textView(item["datetime"]) {
-                        textSize = 18f
-                        backgroundColor = Color.WHITE // for Huwai's initAdditionalStyle default Error.
-                        typeface = Typeface.DEFAULT_BOLD
-                    }.lparams { horizontalGravity = right }
-                    ////////////////////////////////////////
-                    textView(" / ${item["weekday"]}") {
                         textSize = 18f
                         backgroundColor = Color.WHITE // for Huwai's initAdditionalStyle default Error.
                         typeface = Typeface.DEFAULT_BOLD
@@ -122,8 +143,8 @@ class LocalRecordAdapter(val activity: LocalRecordActivity): BaseAdapter() {
         }
     }
     ////////////////////////////////////////
-    override fun getItem(position: Int): MutableMap<String, String> {
-        return list.getItem(position)
+    override fun getItem(position: Int): Map<String, String> {
+        return list.get(position)
     }
     ////////////////////////////////////////
     override fun getCount(): Int {

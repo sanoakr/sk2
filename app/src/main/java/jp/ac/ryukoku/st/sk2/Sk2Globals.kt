@@ -31,8 +31,8 @@ class Sk2Globals: Application() {
     var userMap: MutableMap<String, Any> = mutableMapOf()
     var prefMap: MutableMap<String, Any> = mutableMapOf()
     ////////////////////////////////////////
-    var localQueue = Queue<MutableMap<String, String>>(mutableListOf(), 100)
-
+    //var localQueue = Queue<MutableMap<String, String>>(mutableListOf(), 100)
+    var localQueue = Queue<String>(mutableListOf(), 100)
     ////////////////////////////////////////////////////////////////////////////////
     override fun onCreate() {
         super.onCreate()

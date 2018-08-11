@@ -70,17 +70,19 @@ class RecordActivity : AppCompatActivity(),AnkoLogger {
 
             dataList.forEach { r ->
                 if (! r.isNullOrEmpty()) {
-                    var vMap = mutableMapOf<String, String>().withDefault { "" }
+                    val vMap = mutableMapOf<String, String>().withDefault { "" }
                     val vList = r.split(',')
 
                     val keySize = keys.size
                     for (i in vList.indices) {
                         if (!(i < keySize)) break
 
+                        var value = vList[i]
                         if (keys[i] == "datetime") {
                             val sk2 = this.application as Sk2Globals
-                            vMap.put(keys[i], sk2.addWeekday(vList[i]))
+                            value = sk2.addWeekday(vList[i])
                         }
+                        vMap.put(keys[i], value)
                     }
                     record.add(vMap)
                 }
@@ -109,7 +111,7 @@ class RecordActivityUi: AnkoComponent<RecordActivity> {
 }
 ////////////////////////////////////////////////////////////////////////////////
 class RecordAdapter(var activity: RecordActivity): BaseAdapter() {
-    val list : List<Map<String, String>> = activity.fetchRecord()
+    val list: List<Map<String, String>> = activity.fetchRecord()
     ////////////////////////////////////////
     override fun getView(i : Int, v : View?, parent : ViewGroup?) : View {
         val item = getItem(i)

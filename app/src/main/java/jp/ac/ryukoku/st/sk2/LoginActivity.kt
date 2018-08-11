@@ -53,9 +53,9 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
     }
     ////////////////////////////////////////
     fun attemptLogin(user: String, passwd: String) {
-        if (user.isNullOrBlank()) {
+        if (user.isBlank()) {
             toast("学籍番号を入力して下さい")
-        } else if (passwd.isNullOrBlank()) {
+        } else if (passwd.isBlank()) {
             toast("パスワードを入力して下さい")
         } else if(user.contains('@')) {
             toast("認証IDに @ 以降を含めないで下さい")

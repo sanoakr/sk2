@@ -7,13 +7,16 @@ class Queue <T>(list: MutableList<T>, size: Int = 100) {
     fun isEmpty():Boolean = items.isEmpty()
     fun count():Int = items.count()
     fun getItem(postion: Int):T = items[postion]
+    fun getList(): MutableList<T> = items
 
     override fun toString() = items.toString()
 
     fun push(element: T){
-        items.add(0, element)
-        if (count() > maxsize) {
-            pop()
+        if (element != null) {
+            items.add(0, element)
+            if (count() > maxsize) {
+                pop()
+            }
         }
     }
     fun pop():T?{

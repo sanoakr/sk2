@@ -2,8 +2,6 @@ package jp.ac.ryukoku.st.sk2
 
 import android.Manifest
 import android.app.ActivityManager
-import android.app.Notification
-import android.app.NotificationManager
 import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.content.pm.PackageManager
@@ -115,6 +113,7 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         override fun onReceive(context: Context?, intent: Intent?) {
             val extras = intent?.extras
             latest = extras?.getString("scaninfo")
+            info(latest)
         }
     }
     ////////////////////////////////////////
@@ -144,16 +143,18 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
     ////////////////////////////////////////////////////////////////////////////////
     fun sendServer(marker: Char) {
         var toastMsg = "スキャン情報がありません"
+        val data = latest
 
-        if (latest.isNullOrEmpty()) {
+        if (data.isNullOrEmpty()) {
             doAsync { uiThread {toast(toastMsg)} }
             mainUi.scanInfo.text = "no Scan Messages"
             return
         }
         val sk2 = this.application as Sk2Globals
         val user = (sk2.userMap["uid"] ?: "") as String
-        val info = "${user},${marker}," + latest
-        mainUi.scanInfo.text = latest
+        val info = "${user},${marker}," + data
+        mainUi.scanInfo.text = data
+        sk2.localQueue.push(info)
 
         doAsync {
             try {
@@ -190,10 +191,8 @@ class MainActivity : AppCompatActivity(), AnkoLogger {
         val sk2 = this.application as Sk2Globals
         sk2.prefMap["auto"] = false
         sk2.savePrefData()
-        //unbindScanService()
         unregisterReceiver(receiver)
         stopService<ScanService>()
-        //BluetoothAdapter.getDefaultAdapter().disable()
     }
     ////////////////////////////////////////
     override fun onBackPressed() { /* DO NOTHING */ }
