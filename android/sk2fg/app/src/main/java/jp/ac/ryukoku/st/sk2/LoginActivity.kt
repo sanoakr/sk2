@@ -35,8 +35,8 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
         title = "ログイン：${sk2.app_title} ${sk2.app_name}"
         loginUi.setContentView(this)
 
-        val androidId = getString(this.contentResolver, Settings.Secure.ANDROID_ID)
-        toast(androidId)
+        //val androidId = getString(this.contentResolver, Settings.Secure.ANDROID_ID)
+        //toast(androidId)
     }
     ////////////////////////////////////////
     override fun onResume() {

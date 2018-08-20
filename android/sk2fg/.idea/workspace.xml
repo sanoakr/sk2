@@ -7,8 +7,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="62533f15-c15b-49a6-9f22-78636b6d2646" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/MainActivity.kt" afterPath="$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/MainActivity.kt" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/ScanService.kt" afterPath="$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/ScanService.kt" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/LoginActivity.kt" afterPath="$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/LoginActivity.kt" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -24,11 +23,25 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="ScanService.kt" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ScanService.kt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/ScanService.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="674">
-              <caret line="379" column="0" lean-forward="false" selection-start-line="379" selection-start-column="0" selection-end-line="379" selection-end-column="0" />
+            <state relative-caret-position="997">
+              <caret line="398" column="13" lean-forward="true" selection-start-line="398" selection-start-column="13" selection-end-line="398" selection-end-column="13" />
+              <folding>
+                <element signature="e#3495#3530#1" expanded="true" />
+                <element signature="e#3636#3679#1" expanded="true" />
+                <element signature="e#7038#7066#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="LoginActivity.kt" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/LoginActivity.kt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="612">
+              <caret line="54" column="33" lean-forward="true" selection-start-line="54" selection-start-column="33" selection-end-line="54" selection-end-column="33" />
               <folding />
             </state>
           </provider>
@@ -37,8 +50,8 @@
       <file leaf-file-name="MainActivity.kt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/MainActivity.kt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="5965">
-              <caret line="379" column="58" lean-forward="false" selection-start-line="379" selection-start-column="58" selection-end-line="379" selection-end-column="58" />
+            <state relative-caret-position="459">
+              <caret line="107" column="17" lean-forward="false" selection-start-line="107" selection-start-column="12" selection-end-line="107" selection-end-column="17" />
               <folding />
             </state>
           </provider>
@@ -51,6 +64,8 @@
       <find>restart</find>
       <find>restartU</find>
       <find>rest</find>
+      <find>toas</find>
+      <find>toast</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -2164,6 +2179,7 @@
       <list>
         <option value="$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/MainActivity.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/ScanService.kt" />
+        <option value="$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/LoginActivity.kt" />
       </list>
     </option>
   </component>
@@ -2221,7 +2237,7 @@
     <property name="android.sdk.path" value="$USER_HOME$/Library/Android/sdk" />
     <property name="settings.editor.selected.configurable" value="android.sdk-updates" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="device.picker.selection" value="P3PDU18305003706" />
+    <property name="device.picker.selection" value="4JC7N15C03003756" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -2446,18 +2462,30 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/ScanService.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="997">
+          <caret line="398" column="13" lean-forward="true" selection-start-line="398" selection-start-column="13" selection-end-line="398" selection-end-column="13" />
+          <folding>
+            <element signature="e#3495#3530#1" expanded="true" />
+            <element signature="e#3636#3679#1" expanded="true" />
+            <element signature="e#7038#7066#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/MainActivity.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5965">
-          <caret line="379" column="58" lean-forward="false" selection-start-line="379" selection-start-column="58" selection-end-line="379" selection-end-column="58" />
+        <state relative-caret-position="459">
+          <caret line="107" column="17" lean-forward="false" selection-start-line="107" selection-start-column="12" selection-end-line="107" selection-end-column="17" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/ScanService.kt">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/LoginActivity.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="674">
-          <caret line="379" column="0" lean-forward="false" selection-start-line="379" selection-start-column="0" selection-end-line="379" selection-end-column="0" />
+        <state relative-caret-position="612">
+          <caret line="54" column="33" lean-forward="true" selection-start-line="54" selection-start-column="33" selection-end-line="54" selection-end-column="33" />
           <folding />
         </state>
       </provider>
