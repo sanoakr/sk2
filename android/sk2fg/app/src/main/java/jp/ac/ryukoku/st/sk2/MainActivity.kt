@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             val binder = service as ScanService.LocalBinder
             mService = binder.service
-            mService?.requestLocationUpdates() // always started
+            mService?.requestScanUpdates() // always started
             mBound = true
         }
         override fun onServiceDisconnected(name: ComponentName) {
@@ -152,7 +152,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
     override fun onDestroy() {
         mService?.stopInterval()
-        mService?.removeLocationUpdates()
+        mService?.removeScanUpdates()
         sk2.saveQueue()  // save localQueue to sharedPreference
         super.onDestroy()
     }
@@ -213,7 +213,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 info("User interaction was cancelled.")
             } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission was granted.
-                mService!!.requestLocationUpdates()
+                mService!!.requestScanUpdates()
             } else {
                 // Permission denied.
                 setButtonsState(false)
@@ -377,7 +377,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                         if (!ui.owner.checkPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)) {
                             ui.owner.requestPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)
                         } else {
-                            ui.owner.mService?.requestLocationUpdates()
+                            ui.owner.mService?.requestScanUpdates()
                         }
                     }
                 }
@@ -385,7 +385,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                 stopBt = button("Stop Scan Update") {
                     textSize = 10f
                     onClick {
-                        ui.owner.mService?.removeLocationUpdates()
+                        ui.owner.mService?.removeScanUpdates()
                     }
                 }
             }.lparams {
@@ -422,7 +422,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                     imageResource = R.drawable.ic_history_32dp
                     background = ContextCompat.getDrawable(context, R.drawable.button_circle)
                     onClick {
-                        ui.owner.mService?.removeLocationUpdates()
+                        ui.owner.mService?.removeScanUpdates()
                         startActivity<RecordActivity>()
                     }
                 }.lparams { width = dip(48); height = dip(48); margin = dip(8) }
@@ -431,7 +431,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                     imageResource = R.drawable.ic_live_help_32dp
                     background = ContextCompat.getDrawable(context, R.drawable.button_circle)
                     onClick {
-                        ui.owner.mService?.removeLocationUpdates()
+                        ui.owner.mService?.removeScanUpdates()
                         startActivity<HelpActivity>()
                     }
                 }.lparams { width = dip(48); height = dip(48); margin = dip(8) }
@@ -440,7 +440,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                     imageResource = R.drawable.ic_logout_32dp
                     background = ContextCompat.getDrawable(context, R.drawable.button_circle)
                     onClick {
-                        ui.owner.mService?.removeLocationUpdates()
+                        ui.owner.mService?.removeScanUpdates()
                         sk2.logout()
                     }
                 }.lparams { width = dip(48); height = dip(48); margin = dip(8) }
@@ -452,7 +452,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                 id = SEARCH
                 textSize = 10f
                 onClick {
-                    ui.owner.mService?.removeLocationUpdates()
+                    ui.owner.mService?.removeScanUpdates()
                     browse("https://sk2.st.ryukoku.ac.jp/search.php")
                 }
             }.lparams {

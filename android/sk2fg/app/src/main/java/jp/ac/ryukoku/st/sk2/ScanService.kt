@@ -47,6 +47,8 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
         private const val SCAN_INTERVAL_IN_MILLISECONDS: Long = 1000 // 1 sec.
         const val AUTO_SENDING_INTERVAL_IN_MILLISECONDS: Long = 5*60*1000 // 5 min.
         const val AUTO_SENDING_INTERVAL_IN_MILLISECONDS_DEBUG: Long = 5*1000 // 5 sec.
+        private const val WAKEUP_INTERVAL_IN_MILLISECONDS: Long = 10*60*1000 // 10 min.
+        private const val WAKEUP_MAX_COUNT_TO_BLE_RESET: Int = 6
 
         //private const val IBEACON_FORMAT = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"
         //val ALTBEACON_FORMAT = "m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"
@@ -58,7 +60,6 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
 
     private var mServiceHandler: Handler? = null
     private val mBinder: IBinder = LocalBinder()
-    private val mScan = false
 
     private val notification: Notification
         get() {
@@ -100,6 +101,14 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
     private lateinit var scanSettings: ScanSettings
     private lateinit var scanFilters: ArrayList<ScanFilter>
 
+    ////////////////////////////////////////
+    private var wakeupCount: Int = 0
+    private val btWakeupHandler = Handler()
+    private val wakeupTimer = Runnable { wakeup() }
+    private fun wakeup() {
+        restartScanUpdates()
+        btWakeupHandler.postDelayed(wakeupTimer, WAKEUP_INTERVAL_IN_MILLISECONDS)
+    }
     ////////////////////////////////////////
     private var auto = false
     private val intervalHandler = Handler()
@@ -169,6 +178,9 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
 
         // start auto interval
         if (pref.getBoolean("auto", false)) startInterval(pref.getBoolean("debug", false))
+
+        // start wakeup interval
+        btWakeupHandler.postDelayed(wakeupTimer, WAKEUP_INTERVAL_IN_MILLISECONDS)
     }
     /********** BLE **********/
     ////////////////////////////////////////
@@ -281,7 +293,7 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
 
         if (startedFromNotification) {
             info("Start from notification")
-            removeLocationUpdates()
+            removeScanUpdates()
             stopSelf()
         }
         // Tells the system to not try to recreate the service after it has been killed.
@@ -325,13 +337,13 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
     }
     ////////////////////////////////////////
     override fun onDestroy() {
-        removeLocationUpdates()
+        removeScanUpdates()
         stopInterval()
         mServiceHandler!!.removeCallbacksAndMessages(null)
     }
     ////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////
-    fun requestLocationUpdates() {
+    fun requestScanUpdates() {
         info("Requesting BLE scan updates")
         if (checkBt() && !sk2.getScanRunning()) {
             mScanner.startScan(scanFilters, scanSettings, mScanCallback) // start Ble Scanner
@@ -345,12 +357,29 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
         }
     }
     ////////////////////////////////////////
-    fun removeLocationUpdates() {
+    fun removeScanUpdates() {
         info("Removing BLE scan updates")
 
         mScanner.stopScan(mScanCallback)   // stop Ble Scanner
         sk2.setScanRunning(false)
         stopSelf()
+    }
+    ////////////////////////////////////////
+    fun restartScanUpdates() {
+        wakeupCount++
+
+        val lastArray = sk2.lastScan
+        val curDatetime = Moment()
+        if (curDatetime.compareTo(lastArray.datetime) < WAKEUP_INTERVAL_IN_MILLISECONDS) {
+            info("Restart BLE scan updates")
+            removeScanUpdates()
+            requestScanUpdates()
+        }
+
+        if (wakeupCount >= WAKEUP_MAX_COUNT_TO_BLE_RESET){
+            // restart BLE Device power
+            wakeupCount = 0
+        }
     }
     ////////////////////////////////////////
     inner class LocalBinder : Binder() {
