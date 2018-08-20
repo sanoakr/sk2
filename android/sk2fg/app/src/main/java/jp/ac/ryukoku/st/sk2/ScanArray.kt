@@ -9,6 +9,23 @@ import java.lang.Math.pow
 import java.util.*
 
 ////////////////////////////////////////////////////////////////////////////////
+/*** iOS Swift
+func calculateNewDistance(txCalibratedPower: Int, rssi: Int) -> Double {
+    if rssi == 0 {
+        return -1
+    }
+    let ratio = Double(exactly:rssi)! / Double(txCalibratedPower)
+
+    if ratio < 1.0 {
+        return pow(10.0, ratio)
+    }
+    else {
+        let accuracy = 0.89976 * pow(ratio, 7.7095) + 0.111
+        return accuracy
+    }
+}
+***/
+
 fun getBleDistance(tx: Int, rssi: Int, n: Double = 2.0): Double {
     return pow(10.0, (tx - rssi) / (n * 10))
 }
