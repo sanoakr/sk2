@@ -186,7 +186,8 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     }
     //////////////////////////////
     if ($$fhour != 0) {
-        $sql .= "( date_format(datetime, '%h:%m:%s') between '" . $parray_from[$$fhour] . ":00' AND '" . $parray_to[$$fhour] . ":00') AND ";
+        $sql .= "(time(datetime) between '" . $parray_from[$$fhour] . ":00' AND '" . $parray_to[$$fhour] . ":00') AND ";
+        //$sql .= "( date_format(datetime, '%h:%m:%s') between '" . $parray_from[$$fhour] . ":00' AND '" . $parray_to[$$fhour] . ":00') AND ";
     }
     //////////////////////////////
     $sql .= "True Limit 9999";
