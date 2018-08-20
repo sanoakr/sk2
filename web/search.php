@@ -89,7 +89,7 @@ $user = "sk2";
 $pass = "sk2loglog";
 $dbname = "sk2";
 $dbchar = "UTF-8";
-$dbtbl = "test";
+$dbtbl = "st";
 
 $farr = array('id', 'type');
 $fdt = 'datetime';
@@ -101,8 +101,8 @@ $fhour = 'priod';
 $parray = array('*', '1講時', '2講時', '3講時', '4講時', '5講時', '6講時', '昼休み');
 $parray_from = array('*', '09:20', '11:05', '13:35', '15:20', '17:00', '18:40', '12:40');
 $parray_to = array('*', '10:05', '12:35', '15:05', '16:50', '18:30', '20:10', '13:30');
-$aparr = array('ssid', 'bssid', 'signal');
-$apnum = 5;
+$aparr = array('major', 'minor', 'distance');
+$apnum = 3;
 
 //////////////////////////////
 $link = new mysqli($server, $user, $pass, $dbname);

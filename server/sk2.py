@@ -22,7 +22,7 @@ db_args = {"user": "sk2",
            "host": "localhost",
            "db": "sk2"
 }
-db_tbl = "test"
+db_tbl = "st"
 
 sk2_dir = "/usr/local/sk2/"
 data_dir = sk2_dir + "data/"
@@ -107,11 +107,11 @@ class AsyncClient(asyncio.Protocol):
                 logger.info("LOG write fail {} ".format(user))
 
             # convert NULL data to 0
-            for i in range(18):
-                if pieces[i] == '': 
-                    pieces[i] = None
-                elif i >= len(pieces):
+            for i in range(13):
+                if i >= len(pieces):
                     pieces.append(None)
+                elif pieces[i] == '': 
+                    pieces[i] = None
 
             # to database
             with db.connect(**db_args) as cur:
@@ -120,10 +120,9 @@ class AsyncClient(asyncio.Protocol):
                             + " major0, minor0, distance0,"
                             + " major1, minor1, distance1,"
                             + " major2, minor2, distance2)"
-                            + " VALUES (%s, %s, %s,"
-                            + " %s, %s, %s,"
-                            + " %s, %s, %s,"
-                            + " %s, %s, %s)",
+                            + " VALUES "
+                            + "(%s, %s, %s, %s, %s, %s,"
+                            + " %s, %s, %s, %s, %s, %s)",
                             (pieces[0], pieces[2], pieces[3],
                              int(pieces[4] or 0), int(pieces[5] or 0), float(pieces[6] or 0.0),
                              int(pieces[7] or 0), int(pieces[8] or 0), float(pieces[9] or 0.0),
