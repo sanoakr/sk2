@@ -19,17 +19,17 @@ class HelpViewController: UIViewController,UIWebViewDelegate {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
-		// ナビゲーション
-		self.navigationItem.title = "ヘルプ"
+		// Status Barの高さを取得する.
+		let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height
 		
+		// Viewの高さと幅を取得する.
+		let displayWidth: CGFloat = self.view.frame.width
+		let displayHeight: CGFloat = self.view.frame.height
 		// WebViewの生成.
-		myWebView = UIWebView()
+		myWebView = UIWebView(frame: CGRect(x: 0, y: barHeight + 40, width: displayWidth, height: displayHeight - barHeight - 80))
 		
 		// Deletegateを自身に設定.
 		myWebView.delegate = self
-		
-		// WebViewのサイズを設定.
-		myWebView.frame = self.view.bounds
 		
 		// URLを設定.
 		let helpUrl: URL = URL(string: appDelegate.helpUrl)!
@@ -43,6 +43,16 @@ class HelpViewController: UIViewController,UIWebViewDelegate {
 		// Viewに追加する
 		self.view.addSubview(myWebView)
 		
+		// --------------------------------------------------------------------------------------------------------------------------
+		// タイトル
+		let labelTitle = UILabel(frame: CGRect(x:0, y: barHeight + 5, width:self.view.frame.width, height:30))
+		labelTitle.font = UIFont.systemFont(ofSize: 18.0)    //フォントサイズ
+		labelTitle.font = UIFont.boldSystemFont(ofSize: UIFont.labelFontSize)	//  ボールド
+		labelTitle.textAlignment = NSTextAlignment.center    // センター寄せ
+		labelTitle.text = "ヘルプ"
+		view.addSubview(labelTitle)  // Viewに追加
+		
+		// --------------------------------------------------------------------------------------------------------------------------
 		// 戻るボタン
 		
 		let backButton = UIButton(frame: CGRect(x:0,y: Int(self.view.frame.height - 40),width: Int(self.view.frame.width),height:40))
