@@ -59,7 +59,7 @@ class LocalRecordAdapter(val activity: LocalRecordActivity): BaseAdapter() {
                 linearLayout {
                     padding = dip(5)
                     ////////////////////////////////////////
-                    textView(sk2.getWeekDayString(item.datetime)) {
+                    textView(getWeekDayString(item.datetime)) {
                         textSize = 14f
                         backgroundColor = Color.WHITE // for Huwai's initAdditionalStyle default Error.
                         typeface = Typeface.DEFAULT_BOLD

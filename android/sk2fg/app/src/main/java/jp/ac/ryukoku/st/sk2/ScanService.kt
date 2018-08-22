@@ -16,8 +16,8 @@ import android.content.res.Configuration
 import android.os.*
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.LocalBroadcastManager
+import android.util.Log
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
-import com.neovisionaries.bluetooth.ble.advertising.ADStructure
 import com.neovisionaries.bluetooth.ble.advertising.IBeacon
 import jp.ac.ryukoku.st.sk2.MainActivity.Companion.ATTENDANCE_TIME_DIFFERENCE_MILLISEC
 import me.mattak.moment.Moment
@@ -32,7 +32,7 @@ import javax.net.ssl.SSLSocketFactory
 import kotlin.collections.ArrayList
 
 //@Suppress("DEPRECATION")
-class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
+class ScanService : Service() /*, BootstrapNotifier*/ {
     companion object {
         private const val PACKAGE_NAME = "jp.ac.ryukoku.st.sk2"
         private val TAG = ScanService::class.java.simpleName
@@ -50,10 +50,8 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
         private const val WAKEUP_INTERVAL_IN_MILLISECONDS: Long = 10*60*1000 // 10 min.
         private const val WAKEUP_MAX_COUNT_TO_BLE_RESET: Int = 6
 
-        //private const val IBEACON_FORMAT = "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"
-        //val ALTBEACON_FORMAT = "m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25"
-        //val EDDYSTONE_FORMAT = "s:0-1=feaa,m:2-2=10,p:3-3:-41,i:4-20v"
-        //val UUID = "6F42B781-D072-4E20-A07A-53F6A1C7CB59"
+        private const val PERMISSION_SENDING_TIMME_FROM: Int = 8
+        private const val PERMISSION_SENDING_TIMME_TO: Int = 20
     }
     private var mChangingConfiguration = false
     private var mNotificationManager: NotificationManager? = null
@@ -126,7 +124,7 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
         else
             AUTO_SENDING_INTERVAL_IN_MILLISECONDS
 
-        info("start auto interval in $period msec")
+        Log.d(TAG,"start auto interval in $period msec")
         intervalHandler.postDelayed(timer, period)
 
         auto = true
@@ -135,7 +133,7 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
                 .apply()
     }
     fun stopInterval() {
-        info("stop auto interval")
+        Log.d(TAG,"stop auto interval")
         intervalHandler.removeCallbacks(timer)
 
         auto = false
@@ -192,7 +190,7 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
             onReceivedBleScan(results)
         }
         override fun onScanFailed(errorCode: Int) {
-            warn("ScanFailed: $errorCode")/* should never be called */ }
+            Log.d(TAG, "ScanFailed: $errorCode")/* should never be called */ }
     }
     ////////////////////////////////////////
     private fun onReceivedBleScan(results: List<ScanResult>) {
@@ -204,24 +202,17 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
             val rssi = r.rssi
             val structures = ADPayloadParser.getInstance().parse(bytes)
             structures.forEach { s ->
-                if (s is IBeacon) {
+                if (s is IBeacon && (s.uuid.toString() in sk2.VALID_IBEACON_UUID)) {
                     scanArray.add(Pair(s, rssi))
 
                     val dist = getBleDistance(s.power, rssi)
-                    info("${s.uuid}, ${s.major}, ${s.minor}, ${dist}")
+                    Log.d(TAG,"${s.uuid}, ${s.major}, ${s.minor}, ${dist}")
                 }
             }
             if (scanArray.isNotEmpty()) {
                 sk2.lastScan = scanArray
-                //sendScanBroadcast(iBeaconRssiPairs)
             }
         }
-        /*
-        // Update notification content if running as a foreground service.
-        if (serviceIsRunningInForeground(this)) {
-            mNotificationManager!!.notify(NOTIFICATION_ID, notification)
-        }
-        */
     }
     ////////////////////////////////////////
     private fun sendBroadcast(message: String) {
@@ -231,14 +222,15 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
     }
     ////////////////////////////////////////
     fun sendInfoToServer(type: Char): String? { // not Boolean, couldn't return from the async block
-        info("Sending attendance info to Server with $type")
+        Log.d(TAG, "Sending attendance info to Server with $type")
         val lastArray = sk2.lastScan
         val curDatetime = Moment()
 
         // check sending time
-        if ( (! pref.getBoolean("debug", false)) && (curDatetime.hour < 8 || curDatetime.hour > 20))  {
+        if ( (! pref.getBoolean("debug", false))
+                && (curDatetime.hour < PERMISSION_SENDING_TIMME_FROM || curDatetime.hour > PERMISSION_SENDING_TIMME_TO)) {
             sendBroadcast("設定時間外です")
-            warn("sendInfoToServer; Overtime use")
+            Log.d(TAG,"sendInfoToServer; Overtime use")
             return "Overtime use"
         }
 
@@ -252,7 +244,7 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
             val key = pref.getString("key", "")
             val message = "$uid,$key,$type,$dtString" +
                     lastArray.getBeaconsText(false, false, false)
-            info("SEND to sk2; $message")
+            Log.d(TAG,"SEND to sk2; $message")
 
             //push the last scan record with current daytime and attendance type into the localQueue
             sk2.localQueue.push(AttendData(curDatetime, type, lastArray))
@@ -275,13 +267,13 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
                     // Receive message
                     val recMessage = bufReader.use(BufferedReader::readText)
                     if (recMessage == sk2.recFail) {
-                        warn("sendInfoToServer; Couldn't write a record on sk2 server")
+                        Log.d(TAG, "sendInfoToServer; Couldn't write a record on sk2 server")
                     } else {
-                        info("sendInfoToServer; Success recording on sk2 server")
+                        Log.d(TAG, "sendInfoToServer; Success recording on sk2 server")
                     }
                 } catch (e: Exception) {
                     //e.printStackTrace()
-                    warn("sendInfoToServer; Couldn't connect to sk2 server")
+                    Log.d(TAG, "sendInfoToServer; Couldn't connect to sk2 server")
                 }
             }
             // Update notification content if running as a foreground service.
@@ -295,11 +287,11 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
     }
     ////////////////////////////////////////
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        info("Service started")
+        Log.d(TAG, "Service started")
         val startedFromNotification = intent.getBooleanExtra(EXTRA_STARTED_FROM_NOTIFICATION, false)
 
         if (startedFromNotification) {
-            info("Start from notification")
+            Log.d(TAG,"Start from notification")
             removeScanUpdates()
             stopSelf()
         }
@@ -313,24 +305,24 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
     }
     ////////////////////////////////////////
     override fun onBind(intent: Intent): IBinder? {
-        info("in onBind()")
+        Log.d(TAG, "in onBind()")
         stopForeground(true)
         mChangingConfiguration = false
         return mBinder
     }
     ////////////////////////////////////////
     override fun onRebind(intent: Intent) {
-        info("in onRebind()")
+        Log.d(TAG, "in onRebind()")
         stopForeground(true)
         mChangingConfiguration = false
         super.onRebind(intent)
     }
     ////////////////////////////////////////
     override fun onUnbind(intent: Intent): Boolean {
-        info("Last client unbound from service")
+        Log.d(TAG, "Last client unbound from service")
 
         if (sk2.getScanRunning()) {
-            info("Starting foreground service")
+            Log.d(TAG, "Starting foreground service")
 
             val fgIntent = Intent(this, ScanService::class.java)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -351,21 +343,21 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
     ////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////
     fun requestScanUpdates() {
-        info("Requesting BLE scan updates")
+        Log.d(TAG, "Requesting BLE scan updates")
         if (checkBt() && !sk2.getScanRunning()) {
             mScanner.startScan(scanFilters, scanSettings, mScanCallback) // start Ble Scanner
             sk2.setScanRunning(true)
 
             startService(Intent(applicationContext, ScanService::class.java))
 
-            info("BLE Scanner is started")
+            Log.d(TAG, "BLE Scanner is started")
         } else {
-            info("BLE Scanner can not be started; BLE not found")
+            //info("BLE Scanner can not be started; BLE not found")
         }
     }
     ////////////////////////////////////////
     fun removeScanUpdates() {
-        info("Removing BLE scan updates")
+        //info("Removing BLE scan updates")
 
         mScanner.stopScan(mScanCallback)   // stop Ble Scanner
         sk2.setScanRunning(false)
@@ -378,7 +370,7 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
         val lastArray = sk2.lastScan
         val curDatetime = Moment()
         if (curDatetime.compareTo(lastArray.datetime) < WAKEUP_INTERVAL_IN_MILLISECONDS) {
-            info("Restart BLE scan updates")
+            Log.d(TAG, "Restart BLE scan updates")
             removeScanUpdates()
             requestScanUpdates()
         }

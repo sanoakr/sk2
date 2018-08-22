@@ -141,7 +141,7 @@ class RecordAdapter(var activity: RecordActivity): BaseAdapter() {
                 linearLayout {
                     padding = dip(5)
                     ////////////////////////////////////////
-                    textView(sk2.addWeekday(item.datetime)) {
+                    textView(addWeekday(item.datetime)) {
                         textSize = 14f
                         backgroundColor = Color.WHITE // for Huwai's initAdditionalStyle default Error.
                         typeface = Typeface.DEFAULT_BOLD

@@ -33,8 +33,10 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener, AnkoLogger {
     ////////////////////////////////////////
     companion object {
-        const val MAX_SEND_BEACON_NUM = 10
-        const val ATTENDANCE_TIME_DIFFERENCE_MILLISEC = 60 * 1000
+        const val MAX_SEND_BEACON_NUM: Int = 10
+        const val ATTENDANCE_TIME_DIFFERENCE_MILLISEC: Int = 60 * 1000
+
+        const val ATTENDANCE_VIBRATE_MILLISEC: Long = 1        // vibration time
 
         private val TAG = MainActivity::class.java.simpleName
         // Used in checking for runtime permissions.
@@ -238,8 +240,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     ////////////////////////////////////////
     fun attendance(type: Char) {
         val lastArray = sk2.lastScan
-        val lastDatetime = lastArray.datetime
-        val curDatetime = Moment()
 
         // show scan info if in debug mode
         if (pref.getBoolean("debug", false)) {
@@ -294,7 +294,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     ////////////////////////////////////////
     fun vibrate() {
         if (vibrator != null) {
-            if (vibrator!!.hasVibrator()) vibrator!!.vibrate(100)
+            if (vibrator!!.hasVibrator()) vibrator!!.vibrate(ATTENDANCE_VIBRATE_MILLISEC)
         }
     }
     ////////////////////////////////////////

@@ -39,6 +39,10 @@ class Sk2Globals: Application() {
     var lastScan = ScanArray()
     ////////////////////////////////////////
     val SCAN_RUNNING = "scan_running"
+    val VALID_IBEACON_UUID: List<String> = listOf(
+            "ebf59ccc-21f2-4558-9488-00f2b388e5e6"//, // ru-wifi
+            //"00000000-87b3-1001-b000-001c4d975326"  // sekimoto's
+    )
     ////////////////////////////////////////////////////////////////////////////////
     override fun onCreate() {
         super.onCreate()
@@ -102,30 +106,6 @@ class Sk2Globals: Application() {
         }
         */
         startActivity(intentFor<LoginActivity>().clearTop())
-    }
-    ////////////////////////////////////////
-    fun getWeekDayString(moment: Moment): String {
-        return moment.format("yyyy-MM-dd E HH:mm:ss ZZZZ")
-    }
-    ////////////////////////////////////////
-    fun addWeekday(dt: String?): String {
-        var dwt = if (dt != null) dt else ""
-
-        try {
-            val calendar = Calendar.getInstance()
-            val match = Regex("(\\d+)-(\\d+)-(\\d+)\\s+(\\d+):(\\d+):(\\d+)").find(dwt)?.groupValues
-            if (match?.size == 7) { // Null makes false
-                val y = match[1].toInt()
-                val m = match[2].toInt()-1
-                val d = match[3].toInt()
-                calendar.set(y, m, d, 0, 0, 0)
-                val wday = Moment(calendar.time, TimeZone.getDefault(), Locale.JAPAN).weekdayName
-                dwt = dwt.replace(" ", " $wday ")
-            }
-        }
-        catch(e: Exception) { }
-
-        return dwt
     }
 }
 
