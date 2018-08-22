@@ -5,12 +5,16 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.Button
+import android.widget.*
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk25.coroutines.onScrollChange
+import org.jetbrains.anko.support.v4.onRefresh
+import org.jetbrains.anko.support.v4.swipeRefreshLayout
 import java.io.*
 import java.net.InetSocketAddress
 import javax.net.ssl.SSLSocketFactory
@@ -20,15 +24,18 @@ class RecordActivity : AppCompatActivity(),AnkoLogger {
     lateinit var sk2: Sk2Globals
     lateinit var pref: SharedPreferences
 
+    private var recordUi = RecordActivityUi()
+    lateinit var mSwipe: SwipeRefreshLayout
     ////////////////////////////////////////
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         sk2 = this.application as Sk2Globals
         pref = sk2.pref
-
         title = "記録：${sk2.app_title} ${sk2.app_name}"
-        RecordActivityUi().setContentView(this)
+
+        recordUi.setContentView(this)
+
     }
     ////////////////////////////////////////
     fun fetchRecord(): RecordsData {
@@ -62,45 +69,10 @@ class RecordActivity : AppCompatActivity(),AnkoLogger {
         }
         return RecordsData(rowRecord)
     }
-    /*
-    ////////////////////////////////////////
-    fun parseRecord(data: String): List<Map<String, String>> {
-        val keys = listOf("encUid", "type", "datetime",
-                "major0", "minor0", "dist0",
-                "major1", "minor1", "dist1", "major2", "minor2", "dist2",
-                "major3", "minor3", "dist3", "major4", "minor4", "dist4")
-        val record: MutableList<MutableMap<String, String>> = mutableListOf()
-
-        if (data.isNullOrBlank()) {
-            record.add(mutableMapOf("enUid" to "There is no record"))
-        } else {
-            val dataList = data.split('\n')
-
-            dataList.forEach { r ->
-                if (! r.isNullOrEmpty()) {
-                    val vMap = mutableMapOf<String, String>().withDefault { "" }
-                    val vList = r.split(',')
-
-                    val keySize = keys.size
-                    for (i in vList.indices) {
-                        if (!(i < keySize)) break
-
-                        var value = vList[i]
-                        if (keys[i] == "datetime") {
-                            val sk2 = this.application as Sk2Globals
-                            //value = sk2.addWeekday(vList[i])
-                        }
-                        vMap.put(keys[i], value)
-                    }
-                    record.add(vMap)
-                }
-            }
-        }
-        return record
-    }*/
 }
 ////////////////////////////////////////////////////////////////////////////////
 class RecordActivityUi: AnkoComponent<RecordActivity> {
+    lateinit var recordList: ListView
     lateinit var localBt: Button
     val LISTVIEW = 1; val LOCAL = 2
     ////////////////////////////////////////
@@ -108,12 +80,24 @@ class RecordActivityUi: AnkoComponent<RecordActivity> {
         relativeLayout {
             padding = dip(8)
             ////////////////////////////////////////
-            listView {
-                id = LISTVIEW
-                doAsync {
-                    val recAdapter = RecordAdapter(ui.owner)
-                    uiThread {
-                        adapter = recAdapter
+            swipeRefreshLayout {
+                onRefresh {
+                    doAsync {
+                        val recAdapter = RecordAdapter(ui.owner)
+                        uiThread {
+                            recordList.adapter = recAdapter
+                        }
+                        isRefreshing = false
+                    }
+                }
+                ////////////////////////////////////////
+                recordList = listView {
+                    id = LISTVIEW
+                    doAsync {
+                        val recAdapter = RecordAdapter(ui.owner)
+                        uiThread {
+                            adapter = recAdapter
+                        }
                     }
                 }
             }.lparams { above(LOCAL); alignParentStart(); alignParentEnd() }

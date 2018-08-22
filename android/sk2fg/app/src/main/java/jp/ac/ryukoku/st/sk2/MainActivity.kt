@@ -102,9 +102,13 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 IntentFilter(ScanService.ACTION_BROADCAST))
 
         // go back to LoginActivity if with invalid user
-        if (!checkInfo(mainUi)) {
+        if (!checkInfo(mainUi))
             startActivity(intentFor<LoginActivity>().clearTop())
-        }
+
+        // restore auto setting
+        val auto = pref.getBoolean("auto", false)
+        mainUi.autoSw.isChecked = auto
+        if (auto) mService!!.startInterval(pref.getBoolean("debug", false))
 
         if (!checkBt()) {
             toast("Bloothoothオンにしてください")
@@ -131,7 +135,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         setButtonsState(sk2.getScanRunning())
-        setAutoState(pref.getBoolean("auto", false))
+        //setAutoState(pref.getBoolean("auto", false))
     }
     ////////////////////////////////////////
     override fun onPause() {
@@ -151,7 +155,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 .unregisterOnSharedPreferenceChangeListener(this)
         super.onStop()
     }
-
+    ////////////////////////////////////////
     override fun onDestroy() {
         mService?.stopInterval()
         mService?.removeScanUpdates()
@@ -272,16 +276,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
     }
     ////////////////////////////////////////
-    private fun setAutoState(auto: Boolean) {
-        /*
-        if (auto) {
-            mService?.startInterval(pref.getBoolean("debug", false))
-        } else {
-            mService?.stopInterval()
-        }*/
-        mainUi.autoSw.setChecked(auto)
-    }
-    ////////////////////////////////////////
     private fun setButtonsState(requestingLocationUpdates: Boolean) {
         if (requestingLocationUpdates) {
             mainUi.startBt.isEnabled = false
@@ -291,7 +285,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             mainUi.stopBt.isEnabled = false
         }
     }
-    ////////////////////////////////////////
+////////////////////////////////////////
+@Suppress("DEPRECATION")
     fun vibrate() {
         if (vibrator != null) {
             if (vibrator!!.hasVibrator()) vibrator!!.vibrate(ATTENDANCE_VIBRATE_MILLISEC)
@@ -351,18 +346,15 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                 textSize = 14f
                 onClick {
                     if (isChecked) {
-                        //pref.edit()
-                        //        .putBoolean("auto", true)
-                        //        .apply()
-                        ui.owner.mService?.startInterval(pref.getBoolean("debug", false))
+                        ui.owner.mService!!.startInterval(pref.getBoolean("debug", false))
                         toast("Auto ON")
                     } else {
-                        //pref.edit()
-                        //        .putBoolean("auto", false)
-                        //        .apply()
-                        ui.owner.mService?.stopInterval()
+                        ui.owner.mService!!.stopInterval()
                         toast("Auto OFF")
                     }
+                    pref.edit()
+                            .putBoolean("auto", isChecked)
+                            .apply()
                 }
             }.lparams {
                 alignParentTop(); alignParentEnd()
@@ -422,7 +414,6 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                     imageResource = R.drawable.ic_history_32dp
                     background = ContextCompat.getDrawable(context, R.drawable.button_circle)
                     onClick {
-                        ui.owner.mService?.removeScanUpdates()
                         startActivity<RecordActivity>()
                     }
                 }.lparams { width = dip(48); height = dip(48); margin = dip(8) }
@@ -431,7 +422,6 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                     imageResource = R.drawable.ic_live_help_32dp
                     background = ContextCompat.getDrawable(context, R.drawable.button_circle)
                     onClick {
-                        ui.owner.mService?.removeScanUpdates()
                         startActivity<HelpActivity>()
                     }
                 }.lparams { width = dip(48); height = dip(48); margin = dip(8) }
@@ -440,7 +430,6 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                     imageResource = R.drawable.ic_logout_32dp
                     background = ContextCompat.getDrawable(context, R.drawable.button_circle)
                     onClick {
-                        ui.owner.mService?.removeScanUpdates()
                         sk2.logout()
                     }
                 }.lparams { width = dip(48); height = dip(48); margin = dip(8) }
@@ -452,7 +441,6 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                 id = SEARCH
                 textSize = 10f
                 onClick {
-                    ui.owner.mService?.removeScanUpdates()
                     browse("https://sk2.st.ryukoku.ac.jp/search.php")
                 }
             }.lparams {

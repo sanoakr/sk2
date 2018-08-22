@@ -37,8 +37,8 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         private const val PACKAGE_NAME = "jp.ac.ryukoku.st.sk2"
         private val TAG = ScanService::class.java.simpleName
 
-        const val NOTIFICATION_ID = 12345678
-        const val CHANNEL_ID = "channel_0123" //The name of the channel for notifications.
+        const val NOTIFICATION_ID: Int = 123
+        const val CHANNEL_ID = "channel_123" //The name of the channel for notifications.
 
         internal const val ACTION_BROADCAST = "$PACKAGE_NAME.broadcast"
         internal const val EXTRA_BLESCAN = "$PACKAGE_NAME.scan"
@@ -46,8 +46,8 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
 
         private const val SCAN_INTERVAL_IN_MILLISECONDS: Long = 1000 // 1 sec.
         const val AUTO_SENDING_INTERVAL_IN_MILLISECONDS: Long = 5*60*1000 // 5 min.
-        const val AUTO_SENDING_INTERVAL_IN_MILLISECONDS_DEBUG: Long = 5*1000 // 5 sec.
-        private const val WAKEUP_INTERVAL_IN_MILLISECONDS: Long = 10*60*1000 // 10 min.
+        const val AUTO_SENDING_INTERVAL_IN_MILLISECONDS_DEBUG: Long = 10*1000 // 10 sec.
+        private const val WAKEUP_INTERVAL_IN_MILLISECONDS: Long = 10*60*1000 // 1 min.
         private const val WAKEUP_MAX_COUNT_TO_BLE_RESET: Int = 6
 
         private const val PERMISSION_SENDING_TIMME_FROM: Int = 8
@@ -72,12 +72,9 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
 
             //val builder = NotificationCompat.Builder(this)
             val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-                    .addAction(R.drawable.ic_launch, getString(R.string.launch_activity),
-                            activityPendingIntent)
-                    .addAction(R.drawable.ic_cancel, getString(R.string.remove_location_updates),
-                            servicePendingIntent)
+                    .addAction(R.drawable.ic_launch, "Launch Activity", activityPendingIntent)
+                    .addAction(R.drawable.ic_cancel, "Remove updates", servicePendingIntent)
                     .setContentText(text)
-                    //.setContentTitle(Utils.getLocationTitle(this))
                     .setContentTitle("Sk2サーバへの送信")
                     .setOngoing(true)
                     .setPriority(NotificationManager.IMPORTANCE_LOW)
@@ -108,7 +105,6 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         btWakeupHandler.postDelayed(wakeupTimer, WAKEUP_INTERVAL_IN_MILLISECONDS)
     }
     ////////////////////////////////////////
-    private var auto = false
     private val intervalHandler = Handler()
     private val timer = Runnable { interval() }
     private var period: Long = AUTO_SENDING_INTERVAL_IN_MILLISECONDS
@@ -118,16 +114,16 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
     }
     ////////////////////////////////////////
     fun startInterval(debug: Boolean) {
-        if (auto) { stopInterval(); auto = false }
+        stopInterval()
 
-        period = if (debug) AUTO_SENDING_INTERVAL_IN_MILLISECONDS_DEBUG
+        period = if (debug)
+            AUTO_SENDING_INTERVAL_IN_MILLISECONDS_DEBUG
         else
             AUTO_SENDING_INTERVAL_IN_MILLISECONDS
 
-        Log.d(TAG,"start auto interval in $period msec")
         intervalHandler.postDelayed(timer, period)
+        Log.d(TAG,"start auto interval in $period msec")
 
-        auto = true
         pref.edit()
                 .putBoolean("auto", true)
                 .apply()
@@ -136,7 +132,6 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         Log.d(TAG,"stop auto interval")
         intervalHandler.removeCallbacks(timer)
 
-        auto = false
         pref.edit()
                 .putBoolean("auto", false)
                 .apply()
@@ -162,12 +157,14 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         // Android O requires a Notification Channel.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = getString(R.string.app_name)
+            val name = "Update Foreground Service"
+
             // Create the channel for the notification
             if (notificationManager.getNotificationChannel(CHANNEL_ID) == null) {
+
                 val mChannel = NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_LOW)
                 mChannel.apply {
-                    description = "notification Description"
+                    description = "Sk2のサーバ送信通知"
                 }
                 // Set the Notification Channel for the Notification Manager.
                 mNotificationManager!!.createNotificationChannel(mChannel)
@@ -323,14 +320,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
 
         if (sk2.getScanRunning()) {
             Log.d(TAG, "Starting foreground service")
-
-            val fgIntent = Intent(this, ScanService::class.java)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                this.startForegroundService(fgIntent)
-            } else {
-                this.startService(fgIntent)
-            }
-            startForeground(NOTIFICATION_ID, notification)
+            startScanForeground()
         }
         return true // Ensures onRebind() is called when a client re-binds.
     }
@@ -338,9 +328,24 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
     override fun onDestroy() {
         removeScanUpdates()
         stopInterval()
-        mServiceHandler!!.removeCallbacksAndMessages(null)
+        btWakeupHandler?.removeCallbacks(wakeupTimer)
+        mServiceHandler?.removeCallbacksAndMessages(null)
     }
     ////////////////////////////////////////////////////////////////////////////////
+    fun startScanForeground() {
+        if (pref.getBoolean("auto", false))  //
+            startInterval(pref.getBoolean("debug", false))
+
+        val fgIntent = Intent(this, ScanService::class.java)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            this.startForegroundService(fgIntent)
+        else
+            this.startService(fgIntent)
+
+        startForeground(NOTIFICATION_ID, notification)
+
+    }
     ////////////////////////////////////////
     fun requestScanUpdates() {
         Log.d(TAG, "Requesting BLE scan updates")
@@ -361,6 +366,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
 
         mScanner.stopScan(mScanCallback)   // stop Ble Scanner
         sk2.setScanRunning(false)
+
         stopSelf()
     }
     ////////////////////////////////////////
@@ -371,8 +377,15 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         val curDatetime = Moment()
         if (curDatetime.compareTo(lastArray.datetime) < WAKEUP_INTERVAL_IN_MILLISECONDS) {
             Log.d(TAG, "Restart BLE scan updates")
-            removeScanUpdates()
-            requestScanUpdates()
+
+            if (serviceIsRunningInForeground(this)) {
+                stopForeground(true)
+                startScanForeground()
+
+            } else {
+                removeScanUpdates()
+                requestScanUpdates()
+            }
         }
 
         if (wakeupCount >= WAKEUP_MAX_COUNT_TO_BLE_RESET){

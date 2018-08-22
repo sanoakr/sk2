@@ -8,7 +8,10 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.ListView
 import org.jetbrains.anko.*
+import org.jetbrains.anko.support.v4.onRefresh
+import org.jetbrains.anko.support.v4.swipeRefreshLayout
 
 ////////////////////////////////////////////////////////////////////////////////
 class LocalRecordActivity : AppCompatActivity(), AnkoLogger {
@@ -29,16 +32,29 @@ class LocalRecordActivity : AppCompatActivity(), AnkoLogger {
 }
 ////////////////////////////////////////////////////////////////////////////////
 class LocalRecordActivityUi: AnkoComponent<LocalRecordActivity> {
+    lateinit var recordList: ListView
     ////////////////////////////////////////
     override fun createView(ui: AnkoContext<LocalRecordActivity>) = with(ui) {
         verticalLayout {
             padding = dip(10)
             ////////////////////////////////////////
-            listView {
-                doAsync {
-                    val recAdapter = LocalRecordAdapter(ui.owner)
-                    uiThread {
-                        adapter = recAdapter
+            swipeRefreshLayout {
+                onRefresh {
+                    doAsync {
+                        val recAdapter = LocalRecordAdapter(ui.owner)
+                        uiThread {
+                            recordList.adapter = recAdapter
+                        }
+                        isRefreshing = false
+                    }
+                }
+                ////////////////////////////////////////
+                recordList = listView {
+                    doAsync {
+                        val recAdapter = LocalRecordAdapter(ui.owner)
+                        uiThread {
+                            adapter = recAdapter
+                        }
                     }
                 }
             }

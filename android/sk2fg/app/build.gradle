@@ -45,8 +45,12 @@ dependencies {
     implementation 'me.mattak:moment:0.0.4'
     implementation 'no.nordicsemi.android.support.v18:scanner:1.1.0'
     implementation 'com.neovisionaries:nv-bluetooth:1.8'
-    //implementation 'org.altbeacon:android-beacon-library:2.15'
 
     implementation 'com.google.code.gson:gson:2.8.5'
+}
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
 }
 
