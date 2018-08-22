@@ -538,9 +538,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			}
 			
 			// デバッグ画面にiBeaconの値を表示
-			var beaconText:String = "\(appDelegate.currentTime())\n\n\(beaconUuids[0])\n"
+			var beaconText:String = "now: \(appDelegate.currentTime())\n\nuuid: \(beaconUuids[0])\n"
 			for str in debugBeaconDetails {
-				beaconText += "\(String(describing: str))\n"
+				beaconText += "-->\(String(describing: str))\n"
 			}
 			
 			debugText.text = String(describing: beaconText)
@@ -565,45 +565,55 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	
 	
 	func sendAttend(user: String, key: String, type: String, beaconDetails: Array<String>) -> String{
-		let val:String
+		let resultVal:String
 		let now = appDelegate.currentTime()
-		var sendtext = "\(user),\(key),\(type),\(now),"
+		var sendtext = "\(user),\(key),\(type),\(now)"
 		
-		print("beaconDetails: \(beaconDetails)")
+		print("beaconDetails: \(beaconDetails.count)")
 		
-		for value in beaconDetails {
-			sendtext += "\(value),"
+		//iBeaconの検知数が3以上ある場合
+		if(beaconDetails.count > 2) {
+			for i in stride(from: 0, to: 3, by: 1) {
+				sendtext += ",\(beaconDetails[i])"
+				print("\(i)回目のループの値は\(beaconDetails[i])")
+			}
+		} else {
+			for value in beaconDetails {
+				sendtext += ",\(value)"
+			}
+			for _ in stride(from: 0, to: (3 - beaconDetails.count), by: 1) {
+				sendtext += ",,,"
+			}
 		}
-		
 		print("sendtext:\(sendtext)")
 		
 		// socket通信
 		print("--------------------- sendAttend begin ---------------------")
 		Connection.connect()
 		
-		let sendtext2 = "\(user),\(key),\(type),\(now),2,2,1.1,2,2,0.12345,1,1,0.12345"
+//		let sendtext2 = "\(user),\(key),\(type),\(now),2,2,1.1,2,2,0.12345,1,1,0.12345"
 		
 		// ローカルログ（対応中）
 		let log = myUserDefault.string(forKey: "log")
 		myUserDefault.set("\(log!)\n\(sendtext)", forKey: "log")
 		//        print("log: \(log!)")
 		print("--------------------- sendAttend end ---------------------")
-		let retval = Connection.sendCommand(command: sendtext2)
+		let retVal = Connection.sendCommand(command: sendtext)
 		
 		// 値がカラの場合はエラー
-		if(retval.isEmpty) {
-			val = "fail"
+		if(retVal.isEmpty) {
+			resultVal = "fail"
 		} else {
-			let result:String = retval["response"] as! String;
+			let result:String = retVal["response"] as! String;
 			
 			// 出席が正常に記録された場合の処理
 			if result == "success" {
-				val = "success"
+				resultVal = "success"
 			} else {
-				val = "fail"
+				resultVal = "fail"
 			}
 		}
-		return val
+		return resultVal
 	}
 	
 	// ログアウト
