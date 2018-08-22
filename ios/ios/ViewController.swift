@@ -306,7 +306,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			print("自動送信機能のチェック：\(appDelegate.postInterval)ごと")   //デバッグ
 			
 			// データ送信
-			let result = sendAttend(user: user, key: key, type: "M", beaconDetails: beaconDetails)
+			let result = sendAttend(user: user, key: key, type: "A", beaconDetails: beaconDetails)
 			
 			// データが正常に記録された場合の処理
 			if result == "success" {
