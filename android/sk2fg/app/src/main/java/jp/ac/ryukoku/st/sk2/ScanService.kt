@@ -235,6 +235,13 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
         val lastArray = sk2.lastScan
         val curDatetime = Moment()
 
+        // check sending time
+        if ( (! pref.getBoolean("debug", false)) && (curDatetime.hour < 8 || curDatetime.hour > 20))  {
+            sendBroadcast("設定時間外です")
+            warn("sendInfoToServer; Overtime use")
+            return "Overtime use"
+        }
+
         var message: String? = null
         // Last scan recording time difference within 60 secs
         if (curDatetime.compareTo(lastArray.datetime) < ATTENDANCE_TIME_DIFFERENCE_MILLISEC

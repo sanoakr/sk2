@@ -19,13 +19,14 @@ class Queue <T>(list: MutableList<T>, size: Int = 100): AnkoLogger {
     override fun toString() = items.toString()
 
     fun push(element: T){
-        info(count())
+        //info(count())
+        /*
         items.forEach { e ->
             if (e is AttendData) {
                 info("AttendData")
             } else
                 info("Not an AttendData")
-        }
+        }*/
         if (element != null) {
             items.add(0, element)
             if (count() > maxsize) {
