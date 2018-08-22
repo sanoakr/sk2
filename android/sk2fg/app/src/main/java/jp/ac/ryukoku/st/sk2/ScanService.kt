@@ -19,7 +19,6 @@ import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
 import com.neovisionaries.bluetooth.ble.advertising.IBeacon
-import jp.ac.ryukoku.st.sk2.MainActivity.Companion.ATTENDANCE_TIME_DIFFERENCE_MILLISEC
 import me.mattak.moment.Moment
 import no.nordicsemi.android.support.v18.scanner.*
 import org.jetbrains.anko.*
@@ -46,9 +45,11 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
 
         private const val SCAN_INTERVAL_IN_MILLISECONDS: Long = 1000 // 1 sec.
         const val AUTO_SENDING_INTERVAL_IN_MILLISECONDS: Long = 5*60*1000 // 5 min.
-        const val AUTO_SENDING_INTERVAL_IN_MILLISECONDS_DEBUG: Long = 10*1000 // 10 sec.
-        private const val WAKEUP_INTERVAL_IN_MILLISECONDS: Long = 10*60*1000 // 1 min.
+        const val AUTO_SENDING_INTERVAL_IN_MILLISECONDS_DEBUG: Long = 60*1000 // 1 min.
+        private const val WAKEUP_INTERVAL_IN_MILLISEC: Long = 10*60*1000 // 10 min.
         private const val WAKEUP_MAX_COUNT_TO_BLE_RESET: Int = 6
+
+        private const val ATTENDANCE_TIME_DIFFERENCE_SEC: Long = 60
 
         private const val PERMISSION_SENDING_TIMME_FROM: Int = 8
         private const val PERMISSION_SENDING_TIMME_TO: Int = 20
@@ -102,7 +103,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
     private val wakeupTimer = Runnable { wakeup() }
     private fun wakeup() {
         restartScanUpdates()
-        btWakeupHandler.postDelayed(wakeupTimer, WAKEUP_INTERVAL_IN_MILLISECONDS)
+        btWakeupHandler.postDelayed(wakeupTimer, WAKEUP_INTERVAL_IN_MILLISEC)
     }
     ////////////////////////////////////////
     private val intervalHandler = Handler()
@@ -170,12 +171,12 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
                 mNotificationManager!!.createNotificationChannel(mChannel)
             }
         }
-
+        // always restat scanner
+        restartScanUpdates()
         // start auto interval
         if (pref.getBoolean("auto", false)) startInterval(pref.getBoolean("debug", false))
-
         // start wakeup interval
-        btWakeupHandler.postDelayed(wakeupTimer, WAKEUP_INTERVAL_IN_MILLISECONDS)
+        btWakeupHandler.postDelayed(wakeupTimer, WAKEUP_INTERVAL_IN_MILLISEC)
     }
     /********** BLE **********/
     ////////////////////////////////////////
@@ -233,13 +234,13 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
 
         var message: String? = null
         // Last scan recording time difference within 60 secs
-        if (curDatetime.compareTo(lastArray.datetime) < ATTENDANCE_TIME_DIFFERENCE_MILLISEC
+        if (differenceSec(curDatetime, lastArray.datetime) < ATTENDANCE_TIME_DIFFERENCE_SEC
                 && lastArray.count() > 0) {
 
             val dtString = lastArray.datetime.format("yyy-MM-dd HH:mm:ss")
             val uid = pref.getString("uid", "")
             val key = pref.getString("key", "")
-            val message = "$uid,$key,$type,$dtString" +
+            message = "$uid,$key,$type,$dtString" +
                     lastArray.getBeaconsText(false, false, false)
             Log.d(TAG,"SEND to sk2; $message")
 
@@ -327,13 +328,13 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
     ////////////////////////////////////////
     override fun onDestroy() {
         removeScanUpdates()
-        stopInterval()
-        btWakeupHandler?.removeCallbacks(wakeupTimer)
-        mServiceHandler?.removeCallbacksAndMessages(null)
+        intervalHandler.removeCallbacks(timer)
+        btWakeupHandler.removeCallbacks(wakeupTimer)
+        mServiceHandler!!.removeCallbacksAndMessages(null)
     }
     ////////////////////////////////////////////////////////////////////////////////
     fun startScanForeground() {
-        if (pref.getBoolean("auto", false))  //
+        if (pref.getBoolean("auto", false))
             startInterval(pref.getBoolean("debug", false))
 
         val fgIntent = Intent(this, ScanService::class.java)
@@ -344,7 +345,6 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
             this.startService(fgIntent)
 
         startForeground(NOTIFICATION_ID, notification)
-
     }
     ////////////////////////////////////////
     fun requestScanUpdates() {
@@ -375,7 +375,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
 
         val lastArray = sk2.lastScan
         val curDatetime = Moment()
-        if (curDatetime.compareTo(lastArray.datetime) < WAKEUP_INTERVAL_IN_MILLISECONDS) {
+        if (differenceSec(curDatetime, lastArray.datetime) < WAKEUP_INTERVAL_IN_MILLISEC/1000) {
             Log.d(TAG, "Restart BLE scan updates")
 
             if (serviceIsRunningInForeground(this)) {
@@ -398,7 +398,8 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         internal val service: ScanService
             get() = this@ScanService
     }
-    ////////////////////////////////////////
+////////////////////////////////////////
+    @Suppress("DEPRECATION")
     fun serviceIsRunningInForeground(context: Context): Boolean {
         val manager = context.getSystemService(
                 Context.ACTIVITY_SERVICE) as ActivityManager

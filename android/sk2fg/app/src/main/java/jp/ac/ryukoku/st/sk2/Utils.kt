@@ -7,6 +7,11 @@ import java.lang.Math.pow
 import java.util.*
 
 ////////////////////////////////////////
+fun differenceSec(m1: Moment, m2: Moment): Long {
+    return m1.epoch - m2.epoch
+}
+
+////////////////////////////////////////
 fun getWeekDayString(moment: Moment): String {
     return moment.format("yyyy-MM-dd E HH:mm:ss ZZZZ")
 }

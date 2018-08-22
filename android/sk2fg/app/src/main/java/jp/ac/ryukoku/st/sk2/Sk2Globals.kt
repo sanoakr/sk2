@@ -40,8 +40,8 @@ class Sk2Globals: Application() {
     ////////////////////////////////////////
     val SCAN_RUNNING = "scan_running"
     val VALID_IBEACON_UUID: List<String> = listOf(
-            "ebf59ccc-21f2-4558-9488-00f2b388e5e6"//, // ru-wifi
-            //"00000000-87b3-1001-b000-001c4d975326"  // sekimoto's
+            "ebf59ccc-21f2-4558-9488-00f2b388e5e6", // ru-wifi
+            "00000000-87b3-1001-b000-001c4d975326"  // sekimoto's
     )
     ////////////////////////////////////////////////////////////////////////////////
     override fun onCreate() {

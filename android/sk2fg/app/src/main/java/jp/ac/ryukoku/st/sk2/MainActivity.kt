@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     ////////////////////////////////////////
     companion object {
         const val MAX_SEND_BEACON_NUM: Int = 10
-        const val ATTENDANCE_TIME_DIFFERENCE_MILLISEC: Int = 60 * 1000
+
 
         const val ATTENDANCE_VIBRATE_MILLISEC: Long = 1        // vibration time
 
@@ -105,11 +105,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         if (!checkInfo(mainUi))
             startActivity(intentFor<LoginActivity>().clearTop())
 
-        // restore auto setting
-        val auto = pref.getBoolean("auto", false)
-        mainUi.autoSw.isChecked = auto
-        if (auto) mService!!.startInterval(pref.getBoolean("debug", false))
-
         if (!checkBt()) {
             toast("Bloothoothオンにしてください")
             mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
@@ -118,24 +113,24 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
 
         if (pref.getBoolean("debug", false)) {
-            mainUi.searchBt.visibility = View.VISIBLE
             mainUi.startBt.visibility = View.VISIBLE
             mainUi.stopBt.visibility = View.VISIBLE
             mainUi.scanInfo.visibility = View.VISIBLE
-            mainUi.qclearBt.visibility = View.VISIBLE
         } else {
-            mainUi.searchBt.visibility = View.INVISIBLE
             mainUi.startBt.visibility = View.INVISIBLE
             mainUi.stopBt.visibility = View.INVISIBLE
             mainUi.scanInfo.visibility = View.INVISIBLE
-            mainUi.qclearBt.visibility = View.INVISIBLE
         }
+
+        // restore auto setting
+        val auto = pref.getBoolean("auto", false)
+        mainUi.autoSw.isChecked = auto
+        if (auto) mService?.startInterval(pref.getBoolean("debug", false))
 
         // Vibrator
         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
         setButtonsState(sk2.getScanRunning())
-        //setAutoState(pref.getBoolean("auto", false))
     }
     ////////////////////////////////////////
     override fun onPause() {
@@ -157,7 +152,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     }
     ////////////////////////////////////////
     override fun onDestroy() {
-        mService?.stopInterval()
+        //mService?.stopInterval()
         mService?.removeScanUpdates()
         sk2.saveQueue()  // save localQueue to sharedPreference
         super.onDestroy()
@@ -254,18 +249,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     ////////////////////////////////////////
     private inner class MyReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            /*****
-            val location = intent.getParcelableExtra<Location>(LocationUpdatesService.EXTRA_LOCATION)
-            if (location != null) {
-                Toast.makeText(this@MainActivity, Utils.getLocationText(location),
-                        Toast.LENGTH_SHORT).show()
-            }
-            *****/
             val message = intent.getSerializableExtra(ScanService.EXTRA_BLESCAN) as String
             toast(message)
-            //info(message)
-            // show debug scaninfo
-            //mainUi.scanInfo.text = Utils.getBeaconText(Moment().toString(), beaconPairs)
         }
     }
     ////////////////////////////////////////
@@ -319,11 +304,9 @@ class MainActivityUi: AnkoComponent<MainActivity> {
     lateinit var startBt: Button
     lateinit var stopBt: Button
     lateinit var attBt: Button
-    lateinit var searchBt: Button
-    lateinit var qclearBt: Button
     lateinit var autoSw: Switch
     val USER = 1; val AUTO = 2; val ATTEND = 3; val MENU = 4;
-    val UPDATE = 91;  val SEARCH = 92; val QUEUE = 93
+    val UPDATE = 91;  val SEARCH = 92
     ////////////////////////////////////////
     override fun createView(ui: AnkoContext<MainActivity>) = with(ui) {
         val sk2 = ui.owner.application as Sk2Globals
@@ -402,7 +385,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                     ui.owner.vibrate()
                     ui.owner.attendance('M')
                 }
-            }.lparams{
+            }.lparams {
                 width = dip(200); height = dip(200)//; margin = dip(50);
                 /*below(UPDATE);*/ above(MENU); centerHorizontally(); centerVertically()
             }
@@ -435,26 +418,6 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                 }.lparams { width = dip(48); height = dip(48); margin = dip(8) }
             }.lparams {
                 alignParentBottom(); centerHorizontally()
-            }
-            ////////////////////////////////////////
-            searchBt = button("Web Search") {
-                id = SEARCH
-                textSize = 10f
-                onClick {
-                    browse("https://sk2.st.ryukoku.ac.jp/search.php")
-                }
-            }.lparams {
-                topOf(MENU); centerHorizontally()
-            }
-            ////////////////////////////////////////
-            qclearBt = button("Clear Local Queue") {
-                id = QUEUE
-                textSize = 10f
-                onClick {
-                    sk2.localQueue = Queue<AttendData>(mutableListOf())
-                }
-            }.lparams {
-                topOf(SEARCH); centerHorizontally()
             }
         }
     }

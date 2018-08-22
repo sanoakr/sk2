@@ -74,9 +74,10 @@ class RecordActivity : AppCompatActivity(),AnkoLogger {
 class RecordActivityUi: AnkoComponent<RecordActivity> {
     lateinit var recordList: ListView
     lateinit var localBt: Button
-    val LISTVIEW = 1; val LOCAL = 2
+    val LISTVIEW = 1; val LOCAL = 2; val CLEAR = 3
     ////////////////////////////////////////
     override fun createView(ui: AnkoContext<RecordActivity>) = with(ui) {
+        val sk2 = ui.owner.application as Sk2Globals
         relativeLayout {
             padding = dip(8)
             ////////////////////////////////////////
@@ -86,8 +87,8 @@ class RecordActivityUi: AnkoComponent<RecordActivity> {
                         val recAdapter = RecordAdapter(ui.owner)
                         uiThread {
                             recordList.adapter = recAdapter
+                            isRefreshing = false
                         }
-                        isRefreshing = false
                     }
                 }
                 ////////////////////////////////////////
@@ -107,7 +108,16 @@ class RecordActivityUi: AnkoComponent<RecordActivity> {
                 onClick {
                     startActivity<LocalRecordActivity>()
                 }
+            }.lparams { above(CLEAR); alignParentStart(); alignParentEnd() }
+            ////////////////////////////////////////
+            button("Clear Local Queue") {
+                id = CLEAR
+                textSize = 10f
+                onClick {
+                    sk2.localQueue = Queue<AttendData>(mutableListOf())
+                }
             }.lparams { alignParentBottom(); alignParentStart(); alignParentEnd() }
+
         }
     }
 }
