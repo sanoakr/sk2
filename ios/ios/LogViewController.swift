@@ -27,16 +27,8 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		// UserDefaultの生成.
 		let myUserDefault:UserDefaults = UserDefaults()
 		// 登録されているUserDefaultから設定値を呼び出す.
-		let autoSender:Int = myUserDefault.integer(forKey: "autoSender")
-		let debug:Int = myUserDefault.integer(forKey: "debug")
-		
 		let userName:String = myUserDefault.string(forKey: "user")!
 		let key:String = myUserDefault.string(forKey: "key")!
-		
-		print("autoSender:", autoSender)
-		print("debug:", debug)
-		print("user:", userName)
-		print("key:", key)
 		
 		// socket通信
 		let sendtext = "\(userName),\(key)"
@@ -46,8 +38,8 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		let retval = tmp.sorted(){ $0.0 < $1.0 }
 		
 		// ログデータを取得しTableViewに渡す
-		for (key, value) in retval {
-			myItems += ["\(key):\(value)"]
+		for (_, value) in retval {
+			myItems += ["\(value)"]
 		}
 		
 		print("retval:\n\(retval)")  //デバッグ
@@ -60,10 +52,15 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		let displayHeight: CGFloat = self.view.frame.height
 		
 		// TableViewの生成(Status barの高さをずらして表示).
-		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight, width: displayWidth, height: displayHeight))
+		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 75, width: displayWidth, height: displayHeight - 135))
+		
+		// セルの高さ
+//		myTableView.estimatedRowHeight = 100
+//		myTableView.rowHeight = UITableViewAutomaticDimension
+		myTableView.rowHeight = 100
 		
 		// Cell名の登録をおこなう.
-		myTableView.register(UITableViewCell.self, forCellReuseIdentifier: "MyCell")
+		myTableView.register(MyCell.self, forCellReuseIdentifier: NSStringFromClass(MyCell.self))
 		
 		// DataSourceを自身に設定する.
 		myTableView.dataSource = self
@@ -71,24 +68,34 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		// Delegateを自身に設定する.
 		myTableView.delegate = self
 		
-		// セルの高さ
-		myTableView.estimatedRowHeight = 30
-		myTableView.rowHeight = UITableViewAutomaticDimension
-		
 		// Viewに追加する.
 		self.view.addSubview(myTableView)
 		
 		
 		// --------------------------------------------------------------------------------------------------------------------------
+		// タイトル
+		let labelTitle = UILabel(frame: CGRect(x:0, y: barHeight + 5, width:self.view.frame.width, height:30))
+		labelTitle.font = UIFont.systemFont(ofSize: 18.0)    //フォントサイズ
+		labelTitle.font = UIFont.boldSystemFont(ofSize: UIFont.labelFontSize)	//  ボールド
+		labelTitle.textAlignment = NSTextAlignment.center    // センター寄せ
+		labelTitle.text = "ログ表示"
+		view.addSubview(labelTitle)  // Viewに追加
+		
+		// --------------------------------------------------------------------------------------------------------------------------
+		// ローカルログボタン
+		let localLogButton = UIButton(frame: CGRect(x:0,y: Int(barHeight + 35),width: Int(self.view.frame.width),height:40))
+		localLogButton.setTitle("ローカルログに切り替える", for: .normal)  //タイトル
+		localLogButton.backgroundColor = appDelegate.ifNormalColor
+		localLogButton.addTarget(self, action: #selector(LogViewController.back(_:)), for: .touchUpInside)
+		view.addSubview(localLogButton)  // Viewに追加
+		
+		// --------------------------------------------------------------------------------------------------------------------------
 		// 戻るボタン
-		
 		let backButton = UIButton(frame: CGRect(x:0,y: Int(self.view.frame.height - 40),width: Int(self.view.frame.width),height:40))
-		
 		backButton.setTitle("閉じる", for: .normal)  //タイトル
 		backButton.backgroundColor = appDelegate.ifNormalColor
 		backButton.addTarget(self, action: #selector(LogViewController.back(_:)), for: .touchUpInside)
 		view.addSubview(backButton)  // Viewに追加
-		
 	}
 	
 	override func didReceiveMemoryWarning() {
@@ -101,7 +108,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		print("Num: \(indexPath.row)")
 		print("Value: \(myItems[indexPath.row])")
 	}
-	
+
 	// Cellの総数を返す
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return myItems.count
@@ -110,22 +117,18 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 	// Cellに値を設定する
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		// 再利用するCellを取得する.
-		let cell = tableView.dequeueReusableCell(withIdentifier: "MyCell", for: indexPath as IndexPath)
-		
-		// Cellに値を設定する.
-		cell.textLabel!.font = UIFont.systemFont(ofSize: 16)
-		cell.textLabel!.numberOfLines = 0
+		let cell = tableView.dequeueReusableCell(withIdentifier: NSStringFromClass(MyCell.self), for: indexPath) as! MyCell
 		
 		// 値を取得してカンマで分割
 		let splitRead = (myItems[indexPath.row] as AnyObject).components(separatedBy: ",")
-		var textVal:String = ""
 		
-		// 分割した値を1行ずつ改行して追加
-		for str in splitRead {
-			textVal += "\n\(str)"
-		}
-		
-		cell.textLabel!.text = textVal
+//		cell.textLabel!.text = textVal
+		cell.labelUUid.text = splitRead[0]
+		cell.labelMode.text = splitRead[1]
+		cell.labelDate.text = splitRead[2]
+		cell.labelVal1.text = "major:\(splitRead[3]) minor:\(splitRead[4]) rssi:\(splitRead[5]) "
+		cell.labelVal2.text = "major:\(splitRead[6]) minor:\(splitRead[7]) rssi:\(splitRead[8]) "
+		cell.labelVal3.text = "major:\(splitRead[9]) minor:\(splitRead[10]) rssi:\(splitRead[11]) "
 		
 		return cell
 	}
@@ -135,6 +138,57 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 	@objc func back(_ sender: UIButton) {// selectorで呼び出す場合Swift4からは「@objc」をつける。
 		self.dismiss(animated: true, completion: nil)
 	}
+}
+
+class MyCell: UITableViewCell {
+	var labelUUid: UILabel!
+	var labelMode: UILabel!
+	var labelDate: UILabel!
+	var labelVal1: UILabel!
+	var labelVal2: UILabel!
+	var labelVal3: UILabel!
+	
+	override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+		super.init(style: style, reuseIdentifier: reuseIdentifier)
+		
+		labelUUid = UILabel(frame: CGRect.zero)
+		contentView.addSubview(labelUUid)
+		
+		labelMode = UILabel(frame: CGRect.zero)
+		contentView.addSubview(labelMode)
+		
+		labelDate = UILabel(frame: CGRect.zero)
+		labelDate.font = UIFont.boldSystemFont(ofSize: UIFont.labelFontSize)	//  ボールド
+		contentView.addSubview(labelDate)
+		
+		labelVal1 = UILabel(frame: CGRect.zero)
+		contentView.addSubview(labelVal1)
+		
+		labelVal2 = UILabel(frame: CGRect.zero)
+		contentView.addSubview(labelVal2)
+		
+		labelVal3 = UILabel(frame: CGRect.zero)
+		contentView.addSubview(labelVal3)
+	}
+	
+	required init(coder aDecoder: NSCoder) {
+		fatalError("init(coder: ) has not been implemented")
+	}
+	
+	override func prepareForReuse() {
+		super.prepareForReuse()
+	}
+	
+	override func layoutSubviews() {
+		super.layoutSubviews()
+		labelDate.frame = CGRect(x: 10, y: -40, width: frame.width, height: frame.height)
+		labelMode.frame = CGRect(x: frame.width - 30, y: -40, width: frame.width, height: frame.height)
+		labelUUid.frame = CGRect(x: 20, y: -20, width: frame.width, height: frame.height)
+		labelVal1.frame = CGRect(x: 20, y: 0, width: frame.width, height: frame.height)
+		labelVal2.frame = CGRect(x: 20, y: 20, width: frame.width, height: frame.height)
+		labelVal3.frame = CGRect(x: 20, y: 40, width: frame.width, height: frame.height)
+	}
+	
 }
 
 // --------------------------------------------------------------------------------------------------------------------------
