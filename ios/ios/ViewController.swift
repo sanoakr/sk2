@@ -26,7 +26,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	var leftBarButton: UIBarButtonItem!
 	var rightBarButton: UIBarButtonItem!
 	var attendBtn: UIButton!
-	var daytime : UILabel!
 	var debugText : UITextView!
 	var labelUser : UILabel!
 	var labelBeacon : UILabel!
@@ -46,7 +45,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		super.viewDidLoad()
 		
 		// デバイスの固有ID取得
-		//print(UIDevice.current.identifierForVendor)
+//		print("DeviceID: \(String(describing: UIDevice.current.identifierForVendor))")
 		
 		// UI定義
 		let btnWidth = Int(self.view.frame.width / 3)
@@ -75,18 +74,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		view.addSubview(labelUser)  // Viewに追加
 		
 		// --------------------------------------------------------------------------------------------------------------------------
-		// daytimeを生成
-		daytime = UILabel(frame: CGRect(x:10, y:self.view.frame.height - 150, width:self.view.frame.width - 20, height:30))
-		daytime.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
-		daytime.textAlignment = NSTextAlignment.center    // センター寄せ
-		//view.addSubview(daytime)  // Viewに追加
-		
-		let now = appDelegate.currentTime()
-		daytime.text = String(describing: now)
-		
-		// --------------------------------------------------------------------------------------------------------------------------
 		// debugTextを生成
-		debugText = UITextView(frame: CGRect(x:10, y:self.view.frame.height - 120, width:self.view.frame.width - 20, height:60))
+		debugText = UITextView(frame: CGRect(x:10, y:self.view.frame.height / 2 - 180, width:self.view.frame.width - 20, height:160))
 		debugText.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
 		debugText.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)    // 背景色
 		debugText.isEditable = false    // 編集不可
@@ -94,10 +83,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		
 		// デバッグモードの場合
 		if(debugMode == 1) {
-			view.addSubview(daytime)
 			view.addSubview(debugText)
 		} else {
-			daytime.removeFromSuperview()
 			debugText.removeFromSuperview()
 		}
 		
@@ -107,9 +94,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// ナビゲーション
 		self.navigationItem.title = appDelegate.appTitle
 		
+		// --------------------------------------------------------------------------------------------------------------------------
 		// 自動送信トグルスイッチを生成
 		let SWautoSender: UISwitch = UISwitch()
-		SWautoSender.layer.position = CGPoint(x: self.view.bounds.width - 50, y: 175)
+		SWautoSender.layer.position = CGPoint(x: self.view.bounds.width - 50, y: 125)
 		if(autoSender == 0) {
 			SWautoSender.isOn = false    // SwitchをOffに設定
 		} else if( autoSender == 1 ) {
@@ -122,7 +110,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		
 		// --------------------------------------------------------------------------------------------------------------------------
 		// 出席ボタンを設置
-		attendBtn = UIButton(frame: CGRect(x: (self.view.frame.width/2 - 100),y: (self.view.frame.height/2 - 50),width: 200,height:200))
+		attendBtn = UIButton(frame: CGRect(x: (self.view.frame.width/2 - 100),y: (self.view.frame.height - 300),width: 200,height:200))
 		attendBtn.addTarget(self, action: #selector(ViewController.sendAttend(sender:)), for: .touchUpInside)
 		attendBtn.titleLabel?.lineBreakMode = .byWordWrapping
 		attendBtn.titleLabel?.numberOfLines = 0
@@ -222,7 +210,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// ボタンの動き
 		attendBtn.backgroundColor = appDelegate.ifOnDownColor //色
 		attendBtn.layer.shadowOpacity = 0
-		attendBtn.frame = CGRect(x: (self.view.frame.width/2 - 100),y: (self.view.frame.height/2 - 45),width: 200,height:200)
 		
 		print("beaconDetails: \(beaconDetails)")
 		
@@ -362,7 +349,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			})
 			
 			// 出席ボタンの表示を変更する
-			self.attendBtn.frame = CGRect(x: (self.view.frame.width/2 - 100),y: (self.view.frame.height/2 - 50),width: 200,height:200)
 			self.attendBtn.backgroundColor = self.appDelegate.ifActiveColor //色
 			self.attendBtn.layer.shadowOpacity = 0.3
 		})
@@ -552,7 +538,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			}
 			
 			// デバッグ画面にiBeaconの値を表示
-			var beaconText:String = "\(beaconUuids[0])\n"
+			var beaconText:String = "\(appDelegate.currentTime())\n\n\(beaconUuids[0])\n"
 			for str in debugBeaconDetails {
 				beaconText += "\(String(describing: str))\n"
 			}
