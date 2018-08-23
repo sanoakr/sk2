@@ -127,6 +127,7 @@ class Sk2Globals: Application() {
                 "ebf59ccc-21f2-4558-9488-00f2b388e5e6", // ru-wifi
                 "00000000-87b3-1001-b000-001c4d975326"  // sekimoto's
         )
+        val UUID_MASK = "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"
     }
     ////////////////////////////////////////
     // Shared Preferences

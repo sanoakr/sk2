@@ -40,6 +40,7 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_HOSTNAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_PORT
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_REPLY_FAIL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_TIMEOUT_MILLISEC
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.UUID_MASK
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.VALID_IBEACON_UUID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.WAKEUP_INTERVAL_IN_MILLISEC
 import me.mattak.moment.Moment
@@ -158,10 +159,19 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         mScanner = BluetoothLeScannerCompat.getScanner()
         scanSettings = ScanSettings.Builder()
                 .setLegacy(false)
-                .setScanMode(ScanSettings.SCAN_MODE_BALANCED).setReportDelay(SCAN_INTERVAL_IN_MILLISECONDS)
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                .setReportDelay(SCAN_INTERVAL_IN_MILLISECONDS)
                 .setUseHardwareBatchingIfSupported(false)
                 .build()
-        scanFilters = ArrayList() // ArrayList<ScanFilter>() // フィルタは空 == 全て受け取る
+
+        val builder = ScanFilter.Builder()
+        // Apple Manufacture ID 0x004c
+
+        builder.setManufacturerData(0x004c, byteArrayOf())
+        scanFilters = arrayListOf( builder.build() )
+
+        // フィルターが空だとバックグラウンドで止まる
+        //scanFilters = ArrayList() // ArrayList<ScanFilter>() // フィルタは空 == 全て受け取る
 
         // Handler スレッドを開始
         val handlerThread = HandlerThread(TAG)
@@ -429,9 +439,6 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
     ////////////////////////////////////////////////////////////////////////////////
     /*** ScanService を Foreground で開始 ***/
     fun startScanForeground() {
-        if (pref.getBoolean(PREF_AUTO, false))
-            startInterval(pref.getBoolean(PREF_DEBUG, false))
-
         val fgIntent = Intent(this, ScanService::class.java)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -440,6 +447,9 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
             this.startService(fgIntent)
 
         startForeground(NOTIFICATION_ID, notification)
+
+        if (pref.getBoolean(PREF_AUTO, false))
+            startInterval(pref.getBoolean(PREF_DEBUG, false))
     }
     ////////////////////////////////////////
     /*** BLE スキャナを再スタート ***/
@@ -448,6 +458,9 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
 
         mScanner.stopScan(mScanCallback)
         mScanner.startScan(scanFilters, scanSettings, mScanCallback) // start Ble Scanner
+
+        if (pref.getBoolean(PREF_AUTO, false))
+            startInterval(pref.getBoolean(PREF_DEBUG, false))
     }
     ////////////////////////////////////////
     /*** 自分への Binder ***/
