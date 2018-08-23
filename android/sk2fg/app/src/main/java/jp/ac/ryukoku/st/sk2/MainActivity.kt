@@ -7,16 +7,14 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.content.SharedPreferences
-import android.os.IBinder
 import android.preference.PreferenceManager
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AppCompatActivity
-import android.os.Bundle
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
-import android.os.Vibrator
+import android.os.*
 import android.provider.Settings
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
@@ -46,6 +44,9 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_NORMAL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_CHECK_BLE_OFF
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
+import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 /*** メイン画面: これがアクティブな間は ScanService は通常の Background、ここから外れると Foreground ***/
@@ -97,6 +98,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         if (!checkPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)) {
             requestPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)
         }
+        // Doze mode での実行許可を要求 (> 23M)
+        requestDozeIgnore()
     }
     ////////////////////////////////////////
     override fun onStart() {
@@ -204,6 +207,20 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                         .apply()
             }
             true // O.K.
+        }
+    }
+    ////////////////////////////////////////////////////////////////////////////////
+    /*** Doze パーミッションをチェック ***/
+    fun requestDozeIgnore() {
+        // above Android Marshmallow(23) requires a REQUEST_IGNORE_BATTERY_OPTIMIZATIONS Permission
+        // for running services under the Doze mode.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val powerManager = this.getSystemService(PowerManager::class.java)
+            if (!powerManager.isIgnoringBatteryOptimizations(getPackageName())) {
+                val intent = Intent(ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                intent.data = Uri.parse("package:$packageName")
+                startActivity(intent)
+            }
         }
     }
     ////////////////////////////////////////////////////////////////////////////////
@@ -321,8 +338,15 @@ class MainActivityUi: AnkoComponent<MainActivity> {
     lateinit var stopBt: Button
     lateinit var attBt: Button
     lateinit var autoSw: Switch
-    val USER = 1; val AUTO = 2; val ATTEND = 3; val MENU = 4;
-    val UPDATE = 91;  val SEARCH = 92
+
+    companion object {
+        val USER = 1; val AUTO = 2; val ATTEND = 3; val MENU = 4;
+        val UPDATE = 91;  val SEARCH = 92
+
+        const val BUTTON_TEXT_AUTO = "Auto"
+        const val TOAST_MAIN_AUTO_ON = "Auto ON"
+        const val TOAST_MAIN_AUTO_OFF = "Auto OFF"
+    }
     ////////////////////////////////////////
     override fun createView(ui: AnkoContext<MainActivity>) = with(ui) {
         val sk2 = ui.owner.application as Sk2Globals
@@ -341,18 +365,18 @@ class MainActivityUi: AnkoComponent<MainActivity> {
             ////////////////////////////////////////
             autoSw = switch {
                 id = AUTO
-                text = "Auto"
+                text = BUTTON_TEXT_AUTO
                 textSize = TEXT_SIZE_LARGE
                 onClick {
                     if (isChecked) {
-                        ui.owner.mService!!.startInterval(pref.getBoolean("debug", false))
-                        toast("Auto ON")
+                        ui.owner.mService!!.startInterval(pref.getBoolean(PREF_DEBUG, false))
+                        toast(TOAST_MAIN_AUTO_ON)
                     } else {
                         ui.owner.mService!!.stopInterval()
-                        toast("Auto OFF")
+                        toast(TOAST_MAIN_AUTO_OFF)
                     }
                     pref.edit()
-                            .putBoolean("auto", isChecked)
+                            .putBoolean(PREF_AUTO, isChecked)
                             .apply()
                 }
             }.lparams {

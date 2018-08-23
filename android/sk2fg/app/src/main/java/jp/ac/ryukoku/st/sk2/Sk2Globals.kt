@@ -85,7 +85,7 @@ class Sk2Globals: Application() {
         const val SCAN_INTERVAL_IN_MILLISECONDS: Long = 1000                  // 1 sec.
         // 自動記録のインターバル
         const val AUTO_SENDING_INTERVAL_IN_MILLISECONDS: Long = 5*60*1000     // 5 min.
-        const val AUTO_SENDING_INTERVAL_IN_MILLISECONDS_DEBUG: Long = 60*1000 // デバック用 1 min.
+        const val AUTO_SENDING_INTERVAL_IN_MILLISECONDS_DEBUG: Long = 10*1000 // デバック用 10 sec.
         // BLE Scanner 強制再スタートのインターバル
         const val WAKEUP_INTERVAL_IN_MILLISEC: Long = 10*60*1000              // 10 min.
         // 最新のスキャン結果を送信記録に利用可能な時間差の最大値
