@@ -567,20 +567,23 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	func sendAttend(user: String, key: String, type: String, beaconDetails: Array<String>) -> String{
 		let resultVal:String
 		let now = appDelegate.currentTime()
-		var sendtext = "\(user),\(key),\(type),\(now)"
+//		var sendtext = "\(user),\(key),\(type),\(now)"
+		var sendtext = "\(key),\(type),\(now)"
 		
 		print("beaconDetails: \(beaconDetails.count)")
 		
-		//iBeaconの検知数が3以上ある場合
+		//iBeaconの検出数が3以上ある場合
 		if(beaconDetails.count > 2) {
 			for i in stride(from: 0, to: 3, by: 1) {
 				sendtext += ",\(beaconDetails[i])"
 				print("\(i)回目のループの値は\(beaconDetails[i])")
 			}
 		} else {
+			//検出したiBeaconの値を入れる
 			for value in beaconDetails {
 				sendtext += ",\(value)"
 			}
+			//不足分をカラの値に入れる
 			for _ in stride(from: 0, to: (3 - beaconDetails.count), by: 1) {
 				sendtext += ",,,"
 			}
@@ -591,13 +594,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		print("--------------------- sendAttend begin ---------------------")
 		Connection.connect()
 		
-//		let sendtext2 = "\(user),\(key),\(type),\(now),2,2,1.1,2,2,0.12345,1,1,0.12345"
+		// ローカルログへ保存
+		saveLocalLog(sendtext: sendtext)
 		
-		// ローカルログ（対応中）
-		let log = myUserDefault.string(forKey: "log")
-		myUserDefault.set("\(log!)\n\(sendtext)", forKey: "log")
-		//        print("log: \(log!)")
 		print("--------------------- sendAttend end ---------------------")
+		sendtext = "\(user)," + sendtext
 		let retVal = Connection.sendCommand(command: sendtext)
 		
 		// 値がカラの場合はエラー
@@ -614,6 +615,27 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			}
 		}
 		return resultVal
+	}
+	
+	// ローカルログの保存
+	@objc internal func saveLocalLog(sendtext: String) {
+		
+		var log = Array<Any>()
+		
+		// ローカルログが存在する場合
+		if myUserDefault.array(forKey: "log") != nil {
+			
+			// その値を取得して配列に追加
+			log = myUserDefault.array(forKey: "log")!
+			
+			// 指定数を超えた過去のログは削除
+			if( log.count >= Int(appDelegate.maxLocalLog) ) {
+				log.removeLast()
+			}
+		}
+		
+		log.insert(sendtext, at: 0)
+		myUserDefault.set(log, forKey: "log")
 	}
 	
 	// ログアウト

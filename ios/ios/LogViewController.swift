@@ -13,15 +13,70 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 	// AppDelegateのインスタンスを取得
 	let appDelegate: AppDelegate = UIApplication.shared.delegate as! AppDelegate
 	
+	// Status Barの高さを取得する.
+	let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height
+	
 	var Connection = Connection2()
 	
 	// Tableで使用する配列を設定する
 	private var myItems: Array<Any> = []
 	private var myTableView: UITableView!
 	
+	// UserDefaultの生成
+	let myUserDefault:UserDefaults = UserDefaults()
+	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
+		// --------------------------------------------------------------------------------------------------------------------------
+		// タイトル
+		let labelTitle = UILabel(frame: CGRect(x:0, y: barHeight + 5, width:self.view.frame.width, height:30))
+		labelTitle.font = UIFont.systemFont(ofSize: 18.0)    //フォントサイズ
+		labelTitle.font = UIFont.boldSystemFont(ofSize: UIFont.labelFontSize)	//  ボールド
+		labelTitle.textAlignment = NSTextAlignment.center    // センター寄せ
+		labelTitle.text = "ログ表示"
+		view.addSubview(labelTitle)  // Viewに追加
+		
+		// --------------------------------------------------------------------------------------------------------------------------
+		// UISegmentedControlの表示
+		
+		// ボタンの表記を配列で作成
+		let array = ["サーバーログ","ローカルログ"]
+		
+		// UISegmentedControlのインスタンス作成
+		let segment: UISegmentedControl = UISegmentedControl(items: array as [AnyObject])
+		
+		// segmentの位置を設定
+		segment.center = CGPoint(x: Int(self.view.frame.width / 2), y: Int(barHeight + 55))
+		
+		// ボタンを押した時の処理を設定
+		segment.addTarget(self, action: #selector(LogViewController.change(segment:)), for: UIControlEvents.valueChanged)
+		
+		// ViewにsegmentをsubViewとして追加
+		self.view.addSubview(segment)
+		
+		//初期値のセット
+		segment.selectedSegmentIndex = 0
+		
+		//サーバーログを表示
+		showServerLog()
+
+		// --------------------------------------------------------------------------------------------------------------------------
+		// 戻るボタン
+		let backButton = UIButton(frame: CGRect(x:0,y: Int(self.view.frame.height - 40),width: Int(self.view.frame.width),height:40))
+		backButton.setTitle("閉じる", for: .normal)  //タイトル
+		backButton.backgroundColor = appDelegate.ifNormalColor
+		backButton.addTarget(self, action: #selector(LogViewController.back(_:)), for: .touchUpInside)
+		view.addSubview(backButton)  // Viewに追加
+		
+	}
+	
+	override func didReceiveMemoryWarning() {
+		super.didReceiveMemoryWarning()
+		// Dispose of any resources that can be recreated.
+	}
+	
+	@objc func showServerLog() {
 		Connection.connect()
 		
 		// UserDefaultの生成.
@@ -37,15 +92,15 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		// keysを昇順でソートする
 		let retval = tmp.sorted(){ $0.0 < $1.0 }
 		
+		//配列を初期化
+		myItems = Array()
+		
 		// ログデータを取得しTableViewに渡す
 		for (_, value) in retval {
 			myItems += ["\(value)"]
 		}
 		
-		print("retval:\n\(retval)")  //デバッグ
-		
-		// Status Barの高さを取得する.
-		let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height
+		print("myItems:\n\(myItems)")  //デバッグ
 		
 		// Viewの高さと幅を取得する.
 		let displayWidth: CGFloat = self.view.frame.width
@@ -55,9 +110,9 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 75, width: displayWidth, height: displayHeight - 135))
 		
 		// セルの高さ
-//		myTableView.estimatedRowHeight = 100
-//		myTableView.rowHeight = UITableViewAutomaticDimension
-		myTableView.rowHeight = 100
+		//		myTableView.estimatedRowHeight = 100
+		//		myTableView.rowHeight = UITableViewAutomaticDimension
+		myTableView.rowHeight = 120
 		
 		// Cell名の登録をおこなう.
 		myTableView.register(MyCell.self, forCellReuseIdentifier: NSStringFromClass(MyCell.self))
@@ -70,37 +125,71 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		
 		// Viewに追加する.
 		self.view.addSubview(myTableView)
-		
-		
-		// --------------------------------------------------------------------------------------------------------------------------
-		// タイトル
-		let labelTitle = UILabel(frame: CGRect(x:0, y: barHeight + 5, width:self.view.frame.width, height:30))
-		labelTitle.font = UIFont.systemFont(ofSize: 18.0)    //フォントサイズ
-		labelTitle.font = UIFont.boldSystemFont(ofSize: UIFont.labelFontSize)	//  ボールド
-		labelTitle.textAlignment = NSTextAlignment.center    // センター寄せ
-		labelTitle.text = "ログ表示"
-		view.addSubview(labelTitle)  // Viewに追加
-		
-		// --------------------------------------------------------------------------------------------------------------------------
-		// ローカルログボタン
-		let localLogButton = UIButton(frame: CGRect(x:0,y: Int(barHeight + 35),width: Int(self.view.frame.width),height:40))
-		localLogButton.setTitle("ローカルログに切り替える", for: .normal)  //タイトル
-		localLogButton.backgroundColor = appDelegate.ifNormalColor
-		localLogButton.addTarget(self, action: #selector(LogViewController.back(_:)), for: .touchUpInside)
-		view.addSubview(localLogButton)  // Viewに追加
-		
-		// --------------------------------------------------------------------------------------------------------------------------
-		// 戻るボタン
-		let backButton = UIButton(frame: CGRect(x:0,y: Int(self.view.frame.height - 40),width: Int(self.view.frame.width),height:40))
-		backButton.setTitle("閉じる", for: .normal)  //タイトル
-		backButton.backgroundColor = appDelegate.ifNormalColor
-		backButton.addTarget(self, action: #selector(LogViewController.back(_:)), for: .touchUpInside)
-		view.addSubview(backButton)  // Viewに追加
 	}
 	
-	override func didReceiveMemoryWarning() {
-		super.didReceiveMemoryWarning()
-		// Dispose of any resources that can be recreated.
+	@objc func showLocalLog() {
+		print("ローカルログを表示")
+		
+		// 一旦テーブルを削除
+		myTableView.removeFromSuperview()
+		
+		// ローカルログの取得
+		if myUserDefault.array(forKey: "log") != nil {
+
+			let localLog:Array = myUserDefault.array(forKey: "log")!
+			print("localLog: \(localLog)")
+			
+			//配列を初期化
+			myItems = Array()
+			
+			// ログデータを取得しTableViewに渡す
+			myItems = localLog
+			
+			// Viewの高さと幅を取得する.
+			let displayWidth: CGFloat = self.view.frame.width
+			let displayHeight: CGFloat = self.view.frame.height
+			
+			// TableViewの生成(Status barの高さをずらして表示).
+			myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 75, width: displayWidth, height: displayHeight - 135))
+			
+			// セルの高さ
+			//		myTableView.estimatedRowHeight = 100
+			//		myTableView.rowHeight = UITableViewAutomaticDimension
+			myTableView.rowHeight = 120
+			
+			// Cell名の登録をおこなう.
+			myTableView.register(MyCell.self, forCellReuseIdentifier: NSStringFromClass(MyCell.self))
+			
+			// DataSourceを自身に設定する.
+			myTableView.dataSource = self
+			
+			// Delegateを自身に設定する.
+			myTableView.delegate = self
+			
+			// Viewに追加する.
+			self.view.addSubview(myTableView)
+		}
+	}
+	
+	//ボタンを押した時の処理
+	@objc func change(segment:UISegmentedControl){
+		
+		//ボタンごとの処理をswitch文で処理
+		switch segment.selectedSegmentIndex {
+			
+		case 0:
+			print("サーバーログ")
+			//サーバーログを表示
+			showServerLog()
+
+		case 1:
+			print("ローカルログ")
+			showLocalLog()
+			
+		default:
+			print("デフォルト")
+		}
+		
 	}
 	
 	// Cellが選択された際に呼び出される
@@ -108,7 +197,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		print("Num: \(indexPath.row)")
 		print("Value: \(myItems[indexPath.row])")
 	}
-
+	
 	// Cellの総数を返す
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return myItems.count
@@ -122,14 +211,16 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		// 値を取得してカンマで分割
 		let splitRead = (myItems[indexPath.row] as AnyObject).components(separatedBy: ",")
 		
-//		cell.textLabel!.text = textVal
-		cell.labelUUid.text = splitRead[0]
-		cell.labelMode.text = splitRead[1]
-		cell.labelDate.text = splitRead[2]
-		cell.labelVal1.text = "major:\(splitRead[3]) minor:\(splitRead[4]) rssi:\(splitRead[5]) "
-		cell.labelVal2.text = "major:\(splitRead[6]) minor:\(splitRead[7]) rssi:\(splitRead[8]) "
-		cell.labelVal3.text = "major:\(splitRead[9]) minor:\(splitRead[10]) rssi:\(splitRead[11]) "
-		
+		//配列数をチェック
+		if( splitRead.count == 12 ) {
+			cell.labelDate.text = " \(splitRead[2])"
+			cell.labelMode.text = splitRead[1]
+			cell.labelVal1.text = "major:\(splitRead[3]) minor:\(splitRead[4]) rssi:\(splitRead[5]) "
+			cell.labelVal2.text = "major:\(splitRead[6]) minor:\(splitRead[7]) rssi:\(splitRead[8]) "
+			cell.labelVal3.text = "major:\(splitRead[9]) minor:\(splitRead[10]) rssi:\(splitRead[11]) "
+		} else {
+			cell.labelDate.text = "値が不正です"
+		}
 		return cell
 	}
 	
@@ -141,7 +232,6 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 }
 
 class MyCell: UITableViewCell {
-	var labelUUid: UILabel!
 	var labelMode: UILabel!
 	var labelDate: UILabel!
 	var labelVal1: UILabel!
@@ -151,23 +241,22 @@ class MyCell: UITableViewCell {
 	override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
 		super.init(style: style, reuseIdentifier: reuseIdentifier)
 		
-		labelUUid = UILabel(frame: CGRect.zero)
-		contentView.addSubview(labelUUid)
-		
-		labelMode = UILabel(frame: CGRect.zero)
+		labelMode = UILabel()
+		labelMode.backgroundColor = appDelegate.backgroundColor
 		contentView.addSubview(labelMode)
 		
-		labelDate = UILabel(frame: CGRect.zero)
+		labelDate = UILabel()
 		labelDate.font = UIFont.boldSystemFont(ofSize: UIFont.labelFontSize)	//  ボールド
+		labelDate.backgroundColor = appDelegate.backgroundColor
 		contentView.addSubview(labelDate)
 		
-		labelVal1 = UILabel(frame: CGRect.zero)
+		labelVal1 = UILabel()
 		contentView.addSubview(labelVal1)
 		
-		labelVal2 = UILabel(frame: CGRect.zero)
+		labelVal2 = UILabel()
 		contentView.addSubview(labelVal2)
 		
-		labelVal3 = UILabel(frame: CGRect.zero)
+		labelVal3 = UILabel()
 		contentView.addSubview(labelVal3)
 	}
 	
@@ -181,12 +270,11 @@ class MyCell: UITableViewCell {
 	
 	override func layoutSubviews() {
 		super.layoutSubviews()
-		labelDate.frame = CGRect(x: 10, y: -40, width: frame.width, height: frame.height)
-		labelMode.frame = CGRect(x: frame.width - 30, y: -40, width: frame.width, height: frame.height)
-		labelUUid.frame = CGRect(x: 20, y: -20, width: frame.width, height: frame.height)
-		labelVal1.frame = CGRect(x: 20, y: 0, width: frame.width, height: frame.height)
-		labelVal2.frame = CGRect(x: 20, y: 20, width: frame.width, height: frame.height)
-		labelVal3.frame = CGRect(x: 20, y: 40, width: frame.width, height: frame.height)
+		labelDate.frame = CGRect(x: 0, y: 0, width: frame.width - 30, height: 40)
+		labelMode.frame = CGRect(x: frame.width - 30, y: 0, width: 30, height: 40)
+		labelVal1.frame = CGRect(x: 20, y: 50, width: frame.width, height: 20)
+		labelVal2.frame = CGRect(x: 20, y: 70, width: frame.width, height: 20)
+		labelVal3.frame = CGRect(x: 20, y: 90, width: frame.width, height: 20)
 	}
 	
 }

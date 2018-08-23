@@ -24,6 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	//    var uuidList = ["00000000-87B3-1001-B000-001C4D975326"] //検知対象は1つのUUID。(OS等のバージョンで検出可能な上限数は20個程度が目安)
 	var uuidList = ["ebf59ccc-21f2-4558-9488-00f2b388e5e6"] //本番meraki
 	var debugUser = "testuser-skmt"
+	var maxLocalLog = 10
 	
 	// VC共通カラー
 	var backgroundColor = UIColor(red: 0.93, green: 0.94, blue: 0.95, alpha: 1)
