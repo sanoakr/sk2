@@ -133,12 +133,12 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
         // デバッグモードの表示設定
         if (pref.getBoolean(PREF_DEBUG, false)) {
-            mainUi.startBt.visibility = View.VISIBLE
-            mainUi.stopBt.visibility = View.VISIBLE
+            //mainUi.startBt.visibility = View.VISIBLE
+            //mainUi.stopBt.visibility = View.VISIBLE
             mainUi.scanInfo.visibility = View.VISIBLE
         } else {
-            mainUi.startBt.visibility = View.INVISIBLE
-            mainUi.stopBt.visibility = View.INVISIBLE
+            //mainUi.startBt.visibility = View.INVISIBLE
+            //mainUi.stopBt.visibility = View.INVISIBLE
             mainUi.scanInfo.visibility = View.INVISIBLE
         }
 
@@ -353,7 +353,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
         val pref = sk2.pref
 
         relativeLayout {
-            padding = dip(8)
+            padding = dip(4)
             ////////////////////////////////////////
             userInfo = textView("User Info") {
                 id = USER
@@ -383,36 +383,12 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                 alignParentTop(); alignParentEnd()
             }
             ////////////////////////////////////////////////////////////////////////////////
-            linearLayout {
-                id = UPDATE
-                ////////////////////////////////////////
-                startBt = button("Start Scan Update") {
-                    textSize = TEXT_SIZE_NORMAL
-                    onClick {
-                        if (!ui.owner.checkPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                            ui.owner.requestPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)
-                        } else {
-                            ui.owner.mService?.requestScanUpdates()
-                        }
-                    }
-                }
-                ////////////////////////////////////////
-                stopBt = button("Stop Scan Update") {
-                    textSize = TEXT_SIZE_NORMAL
-                    onClick {
-                        ui.owner.mService?.removeScanUpdates()
-                    }
-                }
-            }.lparams {
-                below(USER); centerHorizontally()
-            }
-            ////////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////
             scanInfo = textView("Scan Info") {
                 textColor = Color.BLACK
                 textSize = TEXT_SIZE_NORMAL
             }.lparams {
-                below(UPDATE); alignParentStart()
+                below(USER); alignParentStart(); margin = dip(8)
             }
             ////////////////////////////////////////
             attBt = button("出席") {
@@ -457,7 +433,31 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                     }
                 }.lparams { width = dip(48); height = dip(48); margin = dip(8) }
             }.lparams {
-                alignParentBottom(); centerHorizontally()
+                above(UPDATE); centerHorizontally()
+            }
+            ////////////////////////////////////////////////////////////////////////////////
+            linearLayout {
+                id = UPDATE
+                ////////////////////////////////////////
+                startBt = button("Start Scan Update") {
+                    textSize = TEXT_SIZE_NORMAL
+                    onClick {
+                        if (!ui.owner.checkPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                            ui.owner.requestPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)
+                        } else {
+                            ui.owner.mService?.requestScanUpdates()
+                        }
+                    }
+                }.lparams { weight = 1f }
+                ////////////////////////////////////////
+                stopBt = button("Stop Scan Update") {
+                    textSize = TEXT_SIZE_NORMAL
+                    onClick {
+                        ui.owner.mService?.removeScanUpdates()
+                    }
+                }.lparams { weight = 1f }
+            }.lparams {
+                alignParentBottom(); centerHorizontally(); width = matchParent
             }
         }
     }

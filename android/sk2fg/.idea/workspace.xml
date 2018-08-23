@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AndroidLogFilters">
+    <option name="TOOL_WINDOW_CUSTOM_FILTER" value="start auto" />
     <option name="TOOL_WINDOW_LOG_LEVEL" value="debug" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
@@ -29,7 +30,7 @@
     <splitter split-orientation="horizontal" split-proportion="0.42545456">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="Sk2Globals.kt" pinned="false" current-in-tab="true">
+          <file leaf-file-name="Sk2Globals.kt" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/Sk2Globals.kt">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="590">
@@ -59,10 +60,10 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="RecordActivity.kt" pinned="false" current-in-tab="false">
+          <file leaf-file-name="RecordActivity.kt" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/RecordActivity.kt">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="157">
+                <state relative-caret-position="-1254">
                   <caret line="73" column="45" lean-forward="false" selection-start-line="73" selection-start-column="45" selection-end-line="73" selection-end-column="45" />
                   <folding />
                 </state>
@@ -113,11 +114,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="ScanService.kt" pinned="false" current-in-tab="true">
+          <file leaf-file-name="ScanService.kt" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/ScanService.kt">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="2261">
-                  <caret line="133" column="0" lean-forward="false" selection-start-line="133" selection-start-column="0" selection-end-line="133" selection-end-column="0" />
+                <state relative-caret-position="240">
+                  <caret line="126" column="21" lean-forward="false" selection-start-line="126" selection-start-column="8" selection-end-line="126" selection-end-column="21" />
                   <folding>
                     <element signature="e#30#2878#0" expanded="true" />
                   </folding>
@@ -125,12 +126,14 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="MainActivity.kt" pinned="false" current-in-tab="false">
+          <file leaf-file-name="MainActivity.kt" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/MainActivity.kt">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-100">
-                  <caret line="46" column="36" lean-forward="false" selection-start-line="46" selection-start-column="36" selection-end-line="46" selection-end-column="36" />
-                  <folding />
+                <state relative-caret-position="543">
+                  <caret line="140" column="14" lean-forward="false" selection-start-line="140" selection-start-column="14" selection-end-line="140" selection-end-column="14" />
+                  <folding>
+                    <element signature="e#30#2342#0" expanded="true" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -171,13 +174,13 @@
       <find>ANDROID</find>
       <find>Foreground</find>
       <find>ble</find>
-      <find>restart</find>
-      <find>startInterval</find>
       <find>startScanFore</find>
       <find>Interval</find>
       <find>Oreo</find>
-      <find>auto</find>
       <find>startinterval</find>
+      <find>restart</find>
+      <find>auto</find>
+      <find>startInterval</find>
     </findStrings>
   </component>
   <component name="GradleLocalSettings">
@@ -2297,8 +2300,8 @@
         <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/values/strings.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/Sk2Globals.kt" />
-        <option value="$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/MainActivity.kt" />
         <option value="$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/ScanService.kt" />
+        <option value="$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/MainActivity.kt" />
       </list>
     </option>
   </component>
@@ -2538,6 +2541,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1920" height="1200" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32919255" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -2549,7 +2553,7 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Logcat" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20851819" sideWeight="0.49753916" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.20851819" sideWeight="0.49753916" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -2649,7 +2653,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4879">
           <caret line="315" column="23" lean-forward="false" selection-start-line="315" selection-start-column="23" selection-end-line="315" selection-end-column="23" />
-          <folding />
+          <folding>
+            <element signature="e#30#2342#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -2749,7 +2755,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="5848">
           <caret line="372" column="0" lean-forward="false" selection-start-line="372" selection-start-column="0" selection-end-line="372" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#30#2342#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -2775,7 +2783,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1343">
           <caret line="107" column="17" lean-forward="false" selection-start-line="107" selection-start-column="12" selection-end-line="107" selection-end-column="17" />
-          <folding />
+          <folding>
+            <element signature="e#30#2342#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -2783,7 +2793,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="459">
           <caret line="107" column="17" lean-forward="false" selection-start-line="107" selection-start-column="12" selection-end-line="107" selection-end-column="17" />
-          <folding />
+          <folding>
+            <element signature="e#30#2342#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -2880,14 +2892,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/RecordActivity.kt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="73" column="45" lean-forward="false" selection-start-line="73" selection-start-column="45" selection-end-line="73" selection-end-column="45" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/Sk2Globals.kt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="590">
@@ -2896,20 +2900,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/MainActivity.kt">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/ScanService.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-100">
-          <caret line="46" column="36" lean-forward="false" selection-start-line="46" selection-start-column="36" selection-end-line="46" selection-end-column="36" />
+        <state relative-caret-position="240">
+          <caret line="126" column="21" lean-forward="false" selection-start-line="126" selection-start-column="8" selection-end-line="126" selection-end-column="21" />
+          <folding>
+            <element signature="e#30#2878#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/RecordActivity.kt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1254">
+          <caret line="73" column="45" lean-forward="false" selection-start-line="73" selection-start-column="45" selection-end-line="73" selection-end-column="45" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/ScanService.kt">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/jp/ac/ryukoku/st/sk2/MainActivity.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2261">
-          <caret line="133" column="0" lean-forward="false" selection-start-line="133" selection-start-column="0" selection-end-line="133" selection-end-column="0" />
+        <state relative-caret-position="543">
+          <caret line="140" column="14" lean-forward="false" selection-start-line="140" selection-start-column="14" selection-end-line="140" selection-end-column="14" />
           <folding>
-            <element signature="e#30#2878#0" expanded="true" />
+            <element signature="e#30#2342#0" expanded="true" />
           </folding>
         </state>
       </provider>
