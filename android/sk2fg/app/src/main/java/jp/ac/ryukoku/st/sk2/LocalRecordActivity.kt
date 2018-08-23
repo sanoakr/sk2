@@ -9,20 +9,27 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ListView
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_LARGE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_NORMAL
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TITLE_LOCALRECORD
 import org.jetbrains.anko.*
 import org.jetbrains.anko.support.v4.onRefresh
 import org.jetbrains.anko.support.v4.swipeRefreshLayout
 
 ////////////////////////////////////////////////////////////////////////////////
+/*** ローカル記録の表示 ***/
 class LocalRecordActivity : AppCompatActivity(), AnkoLogger {
     ////////////////////////////////////////
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val sk2 = this.application as Sk2Globals
-        title = "ローカル記録：${sk2.app_title} ${sk2.app_name}"
+        title = "$TITLE_LOCALRECORD: $APP_TITLE $APP_NAME"
         LocalRecordActivityUi().setContentView(this)
     }
+    /////////////////////////////////////////
+    // バックキーではメイン画面に直接戻る
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             startActivity(intentFor<MainActivity>().clearTop())
@@ -31,6 +38,7 @@ class LocalRecordActivity : AppCompatActivity(), AnkoLogger {
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
+/*** UI構成 via Anko ***/
 class LocalRecordActivityUi: AnkoComponent<LocalRecordActivity> {
     lateinit var recordList: ListView
     ////////////////////////////////////////
@@ -38,6 +46,7 @@ class LocalRecordActivityUi: AnkoComponent<LocalRecordActivity> {
         verticalLayout {
             padding = dip(10)
             ////////////////////////////////////////
+            // PULLスワイプでデータを再取得してViewを更新
             swipeRefreshLayout {
                 onRefresh {
                     doAsync {
@@ -73,16 +82,16 @@ class LocalRecordAdapter(val activity: LocalRecordActivity): BaseAdapter() {
             verticalLayout {
                 ////////////////////////////////////////
                 linearLayout {
-                    padding = dip(5)
+                    padding = dip(4)
                     ////////////////////////////////////////
                     textView(getWeekDayString(item.datetime)) {
-                        textSize = 14f
+                        textSize = TEXT_SIZE_LARGE
                         backgroundColor = Color.WHITE // for Huwai's initAdditionalStyle default Error.
                         typeface = Typeface.DEFAULT_BOLD
                     }.lparams { horizontalGravity = left; weight = 1f }
                     ////////////////////////////////////////
                     textView(item.type.toString()) {
-                        textSize = 14f
+                        textSize = TEXT_SIZE_LARGE
                         backgroundColor = Color.WHITE // for Huwai's initAdditionalStyle default Error.
                         typeface = Typeface.DEFAULT_BOLD
                     }.lparams { horizontalGravity = right }
@@ -93,16 +102,16 @@ class LocalRecordAdapter(val activity: LocalRecordActivity): BaseAdapter() {
                         padding = dip(3)
                         ////////////////////////////////////////
                         textView("Majour=${item.getMajor(0)}") {
-                            textSize = 12f
+                            textSize = TEXT_SIZE_NORMAL
                         }.lparams { horizontalGravity = left; weight = 1f }
                         ////////////////////////////////////////
                         textView("Minor=${item.getMinor(0)}") {
-                            textSize = 12f
+                            textSize = TEXT_SIZE_NORMAL
                         }.lparams { horizontalGravity = left; weight = 1f }
                         ////////////////////////////////////////
                         textView("Distance=${item.getDistance(0)} m") {
-                            textSize = 12f
-                        }.lparams { horizontalGravity = left; weight = 2f; leftMargin = dip(5) }
+                            textSize = TEXT_SIZE_NORMAL
+                        }.lparams { horizontalGravity = left; weight = 2f; leftMargin = dip(4) }
                     }
                 }
                 if (item.count() > 1) {
@@ -111,16 +120,16 @@ class LocalRecordAdapter(val activity: LocalRecordActivity): BaseAdapter() {
                         padding = dip(3)
                         ////////////////////////////////////////
                         textView("Majour=${item.getMajor(1)}") {
-                            textSize = 12f
+                            textSize = TEXT_SIZE_NORMAL
                         }.lparams { horizontalGravity = left; weight = 1f }
                         ////////////////////////////////////////
                         textView("Minor=${item.getMinor(1)}") {
-                            textSize = 12f
+                            textSize = TEXT_SIZE_NORMAL
                         }.lparams { horizontalGravity = left; weight = 1f }
                         ////////////////////////////////////////
                         textView("Distance=${item.getDistance(1)} m") {
-                            textSize = 12f
-                        }.lparams { horizontalGravity = right; weight = 2f; leftMargin = dip(5) }
+                            textSize = TEXT_SIZE_NORMAL
+                        }.lparams { horizontalGravity = right; weight = 2f; leftMargin = dip(4) }
                     }
                 }
                 if (item.count() > 2) {
@@ -129,16 +138,16 @@ class LocalRecordAdapter(val activity: LocalRecordActivity): BaseAdapter() {
                         padding = dip(3)
                         ////////////////////////////////////////
                         textView("Majour=${item.getMajor(2)}") {
-                            textSize = 12f
+                            textSize = TEXT_SIZE_NORMAL
                         }.lparams { horizontalGravity = left; weight = 1f }
                         ////////////////////////////////////////
                         textView("Minor=${item.getMinor(2)}") {
-                            textSize = 12f
+                            textSize = TEXT_SIZE_NORMAL
                         }.lparams { horizontalGravity = left; weight = 1f }
                         ////////////////////////////////////////
                         textView("Distance=${item.getDistance(2)} m") {
-                            textSize = 12f
-                        }.lparams { horizontalGravity = right; weight = 2f; leftMargin = dip(5) }
+                            textSize = TEXT_SIZE_NORMAL
+                        }.lparams { horizontalGravity = right; weight = 2f; leftMargin = dip(4) }
                     }
                 }
             }

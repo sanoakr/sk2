@@ -4,13 +4,28 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.Settings
-import android.provider.Settings.Secure.getString
 import android.support.v4.content.ContextCompat
 import android.text.InputType.*
 import android.view.Gravity
-import android.view.View
-import android.widget.Button
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_KEY
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_LOGIN_TIME
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_UID
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_USER_NAME
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_COMMAND_AUTH
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_HOSTNAME
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_PORT
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_REPLY_AUTH_FAIL
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_REPLY_FAIL
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_TIMEOUT_MILLISEC
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TITLE_LOGIN
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_CANT_CONNECT_SERVER
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOGIN_ATTEMPT_ATMARK
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOGIN_ATTEMPT_PASSWD
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOGIN_ATTEMPT_UID
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOGIN_FAIL
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOGIN_SUCCESS
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.io.BufferedReader
@@ -26,39 +41,32 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
     lateinit var sk2: Sk2Globals
     lateinit var pref: SharedPreferences
 
-    ////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sk2 = this.application as Sk2Globals
         pref = sk2.pref
 
-        title = "ログイン：${sk2.app_title} ${sk2.app_name}"
+        title = "$TITLE_LOGIN: $APP_TITLE $APP_NAME"
         loginUi.setContentView(this)
-
         //val androidId = getString(this.contentResolver, Settings.Secure.ANDROID_ID)
         //toast(androidId)
     }
     ////////////////////////////////////////
     override fun onResume() {
         super.onResume()
-
-        //loginUi.testBt.visibility = if (sk2.prefMap.getOrDefault("debug", false) as Boolean)
-        //loginUi.testBt.visibility = if (sk2.prefMap["debug"] as Boolean ?: false)
-        //    View.VISIBLE else View.INVISIBLE
-
-        val uid = pref.getString("uid", "")
-        if (uid.isNotBlank()) { startActivity<MainActivity>() }
+        // ユーザIDが空でなければ、そのままメインアクティビティへ
+        if (pref.getString(PREF_UID, "").isNotBlank()) { startActivity<MainActivity>() }
     }
     ////////////////////////////////////////
+    // サーバでログイン認証
     fun attemptLogin(user: String, passwd: String) {
-        if (user.isBlank()) {
-            toast("学籍番号を入力して下さい")
-        } else if (passwd.isBlank()) {
-            toast("パスワードを入力して下さい")
-        } else if(user.contains('@')) {
-            toast("認証IDに @ 以降を含めないで下さい")
+        when {
+            user.isBlank() -> toast(TOAST_LOGIN_ATTEMPT_UID)
+            passwd.isBlank() -> toast(TOAST_LOGIN_ATTEMPT_PASSWD)
+            user.contains('@') -> toast(TOAST_LOGIN_ATTEMPT_ATMARK)
         }
-        // authentication on sk2 Server
+        // sk2 サーバで認証してログイン
         doAsync {
             val result = authServer(user, passwd)
             uiThread {
@@ -67,84 +75,91 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
         }
     }
     ////////////////////////////////////////
-    fun authServer(user: String, passwd: String): String {
-        val serverHost = sk2.serverHost
-        val serverPort = sk2.serverPort
-        val timeOut = sk2.timeOut
-        val authWord = sk2.authWord
-        val authFail = sk2.authFail
-
+    // サーバ認証
+    private fun authServer(user: String, passwd: String): String {
+        // 認証結果受信用
         lateinit var result: String
         try {
+            // SSL Socket
             val sslSocketFactory = SSLSocketFactory.getDefault()
             val sslsocket = sslSocketFactory.createSocket()
-            //connect with TimeOut
-            sslsocket.connect(InetSocketAddress(serverHost, serverPort), timeOut)
 
+            // SSL Connect with TimeOut
+            sslsocket.connect(InetSocketAddress(SERVER_HOSTNAME, SERVER_PORT), SERVER_TIMEOUT_MILLISEC)
+
+            // 入出力バッファ
             val input = sslsocket.inputStream
             val output = sslsocket.outputStream
             val bufReader = BufferedReader(InputStreamReader(input, "UTF-8"))
             val bufWriter = BufferedWriter(OutputStreamWriter(output, "UTF-8"))
+
             // Send message
-            val message = "$authWord,$user,$passwd"
+            val message = "$SERVER_COMMAND_AUTH,$user,$passwd"
             bufWriter.write(message)
             bufWriter.flush()
+
             // Receive message
             result = bufReader.use(BufferedReader::readText)
 
         } catch (e: Exception) {
-            result = authFail
-            toast("サーバーに接続できません")
+            // サーバ接続時にエラーが出たら Toast 表示だけ
+            result = SERVER_REPLY_FAIL
+            toast(TOAST_CANT_CONNECT_SERVER)
         }
         return result
     }
     ////////////////////////////////////////
+    // ログインする
     fun login(user: String, result: String) {
-        if (result != sk2.authFail) {
+        if (result != SERVER_REPLY_AUTH_FAIL) { // サーバからの返信が失敗でなければ
+            // サーバ返信を ',' で分割
             val v: List<String> = result.split(",")
-            val time: Long = System.currentTimeMillis()
-
-            val gList: List<String> = v[1].split(Regex("\\s+")).map { it.capitalize() }
-            val clrGcos: String = gList.joinToString(" ")
+            val time: Long = System.currentTimeMillis() // 現在時刻
+            // ユーザ名の空白は全て半角スペース一つに圧縮
             val clrName: String = v[2].replace(Regex("\\s+"), " ")
 
-            pref.edit()
-                    .putString("uid", user)
-                    .putString("key", v[0])
-                    .putString("gcos", clrGcos)
-                    .putString("name", clrName)
-                    .putLong("time", time)
+            pref.edit() // SharedPreference に保存
+                    .putString(PREF_UID, user)
+                    .putString(PREF_KEY, v[0])
+                    .putString(PREF_USER_NAME, clrName)
+                    .putLong(PREF_LOGIN_TIME, time)     // not in use
                     .apply()
 
-            toast("ログインします")
-            //sk2.saveUserData()
-
+            toast(TOAST_LOGIN_SUCCESS)
+            // メイン画面へ
             startActivity<MainActivity>()
         } else {
-            toast("ログインに失敗しました")
+            // in fail
+            toast(TOAST_LOGIN_FAIL)
         }
     }
 }
-@Suppress("EXPERIMENTAL_FEATURE_WARNING")
+//@Suppress("EXPERIMENTAL_FEATURE_WARNING")
 ////////////////////////////////////////////////////////////////////////////////
+// UI構成 via Anko
 class LoginActivityUi: AnkoComponent<LoginActivity> {
-    //lateinit var testBt: Button
+    companion object {
+        const val HINT_UID = "学籍番号ID"
+        const val HINT_PASSWD = "パスワード"
+
+        const val BUTTON_TEXT_LOGIN = "Login"
+    }
     ////////////////////////////////////////
     override fun createView(ui: AnkoContext<LoginActivity>) = with(ui) {
         verticalLayout {
             padding = dip(16)
             ////////////////////////////////////////
             val user = editText {
-                hint = "学籍番号ID"
+                hint = HINT_UID
                 inputType = TYPE_TEXT_VARIATION_EMAIL_ADDRESS
             }
             ////////////////////////////////////////
             val passwd = editText {
-                hint = "パスワード"
+                hint = HINT_PASSWD
                 inputType = TYPE_CLASS_TEXT or TYPE_TEXT_VARIATION_PASSWORD
             }
             ////////////////////////////////////////
-            button("ログイン") {
+            button(BUTTON_TEXT_LOGIN) {
                 textColor = Color.WHITE
                 backgroundColor = ContextCompat.getColor(ctx, R.color.colorPrimary)
                 onClick {

@@ -13,11 +13,9 @@ import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.Manifest
-import android.bluetooth.BluetoothAdapter
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
-import android.os.VibrationEffect
 import android.os.Vibrator
 import android.provider.Settings
 import android.support.design.widget.Snackbar
@@ -25,33 +23,47 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.view.View
 import android.widget.*
-import com.neovisionaries.bluetooth.ble.advertising.ADStructure
-import me.mattak.moment.Moment
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.ACTION_BROADCAST
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.ATTENDANCE_VIBRATE_MILLISEC
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_BLESCAN
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_TOAST
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOCATION_PERMISSION_DENIED_MESSAGE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOCATION_PERMISSION_REQUEST_MESSAGE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NAME_START_TESTUSER
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_AUTO
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_DEBUG
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_UID
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_USER_NAME
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.REQUEST_PERMISSIONS_REQUEST_CODE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_RUNNING
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_OK
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SETTINGS
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_ATTEND
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_LARGE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_NORMAL
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_CHECK_BLE_OFF
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
+////////////////////////////////////////////////////////////////////////////////
+/*** メイン画面: これがアクティブな間は ScanService は通常の Background、ここから外れると Foreground ***/
+// Oreo 以前からの移行のためにこうなったが、ずっと Foreground のままで切り替える必要ない？
 class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener, AnkoLogger {
-    ////////////////////////////////////////
-    companion object {
-        const val MAX_SEND_BEACON_NUM: Int = 10
 
-
-        const val ATTENDANCE_VIBRATE_MILLISEC: Long = 1        // vibration time
-
-        private val TAG = MainActivity::class.java.simpleName
-        // Used in checking for runtime permissions.
-        private val REQUEST_PERMISSIONS_REQUEST_CODE = 34
-    }
-    ////////////////////////////////////////
     private var mainUi = MainActivityUi()
 
     lateinit var sk2: Sk2Globals
     lateinit var pref: SharedPreferences
 
-    private var myReceiver: MyReceiver? = null   // The BroadcastReceiver
-    var mService: ScanService? = null // Reference to the service
-    private var mBound = false                   // Bound state of the service
-
+    // Broadcast Reciever
+    private var myReceiver: MyReceiver? = null
+    // ScanService のリファレンス
+    var mService: ScanService? = null
+    // ScanService へのバインド状態
+    private var mBound = false
+    // バイブレータ
     private var vibrator: Vibrator? = null
 
     // Monitors the state of the connection to the service.
@@ -59,7 +71,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             val binder = service as ScanService.LocalBinder
             mService = binder.service
-            mService?.requestScanUpdates() // always started
+            mService?.requestScanUpdates() // BLE scan is always started
             mBound = true
         }
         override fun onServiceDisconnected(name: ComponentName) {
@@ -67,52 +79,57 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             mBound = false
         }
     }
+
     ////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        myReceiver = MyReceiver()
+
+        myReceiver = MyReceiver()  // Broadcast レシーバ
 
         sk2 = this.application as Sk2Globals
         pref = sk2.pref
 
-        title = "${sk2.app_title} ${sk2.app_name}"
+        title = "$APP_TITLE $APP_NAME"
         mainUi.setContentView(this)
 
-        //if (sk2.getScanRunning()) {
-            if (!checkPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                requestPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)
-            }
-        //}
+        // (ゆるい)位置情報へのパーミッションをリクエスト
+        if (!checkPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            requestPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)
+        }
     }
     ////////////////////////////////////////
     override fun onStart() {
         super.onStart()
+        // SharedPreference の変更を通知するリスナー
         pref.registerOnSharedPreferenceChangeListener(this)
 
-        // Bind to the service. If the service is in foreground mode, this signals to the service
-        // that since this activity is in the foreground, the service can exit foreground mode.
+        // ScanService へバインド with AUTO_CREATE
         bindService(Intent(this, ScanService::class.java), mServiceConnection,
                 Context.BIND_AUTO_CREATE)
     }
     ////////////////////////////////////////
     override fun onResume() {
         super.onResume()
+        // ScanService からのブロードキャストレシーバ
         LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver!!,
-                IntentFilter(ScanService.ACTION_BROADCAST))
+                IntentFilter(ACTION_BROADCAST))
 
-        // go back to LoginActivity if with invalid user
+        // ユーザ情報を確認、デバッグモード設定、空なら Login へ
         if (!checkInfo(mainUi))
             startActivity(intentFor<LoginActivity>().clearTop())
 
-        if (!checkBt()) {
-            toast("Bloothoothオンにしてください")
+        // BLE のチェック
+        if (!sk2.checkBt()) {
+            // ダメならボタンをグレーアウト
             mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
+            toast(TOAST_CHECK_BLE_OFF)
         } else {
             mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
         }
 
-        if (pref.getBoolean("debug", false)) {
+        // デバッグモードの表示設定
+        if (pref.getBoolean(PREF_DEBUG, false)) {
             mainUi.startBt.visibility = View.VISIBLE
             mainUi.stopBt.visibility = View.VISIBLE
             mainUi.scanInfo.visibility = View.VISIBLE
@@ -122,30 +139,32 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             mainUi.scanInfo.visibility = View.INVISIBLE
         }
 
-        // restore auto setting
-        val auto = pref.getBoolean("auto", false)
+        // 自動モードの設定
+        val auto = pref.getBoolean(PREF_AUTO, false)
         mainUi.autoSw.isChecked = auto
-        if (auto) mService?.startInterval(pref.getBoolean("debug", false))
+        if (auto)
+            mService?.startInterval(pref.getBoolean(PREF_DEBUG, false))
 
-        // Vibrator
+        // バイブレーション
         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
+        // ScanService ON/OFF ボタンの状態設定
         setButtonsState(sk2.getScanRunning())
     }
     ////////////////////////////////////////
     override fun onPause() {
+        // Broadcast Reciever を停止
         LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver!!)
         super.onPause()
     }
     ////////////////////////////////////////
     override fun onStop() {
+        // ScanService の Bind を外す
         if (mBound) {
-            // Unbind from the service. This signals to the service that this activity is no longer
-            // in the foreground, and the service can respond by promoting itself to a foreground
-            // service.
             unbindService(mServiceConnection)
             mBound = false
         }
+        // SharedPreferences のチェンジリスナーを止める
         PreferenceManager.getDefaultSharedPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(this)
         super.onStop()
@@ -153,49 +172,56 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     ////////////////////////////////////////
     override fun onDestroy() {
         //mService?.stopInterval()
+        // サービスを停止
         mService?.removeScanUpdates()
-        sk2.saveQueue()  // save localQueue to sharedPreference
+        // ローカルキューを保存
+        sk2.saveQueue()
         super.onDestroy()
     }
     ////////////////////////////////////////
+    /*** ユーザー情報のチェック ***/
     private fun checkInfo(ui: MainActivityUi): Boolean {
-        val uid = pref.getString("uid", "")
-        val name = pref.getString("name", "")
-
-        //val time = sk2.userMap.getOrDefault("name", 0L)
+        val uid = pref.getString(PREF_UID, "")
+        val name = pref.getString(PREF_USER_NAME, "")
+        /***
+        val time = sk2.userMap.getOrDefault("name", 0L)
         // check key life
-        //val now = System.currentTimeMillis()
-        //val over = (now - time) > lifetime
+        val now = System.currentTimeMillis()
+        val over = (now - time) > lifetime
+        ***/
 
-        if (uid == "") {
-            return false
+        return if (uid == "") { // 空ならダメ
+            false
         } else {
-            val utext = " $uid / $name "
+            // 画面上部のユーザ情報を設定
+            val utext = " $uid / $name"
             ui.userInfo.text = utext
-            if (Regex("^${sk2.testuser}").containsMatchIn(uid)) {
+
+            // 前方一致でテストユーザー(デバッグモード)とする
+            if (Regex("^$NAME_START_TESTUSER").containsMatchIn(uid)) {
                 pref.edit()
-                        .putBoolean("debug", true)
+                        .putBoolean(PREF_DEBUG, true)
                         .apply()
             }
-            return true
+            true // O.K.
         }
     }
     ////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////
+    /*** パーミッションをチェック ***/
     fun checkPermissions(permission: String): Boolean {
         return PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(this, permission)
     }
     ////////////////////////////////////////
+    /*** パーミッションをリクエスト ***/
     fun requestPermissions(permission: String) {
         val shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(this, permission)
 
         if (shouldProvideRationale) {
             Snackbar.make(
-                    //findViewById(R.id.activity_main),
                     this.contentView!!,
-                    R.string.permission_rationale,
+                    LOCATION_PERMISSION_REQUEST_MESSAGE,
                     Snackbar.LENGTH_INDEFINITE)
-                    .setAction(R.string.ok) {
+                    .setAction(TEXT_OK) {
                         ActivityCompat.requestPermissions(this@MainActivity,
                                 arrayOf(permission), REQUEST_PERMISSIONS_REQUEST_CODE)
                     }.show()
@@ -206,6 +232,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
     }
     ////////////////////////////////////////
+    /*** パーミッションリクエストからの結果を処理 ***/
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
                                             grantResults: IntArray) {
         info("onRequestPermissionResult")
@@ -220,10 +247,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 setButtonsState(false)
                 Snackbar.make(
                         this.contentView!!,
-                        //findViewById(R.id.activity_main),
-                        R.string.permission_denied_explanation,
+                        LOCATION_PERMISSION_DENIED_MESSAGE,
                         Snackbar.LENGTH_INDEFINITE)
-                        .setAction(R.string.settings) {
+                        .setAction(TEXT_SETTINGS) {
                             // Build intent that displays the App settings screen.
                             val intent = Intent()
                             intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
@@ -237,30 +263,35 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
     }
     ////////////////////////////////////////
+    /*** Type を引数とした出席記録用： ScanService.sendInfoToServer() を Bind 経由で叩く ***/
     fun attendance(type: Char) {
-        val lastArray = sk2.lastScan
-
-        // show scan info if in debug mode
-        if (pref.getBoolean("debug", false)) {
-            mainUi.scanInfo.text = lastArray.getBeaconsText()
-        }
         mService?.sendInfoToServer(type)
     }
     ////////////////////////////////////////
+    /*** ScanService からの Broadcast Receiver ***/
     private inner class MyReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            val message = intent.getSerializableExtra(ScanService.EXTRA_BLESCAN) as String
-            toast(message)
+            val message= intent.getSerializableExtra(EXTRA_TOAST) as String?
+            val lastscan = intent.getSerializableExtra(EXTRA_BLESCAN) as String?
+
+            // Toast 表示
+            if (! message.isNullOrEmpty())
+                toast(message!!)
+            // デバッグモードのときは(記録される)最新スキャンを表示
+            if (pref.getBoolean(PREF_DEBUG, false) && ! lastscan.isNullOrEmpty())
+                mainUi.scanInfo.text = lastscan
         }
     }
     ////////////////////////////////////////
+    /*** SharedPreferences が変化したときのコールバック ***/
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, s: String) {
         // Update the buttons state depending on whether location updates are being requested.
-        if (s == sk2.SCAN_RUNNING) {
+        if (s == SCAN_RUNNING) {
             setButtonsState(sk2.getScanRunning())
         }
     }
     ////////////////////////////////////////
+    /*** スキャンON/OFFボタンの状態設定（デバック時のみ表示） ***/
     private fun setButtonsState(requestingLocationUpdates: Boolean) {
         if (requestingLocationUpdates) {
             mainUi.startBt.isEnabled = false
@@ -270,34 +301,19 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             mainUi.stopBt.isEnabled = false
         }
     }
-////////////////////////////////////////
-@Suppress("DEPRECATION")
+    ////////////////////////////////////////
+    /*** バイブレーションを鳴らす ***/
+    @Suppress("DEPRECATION")
     fun vibrate() {
         if (vibrator != null) {
             if (vibrator!!.hasVibrator()) vibrator!!.vibrate(ATTENDANCE_VIBRATE_MILLISEC)
         }
     }
-    ////////////////////////////////////////
-    private fun hasBLE(): Boolean {
-        return getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)
-    }
-    ////////////////////////////////////////
-    fun checkBt(): Boolean {
-        val btAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
-        if (btAdapter == null || !hasBLE()) {
-            toast("このデバイスのBLEアダプタが見つかりません")
-            return false
-        } else if (!btAdapter.isEnabled) {
-            toast("Bluetoothをオンにしてください")
-            return false
-        }
-        return true
-    }
 }
-
 
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
 ////////////////////////////////////////////////////////////////////////////////
+/*** UI構成 via Anko ***/
 class MainActivityUi: AnkoComponent<MainActivity> {
     lateinit var userInfo: TextView
     lateinit var scanInfo: TextView
@@ -318,7 +334,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
             userInfo = textView("User Info") {
                 id = USER
                 textColor = Color.BLACK
-                textSize = 14f
+                textSize = TEXT_SIZE_LARGE
             }.lparams {
                 alignParentTop(); alignParentStart()
             }
@@ -326,7 +342,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
             autoSw = switch {
                 id = AUTO
                 text = "Auto"
-                textSize = 14f
+                textSize = TEXT_SIZE_LARGE
                 onClick {
                     if (isChecked) {
                         ui.owner.mService!!.startInterval(pref.getBoolean("debug", false))
@@ -347,7 +363,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                 id = UPDATE
                 ////////////////////////////////////////
                 startBt = button("Start Scan Update") {
-                    textSize = 10f
+                    textSize = TEXT_SIZE_NORMAL
                     onClick {
                         if (!ui.owner.checkPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)) {
                             ui.owner.requestPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -358,7 +374,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                 }
                 ////////////////////////////////////////
                 stopBt = button("Stop Scan Update") {
-                    textSize = 10f
+                    textSize = TEXT_SIZE_NORMAL
                     onClick {
                         ui.owner.mService?.removeScanUpdates()
                     }
@@ -370,7 +386,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
             ////////////////////////////////////////
             scanInfo = textView("Scan Info") {
                 textColor = Color.BLACK
-                textSize = 10f
+                textSize = TEXT_SIZE_NORMAL
             }.lparams {
                 below(UPDATE); alignParentStart()
             }
@@ -378,7 +394,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
             attBt = button("出席") {
                 id = ATTEND
                 textColor = Color.WHITE
-                textSize = 36f
+                textSize = TEXT_SIZE_ATTEND
                 background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
                 allCaps = false
                 onClick {
