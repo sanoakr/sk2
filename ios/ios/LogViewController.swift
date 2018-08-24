@@ -55,10 +55,10 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		// ViewにsegmentをsubViewとして追加
 		self.view.addSubview(segment)
 		
-		//初期値のセット
+		// 初期値のセット
 		segment.selectedSegmentIndex = 0
 		
-		//サーバーログを表示
+		// サーバーログを表示
 		showServerLog()
 
 		// --------------------------------------------------------------------------------------------------------------------------
@@ -122,9 +122,28 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		
 		// Delegateを自身に設定する.
 		myTableView.delegate = self
+
+		// リフレッシュ
+		// UIRefreshControlのインスタンス作成
+		let refresh = UIRefreshControl()
+		myTableView.refreshControl = refresh
+		
+		// リフレッシュしたときの処理内容を設定
+		refresh.addTarget(self, action: #selector(LogViewController.serverLogRefresh(sender:)), for: .valueChanged)
 		
 		// Viewに追加する.
 		self.view.addSubview(myTableView)
+	}
+	
+	//サーバーログをリフレッシュ
+	@objc func serverLogRefresh(sender: UIRefreshControl) {
+		//1秒待ってから処理を始める
+		DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+			//サーバーログを表示
+			self.showServerLog()
+			//refreshを閉じる
+			sender.endRefreshing()
+		})
 	}
 	
 	@objc func showLocalLog() {
@@ -139,7 +158,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 			let localLog:Array = myUserDefault.array(forKey: "log")!
 			print("localLog: \(localLog)")
 			
-			//配列を初期化
+			// 配列を初期化
 			myItems = Array()
 			
 			// ログデータを取得しTableViewに渡す
@@ -166,20 +185,39 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 			// Delegateを自身に設定する.
 			myTableView.delegate = self
 			
+			// リフレッシュ
+			// UIRefreshControlのインスタンス作成
+			let refresh = UIRefreshControl()
+			myTableView.refreshControl = refresh
+			
+			// リフレッシュしたときの処理内容を設定
+			refresh.addTarget(self, action: #selector(LogViewController.localLogRefresh(sender:)), for: .valueChanged)
+			
 			// Viewに追加する.
 			self.view.addSubview(myTableView)
 		}
 	}
 	
-	//ボタンを押した時の処理
+	// ローカルログをリフレッシュ
+	@objc func localLogRefresh(sender: UIRefreshControl) {
+		//1秒待ってから処理を始める
+		DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+			//サーバーログを表示
+			self.showLocalLog()
+			//refreshを閉じる
+			sender.endRefreshing()
+		})
+	}
+	
+	// ボタンを押した時の処理
 	@objc func change(segment:UISegmentedControl){
 		
-		//ボタンごとの処理をswitch文で処理
+		// ボタンごとの処理をswitch文で処理
 		switch segment.selectedSegmentIndex {
 			
 		case 0:
 			print("サーバーログ")
-			//サーバーログを表示
+			// サーバーログを表示
 			showServerLog()
 
 		case 1:
@@ -211,7 +249,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		// 値を取得してカンマで分割
 		let splitRead = (myItems[indexPath.row] as AnyObject).components(separatedBy: ",")
 		
-		//配列数をチェック
+		// 配列数をチェック
 		if( splitRead.count == 12 ) {
 			cell.labelDate.text = " \(splitRead[2])"
 			cell.labelMode.text = splitRead[1]
