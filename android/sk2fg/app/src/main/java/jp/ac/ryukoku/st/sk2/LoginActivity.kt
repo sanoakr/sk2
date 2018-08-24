@@ -9,6 +9,8 @@ import android.text.InputType.*
 import android.view.Gravity
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGIN_EXPIRY_PERIOD_DAYS
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGIN_TIME_DAY_UNIT_MILLSEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_KEY
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_LOGIN_TIME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_UID
@@ -55,8 +57,14 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
     ////////////////////////////////////////
     override fun onResume() {
         super.onResume()
-        // ユーザIDが空でなければ、そのままメインアクティビティへ
-        if (pref.getString(PREF_UID, "").isNotBlank()) { startActivity<MainActivity>() }
+        // ユーザIDが空でなければ、
+        if (pref.getString(PREF_UID, "").isNotBlank()) {
+            // 期限を確認して
+            val today: Long = System.currentTimeMillis() / LOGIN_TIME_DAY_UNIT_MILLSEC
+            if ( today - pref.getLong(PREF_LOGIN_TIME, 0L)/ LOGIN_TIME_DAY_UNIT_MILLSEC < LOGIN_EXPIRY_PERIOD_DAYS)
+            // そのままメインアクティビティへ
+                startActivity<MainActivity>()
+        }
     }
     ////////////////////////////////////////
     // サーバでログイン認証

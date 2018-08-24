@@ -42,6 +42,9 @@ class Sk2Globals: Application() {
         const val PREF_LAST_SCAN = "lastscan" // 最新スキャン保存用 /* not in use */
         /*** ScanServer の実行自体を保存する SharedPreference のキー ***/
         const val SCAN_RUNNING = "scan_running"
+        /*** login 情報の有効期限 ***/
+        const val LOGIN_TIME_DAY_UNIT_MILLSEC: Long = 24*60*60*1000 // 1 days
+        const val LOGIN_EXPIRY_PERIOD_DAYS: Long = 150
 
         /*** SK2 サーバ ***/
         const val SERVER_HOSTNAME = "sk2.st.ryukoku.ac.jp"
@@ -82,10 +85,12 @@ class Sk2Globals: Application() {
 
         /*** Timer ***/
         // BLE Scan インターバル
-        const val SCAN_INTERVAL_IN_MILLISECONDS: Long = 1000                  // 1 sec.
+        const val SCAN_INTERVAL_IN_MILLISECONDS: Long = 1000                  // 10 sec.
         // 自動記録のインターバル
+        /** prevents an app from stopping and starting BLE scans more than 5 times in a window of 30 seconds. **/
+        /** https://blog.classycode.com/undocumented-android-7-ble-behavior-changes-d1a9bd87d983 **/
         const val AUTO_SENDING_INTERVAL_IN_MILLISECONDS: Long = 5*60*1000     // 5 min.
-        const val AUTO_SENDING_INTERVAL_IN_MILLISECONDS_DEBUG: Long = 10*1000 // デバック用 10 sec.
+        const val AUTO_SENDING_INTERVAL_IN_MILLISECONDS_DEBUG: Long = 10*1000 // デバック用 30 sec.
         // BLE Scanner 強制再スタートのインターバル
         const val WAKEUP_INTERVAL_IN_MILLISEC: Long = 10*60*1000              // 10 min.
         // 最新のスキャン結果を送信記録に利用可能な時間差の最大値

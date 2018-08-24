@@ -1,5 +1,6 @@
 package jp.ac.ryukoku.st.sk2
 
+import android.app.Activity.DEFAULT_KEYS_SEARCH_GLOBAL
 import android.app.ActivityManager
 import android.app.Notification
 import android.app.NotificationChannel
@@ -158,19 +159,20 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         mScanner = BluetoothLeScannerCompat.getScanner()
         scanSettings = ScanSettings.Builder()
                 .setLegacy(false)
-                .setScanMode(ScanSettings.SCAN_MODE_BALANCED)
-                //.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                .setReportDelay(SCAN_INTERVAL_IN_MILLISECONDS)
+                //.setScanMode(ScanSettings.SCAN_MODE_BALANCED)
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                .setReportDelay(10)
+                .setCallbackType(DEFAULT_KEYS_SEARCH_GLOBAL)
+                //.setReportDelay(SCAN_INTERVAL_IN_MILLISECONDS)
                 .setUseHardwareBatchingIfSupported(false)
                 .build()
-        /**
+
         val builder = ScanFilter.Builder()
         // Apple Manufacture ID 0x004c
         builder.setManufacturerData(0x004c, byteArrayOf())
         scanFilters = arrayListOf( builder.build() )
-        **/
-        // フィルターが空だとバックグラウンドで止まる?
-        scanFilters = ArrayList() // ArrayList<ScanFilter>() // フィルタは空 == 全て受け取る
+                // フィルターが空だとバックグラウンドで止まる?
+        //scanFilters = ArrayList() // ArrayList<ScanFilter>() // フィルタは空 == 全て受け取る
 
         // Handler スレッドを開始
         val handlerThread = HandlerThread(TAG)
