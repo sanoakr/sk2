@@ -34,7 +34,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		labelTitle.font = UIFont.systemFont(ofSize: 18.0)    //フォントサイズ
 		labelTitle.font = UIFont.boldSystemFont(ofSize: UIFont.labelFontSize)	//  ボールド
 		labelTitle.textAlignment = NSTextAlignment.center    // センター寄せ
-		labelTitle.text = "ログ表示"
+		labelTitle.text = "ログ"
 		view.addSubview(labelTitle)  // Viewに追加
 		
 		// --------------------------------------------------------------------------------------------------------------------------

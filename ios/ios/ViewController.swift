@@ -134,7 +134,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 				height: 50
 		))
 		
-		logViewBtn.setTitle("ログ表示", for: .normal)  //タイトル
+		logViewBtn.setTitle("ログ", for: .normal)  //タイトル
 		logViewBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
 		logViewBtn.backgroundColor = appDelegate.ifNormalColor  //色
 		logViewBtn.addTarget(self, action: #selector(ViewController.logView(_:)), for: .touchUpInside)
@@ -206,7 +206,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	
 	// 出席ボタンイベント　ボタン押下
 	@objc func sendAttend(sender: UIButton) {
-		print("==================== touchDown")
 		// ボタンの動き
 		attendBtn.backgroundColor = appDelegate.ifOnDownColor //色
 		attendBtn.layer.shadowOpacity = 0
@@ -224,13 +223,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		if result == "success" {
 			
 			// ウィンドウを表示
-			showAlertAutoHidden(title : "Success", message: "Attendance data was sent to the server.", time: 0.5)
+			showAlertAutoHidden(title : "出席を記録しました", message: "記録はログで確認することができます", time: 0.5)
 			
 			// バイブレーション
 			AudioServicesPlaySystemSound(1003);
 			AudioServicesDisposeSystemSoundID(1003);
 			
-			print("Attendance data was sent to the server.")
+			print("sendAttend: success")
 		}
 	}
 	
@@ -384,7 +383,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			// 退域通知の設定.
 			myBeaconRegion.notifyOnExit = true
 			
-			// [iBeacon 手順1] iBeaconのモニタリング開始([iBeacon 手順2]がDelegateで呼び出される).
+			// iBeaconのモニタリング開始
 			myLocationManager.startMonitoring(for: myBeaconRegion)
 		}
 	}
@@ -418,17 +417,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		}
 	}
 	
-	// startMyMonitoring()内のでstartMonitoringForRegionが正常に開始されると呼び出される。
+	// startMyMonitoring()内のでstartMonitoringForRegionが正常に開始されると呼び出される
 	func locationManager(_ manager: CLLocationManager, didStartMonitoringFor region: CLRegion) {
 		
-		print("[iBeacon 手順2] didStartMonitoringForRegion");
+		print("didStartMonitoringForRegion");
 		
 		// この時点でビーコンがすでにRegion内に入っている可能性があるので、その問い合わせを行う
 		// Delegateで呼び出される.
 		manager.requestState(for: region);
 	}
 	
-	// [iBeacon 手順4] 現在リージョン内にiBeaconが存在するかどうかの通知を受け取る.
+	// 現在リージョン内にiBeaconが存在するかどうかの通知を受け取る
 	func locationManager(_ manager: CLLocationManager, didDetermineState state: CLRegionState,  for region: CLRegion) {
 		
 		if let region = region as? CLBeaconRegion { //これがあると安定する？
@@ -436,7 +435,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			// 登録されているUserDefaultから設定値を呼び出す
 			let autoSender:Int = myUserDefault.integer(forKey: "autoSender")
 			
-			print("[iBeacon 手順4] locationManager: didDetermineState \(state)")
+			print("locationManager: didDetermineState \(state)")
 			
 			switch (state) {
 				
@@ -451,8 +450,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 					btnNormal() //通常送信ボタンの表示
 				}
 				
-				// すでに入っている場合は、そのままiBeaconのRangingをスタートさせる。
-				// Delegateで呼び出される.
+				// すでに入っている場合は、そのままiBeaconのRangingをスタートさせる
+				// Delegateで呼び出される
 				// iBeaconがなくなったら、Rangingを停止する
 				manager.startRangingBeacons(in: region )
 				break;
@@ -473,8 +472,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		}
 	}
 	
-	// 現在取得しているiBeacon情報一覧が取得できる. iBeaconを検出していなくても1秒ごとに呼ばれる.
-	
+	// 現在取得しているiBeacon情報一覧が取得
+	// iBeaconを検出していなくても1秒ごとに呼ばれる
 	func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion)  {
 		
 		// 配列をリセット
@@ -482,7 +481,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		beaconDetails = Array<String>()
 		var debugBeaconDetails = Array<String>()
 		// 範囲内で検知されたビーコンはこのbeaconsにCLBeaconオブジェクトとして格納される
-		// rangingが開始されると１秒毎に呼ばれるため、beaconがある場合のみ処理をするようにすること.
+		// rangingが開始されると１秒毎に呼ばれるため、beaconがある場合のみ処理をするようにすること
 		if(beacons.count > 0){
 			
 			// 発見したBeaconの数だけLoopをまわす
@@ -498,27 +497,27 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 				
 				var proximity = ""
 				
-				print("beaconFlg: \(beaconFlg)")
+//				print("beaconFlg: \(beaconFlg)")
 				
 				switch (beacon.proximity) {
 					
 				case CLProximity.unknown :
-					print("Proximity: Unknown");
+//					print("Proximity: Unknown");
 					proximity = "Unknown"
 					break
 					
 				case CLProximity.far:
-					print("Proximity: Far");
+//					print("Proximity: Far");
 					proximity = "Far"
 					break
 					
 				case CLProximity.near:
-					print("Proximity: Near");
+//					print("Proximity: Near");
 					proximity = "Near"
 					break
 					
 				case CLProximity.immediate:
-					print("Proximity: Immediate");
+//					print("Proximity: Immediate");
 					proximity = "Immediate"
 					break
 				}
@@ -547,7 +546,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		}
 	}
 	
-	// iBeaconを検出した際に呼ばれる.
+	// iBeaconを検出した際に呼ばれる
 	func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
 		print("didEnterRegion: iBeaconが圏内に発見されました。");
 		
@@ -555,22 +554,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		manager.startRangingBeacons(in: region as! CLBeaconRegion)
 	}
 	
-	// iBeaconを喪失した際に呼ばれる. 喪失後 30秒ぐらいあとに呼び出される.
+	// iBeaconを喪失した際に呼ばれる. 喪失後 30秒ぐらいあとに呼び出される
 	func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
 		print("didExitRegion: iBeaconが圏外に喪失されました。");
 		
-		// 検出中のiBeaconが存在しないのなら、iBeaconのモニタリングを終了する.
+		// 検出中のiBeaconが存在しないのなら、iBeaconのモニタリングを終了する
 		manager.stopRangingBeacons(in: region as! CLBeaconRegion)
 	}
 	
 	
 	func sendAttend(user: String, key: String, type: String, beaconDetails: Array<String>) -> String{
+		
 		let resultVal:String
 		let now = appDelegate.currentTime()
-//		var sendtext = "\(user),\(key),\(type),\(now)"
 		var sendtext = "\(key),\(type),\(now)"
 		
-		print("beaconDetails: \(beaconDetails.count)")
+		print("--------------------- sendAttend begin ---------------------")
 		
 		//iBeaconの検出数が3以上ある場合
 		if(beaconDetails.count > 2) {
@@ -591,13 +590,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		print("sendtext:\(sendtext)")
 		
 		// socket通信
-		print("--------------------- sendAttend begin ---------------------")
 		Connection.connect()
 		
 		// ローカルログへ保存
 		saveLocalLog(sendtext: sendtext)
 		
-		print("--------------------- sendAttend end ---------------------")
 		sendtext = "\(user)," + sendtext
 		let retVal = Connection.sendCommand(command: sendtext)
 		
@@ -614,6 +611,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 				resultVal = "fail"
 			}
 		}
+		
+		print("--------------------- sendAttend end ---------------------")
+		
 		return resultVal
 	}
 	
@@ -643,10 +643,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// UserDefaultの生成.
 		let _:UserDefaults = UserDefaults()
 		
-		// UIAlertControllerを作成する.
+		// UIAlertControllerを作成する
 		let myAlert: UIAlertController = UIAlertController(title: "ログアウト", message: "ログアウトしますか？", preferredStyle: .alert)
 		
-		// OKのアクションを作成する.
+		// OKのアクションを作成する
 		let myOkAction = UIAlertAction(title: "OK", style: .default) { action in
 			//            print("OK")
 			
@@ -664,11 +664,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			//            print("Cancel")
 		})
 		
-		// Actionを追加する.
+		// Actionを追加する
 		myAlert.addAction(myOkAction)
 		myAlert.addAction(myCancelAction)
 		
-		// UIAlertを発動する.
+		// UIAlertを発動する
 		present(myAlert, animated: true, completion: nil)
 	}
 	
@@ -753,7 +753,7 @@ class Connection3: NSObject, StreamDelegate {
 	// 今回の場合では、同期型なのでoutputStreamの時しか起動してくれない
 	
 	func stream(_ stream:Stream, handle eventCode : Stream.Event){
-		print(stream)
+		print("stream: \(stream)")
 	}
 	
 	// サーバーにコマンド文字列を送信する関数
@@ -768,7 +768,7 @@ class Connection3: NSObject, StreamDelegate {
 		}
 		
 		// エラー処理
-		var timeout = 5 * 100000 // タイムアウト値は5秒
+		var timeout = appDelegate.timeout * 100000 // タイムアウト値は5秒
 		while !self.outputStream.hasSpaceAvailable {
 			usleep(1000) // wait until the socket is ready
 			timeout -= 100

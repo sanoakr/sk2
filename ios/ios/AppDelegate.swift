@@ -24,6 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	//    var uuidList = ["00000000-87B3-1001-B000-001C4D975326"] //検知対象は1つのUUID。(OS等のバージョンで検出可能な上限数は20個程度が目安)
 	var uuidList = ["ebf59ccc-21f2-4558-9488-00f2b388e5e6"] //本番meraki
 	var debugUser = "testuser-skmt"
+	var timeout = 5
 	var maxLocalLog = 10
 	
 	// VC共通カラー
@@ -128,7 +129,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let date = Date()
 		
 		let dateString = dateFormatter.string(from: date)
-		print(dateString)
+//		print(dateString)
 		
 		return dateString
 	}
