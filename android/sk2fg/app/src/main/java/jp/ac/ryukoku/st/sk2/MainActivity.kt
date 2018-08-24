@@ -210,7 +210,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
     }
     ////////////////////////////////////////////////////////////////////////////////
-    /*** Doze パーミッションをチェック ***/
+    /*** Doze Ignore パーミッションをチェックして許可を要求 ***/
     fun requestDozeIgnore() {
         // above Android Marshmallow(23) requires a REQUEST_IGNORE_BATTERY_OPTIMIZATIONS Permission
         // for running services under the Doze mode.
