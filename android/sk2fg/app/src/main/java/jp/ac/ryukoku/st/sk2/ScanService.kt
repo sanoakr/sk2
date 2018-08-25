@@ -1,15 +1,7 @@
 package jp.ac.ryukoku.st.sk2
 
-import android.app.Activity.DEFAULT_KEYS_SEARCH_GLOBAL
-import android.app.ActivityManager
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.Service
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.app.*
+import android.content.*
 import android.content.res.Configuration
 import android.os.*
 import android.support.v4.app.NotificationCompat
@@ -64,6 +56,9 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
     /*** Notification Manager ***/
     private var mNotificationManager: NotificationManager? = null
 
+    /*** Alarm Manager ***/
+    private var mAlarmManager: AlarmManager? = null
+
     /*** ScanService service Handler & Binder ***/
     private var mServiceHandler: Handler? = null
     private val mBinder: IBinder = LocalBinder()
@@ -116,6 +111,9 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         restartScanner()
         btWakeupHandler.postDelayed(wakeupTimer, WAKEUP_INTERVAL_IN_MILLISEC)
     }
+    /*** AlarmBroacastReceiver ***/
+    //private var alarmReceiver: AlarmBroadcastReceiver? = null
+
     /*** 自動データ送信用インターバル Handler & Timer ***/
     private val intervalHandler = Handler()
     private val timer = Runnable { interval() }
@@ -159,11 +157,11 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         mScanner = BluetoothLeScannerCompat.getScanner()
         scanSettings = ScanSettings.Builder()
                 .setLegacy(false)
-                //.setScanMode(ScanSettings.SCAN_MODE_BALANCED)
                 .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                .setReportDelay(10)
-                .setCallbackType(DEFAULT_KEYS_SEARCH_GLOBAL)
-                //.setReportDelay(SCAN_INTERVAL_IN_MILLISECONDS)
+                .setReportDelay(SCAN_INTERVAL_IN_MILLISECONDS)
+                //.setScanMode(ScanSettings.SCAN_MODE_BALANCED)
+                //.setCallbackType(DEFAULT_KEYS_SEARCH_GLOBAL)
+                //.setReportDelay(10)
                 .setUseHardwareBatchingIfSupported(false)
                 .build()
 
@@ -171,14 +169,47 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         // Apple Manufacture ID 0x004c
         builder.setManufacturerData(0x004c, byteArrayOf())
         scanFilters = arrayListOf( builder.build() )
-                // フィルターが空だとバックグラウンドで止まる?
-        //scanFilters = ArrayList() // ArrayList<ScanFilter>() // フィルタは空 == 全て受け取る
+        /**
+        // フィルターが空だとバックグラウンドで止まる?
+        scanFilters = ArrayList() // ArrayList<ScanFilter>() // フィルタは空 == 全て受け取る
+         **/
 
         // Handler スレッドを開始
         val handlerThread = HandlerThread(TAG)
         handlerThread.start()
         // Service Handler
         mServiceHandler = Handler(handlerThread.looper)
+
+        /*** 自動データ送信用インターバル Alarm ***/
+        // Alarm Receiver
+        val alarmReceiver = object: BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                Log.d("******", "ALARM")
+            }
+        }
+
+        // Alram Intent
+        val alarmIntent = Intent(this, AlarmBroadcastReceiver::class.java).let {
+            intent ->
+            intent.action = "TEST"
+            PendingIntent.getBroadcast(this, 0, intent, 0)
+        }
+
+
+        // Alarm Manager を取得
+        mAlarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+
+        mAlarmManager?.setAndAllowWhileIdle(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                //SystemClock.elapsedRealtime() + 5*1000,
+                5*10000, alarmIntent)
+
+
+
+
+
+
 
         // Notification Manager を取得
         mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -462,6 +493,14 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
 
         //if (pref.getBoolean(PREF_AUTO, false))
         //    startInterval(pref.getBoolean(PREF_DEBUG, false))
+    }
+    ////////////////////////////////////////
+    /*** AlarmManager からの Receiver ***/
+    class AlarmBroadcastReceiver: BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action != null)
+                Log.i("ALARM", intent?.action)
+        }
     }
     ////////////////////////////////////////
     /*** 自分への Binder ***/

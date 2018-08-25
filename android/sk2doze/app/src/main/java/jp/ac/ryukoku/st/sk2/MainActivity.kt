@@ -1,187 +1,134 @@
 package jp.ac.ryukoku.st.sk2
 
-import android.content.BroadcastReceiver
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.ServiceConnection
-import android.content.SharedPreferences
-import android.preference.PreferenceManager
-import android.support.v4.content.LocalBroadcastManager
-import android.support.v7.app.AppCompatActivity
 import android.Manifest
+import android.Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
+import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
-import android.view.View
-import android.widget.*
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.ACTION_BROADCAST
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.ATTENDANCE_VIBRATE_MILLISEC
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_BLESCAN
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_TOAST
+import android.support.v7.app.AppCompatActivity
+import android.util.Log
+import android.widget.Button
+import android.widget.Switch
+import android.widget.TextView
+import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
+import com.neovisionaries.bluetooth.ble.advertising.IBeacon
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOCATION_PERMISSION_DENIED_MESSAGE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOCATION_PERMISSION_REQUEST_MESSAGE
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NAME_START_TESTUSER
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_AUTO
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_DEBUG
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_UID
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_USER_NAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.REQUEST_PERMISSIONS_REQUEST_CODE
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_RUNNING
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_INTERVAL_IN_MILLISECONDS
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_OK
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SETTINGS
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_ATTEND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_LARGE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_NORMAL
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_CHECK_BLE_OFF
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.VALID_IBEACON_UUID
+import me.mattak.moment.Moment
+import no.nordicsemi.android.support.v18.scanner.*
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+import android.app.ActivityManager
+import android.content.*
+import android.service.voice.VoiceInteractionService.isActiveService
+import android.content.Context.POWER_SERVICE
+import android.support.v4.content.LocalBroadcastManager
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.ACTION_BROADCAST
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_BLESCAN
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_TOAST
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NAME_START_TESTUSER
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_DEBUG
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_UID
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_USER_NAME
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_ALARM
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_AUTO
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_SEND
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_RUNNING
 
 
-
-////////////////////////////////////////////////////////////////////////////////
-/*** メイン画面: これがアクティブな間は ScanService は通常の Background、ここから外れると Foreground ***/
-// Oreo 以前からの移行のためにこうなったが、ずっと Foreground のままで切り替える必要ない？
+/** ////////////////////////////////////////////////////////////////////////////// **/
+/** Sk2 Main Activity **/
 class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener, AnkoLogger {
-
-    private var mainUi = MainActivityUi()
-
     lateinit var sk2: Sk2Globals
     lateinit var pref: SharedPreferences
+    private var mainUi = MainActivityUi()
 
-    // Broadcast Reciever
-    private var myReceiver: MyReceiver? = null
-    // ScanService のリファレンス
-    var mService: ScanService? = null
-    // ScanService へのバインド状態
-    private var mBound = false
-    // バイブレータ
-    private var vibrator: Vibrator? = null
+    /*** BLE Scanner ***/
+    private lateinit var mScanner: BluetoothLeScannerCompat
+    private lateinit var scanSettings: ScanSettings
+    private lateinit var scanFilters: ArrayList<ScanFilter>
 
-    // Monitors the state of the connection to the service.
-    private val mServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName, service: IBinder) {
-            val binder = service as ScanService.LocalBinder
-            mService = binder.service
-            mService?.requestScanUpdates() // BLE scan is always started
-            mBound = true
-        }
-        override fun onServiceDisconnected(name: ComponentName) {
-            mService = null
-            mBound = false
-        }
-    }
+    /** Scan result Broadcast Reciever **/
+    private var scanReceiver: ScanReceiver? = null
 
-    ////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////
+    /** ////////////////////////////////////////////////////////////////////////////// **/
+    /********************************************************************/
+    /** /////////////////////////////////////// **/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        myReceiver = MyReceiver()  // Broadcast レシーバ
-
         sk2 = this.application as Sk2Globals
-        pref = sk2.pref
+        pref = Sk2Globals.pref
 
         title = "$APP_TITLE $APP_NAME"
         mainUi.setContentView(this)
 
-        // (ゆるい)位置情報へのパーミッションをリクエスト
+        /** (ゆるい)位置情報へのパーミッションをリクエスト **/
         if (!checkPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)) {
             requestPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)
         }
-        // Doze mode での実行許可を要求 (> 23M)
+        /** Doze mode での実行許可を要求 (> 23M) **/
         requestDozeIgnore()
-    }
-    ////////////////////////////////////////
-    override fun onStart() {
-        super.onStart()
-        // SharedPreference の変更を通知するリスナー
+
+        /** SharedPreference の変更を通知するリスナー **/
         pref.registerOnSharedPreferenceChangeListener(this)
 
-        // ScanService へバインド with AUTO_CREATE
-        bindService(Intent(this, ScanService::class.java), mServiceConnection,
-                Context.BIND_AUTO_CREATE)
+        /** Scan result Broadcast Reciever **/
+        scanReceiver = ScanReceiver()
+        LocalBroadcastManager.getInstance(this).registerReceiver(scanReceiver!!, IntentFilter(ACTION_BROADCAST))
+
+        /** Create & Start BLE Scanner **/
+        mScanner = BluetoothLeScannerCompat.getScanner()
+        scanSettings = ScanSettings.Builder()
+                .setLegacy(false)
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                .setReportDelay(SCAN_INTERVAL_IN_MILLISECONDS)
+                .setUseHardwareBatchingIfSupported(false)
+                .build()
+
+        val builder = ScanFilter.Builder()
+        // Apple Manufacture ID 0x004c
+        builder.setManufacturerData(0x004c, byteArrayOf())
+        scanFilters = arrayListOf( builder.build() )
+        // フィルターが空だとバックグラウンドで止まる?
+        //scanFilters = ArrayList() // ArrayList<ScanFilter>() // フィルタは空 == 全て受け取る
+
+        /** Scanning フラグをリセット **/
+        sk2.setScanRunning(false)
+        //mScanner.startScan(scanFilters, scanSettings, mScanCallback)
     }
-    ////////////////////////////////////////
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onResume() {
         super.onResume()
-        // ScanService からのブロードキャストレシーバ
-        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver!!,
-                IntentFilter(ACTION_BROADCAST))
-
         // ユーザ情報を確認、デバッグモード設定、空なら Login へ
         if (!checkInfo(mainUi))
             startActivity(intentFor<LoginActivity>().clearTop())
-
-        // BLE のチェック
-        if (!sk2.checkBt()) {
-            // ダメならボタンをグレーアウト
-            mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
-            toast(TOAST_CHECK_BLE_OFF)
-        } else {
-            mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
-        }
-
-        // デバッグモードの表示設定
-        if (pref.getBoolean(PREF_DEBUG, false)) {
-            mainUi.startBt.visibility = View.VISIBLE
-            mainUi.stopBt.visibility = View.VISIBLE
-            mainUi.scanInfo.visibility = View.VISIBLE
-        } else {
-            mainUi.startBt.visibility = View.INVISIBLE
-            mainUi.stopBt.visibility = View.INVISIBLE
-            mainUi.scanInfo.visibility = View.INVISIBLE
-        }
-
-        // 自動モードの設定
-        val auto = pref.getBoolean(PREF_AUTO, false)
-        mainUi.autoSw.isChecked = auto
-        if (auto)
-            mService?.startInterval(pref.getBoolean(PREF_DEBUG, false))
-
-        // バイブレーション
-        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-
-        // ScanService ON/OFF ボタンの状態設定
-        setButtonsState(sk2.getScanRunning())
     }
-    ////////////////////////////////////////
-    override fun onPause() {
-        // Broadcast Reciever を停止
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver!!)
-        super.onPause()
-    }
-    ////////////////////////////////////////
-    override fun onStop() {
-        // ScanService の Bind を外す
-        if (mBound) {
-            unbindService(mServiceConnection)
-            mBound = false
-        }
-        // SharedPreferences のチェンジリスナーを止める
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .unregisterOnSharedPreferenceChangeListener(this)
-        super.onStop()
-    }
-    ////////////////////////////////////////
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onDestroy() {
-        //mService?.stopInterval()
-        // サービスを停止
-        mService?.removeScanUpdates()
-        // ローカルキューを保存
-        sk2.saveQueue()
+        mScanner.stopScan(mScanCallback)
         super.onDestroy()
     }
-    ////////////////////////////////////////
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** ユーザー情報のチェック ***/
     private fun checkInfo(ui: MainActivityUi): Boolean {
         val uid = pref.getString(PREF_UID, "")
@@ -209,26 +156,110 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             true // O.K.
         }
     }
-    ////////////////////////////////////////////////////////////////////////////////
+
+    /** /////////////////////////////////////// **/
+    /** BLE スキャナのコールバック **/
+    private val mScanCallback = object: ScanCallback() {
+        override fun onScanResult(callbackType: Int, result: ScanResult) {
+            onReceivedBleScan(listOf(result))
+        }
+        override fun onBatchScanResults(results: List<ScanResult>) {
+            onReceivedBleScan(results)
+        }
+        override fun onScanFailed(errorCode: Int) {
+            warn("ScanFailed: $errorCode")
+        }
+    }
+    /** ////////////////////////////////////////////////////////////////////////////// **/
+    /*** BLE スキャン受診時のコールバック ***/
+    private fun onReceivedBleScan(results: List<ScanResult>) {
+        val scanArray = ScanArray()
+        scanArray.datetime = Moment()
+
+        // ビーコン情報をパースして ScanArray() に保存
+        results.forEach { r ->
+            val bytes = r.scanRecord?.bytes
+            val rssi = r.rssi
+            val structures = ADPayloadParser.getInstance().parse(bytes)
+            structures.forEach { s ->
+                if (s is IBeacon && (s.uuid.toString() in VALID_IBEACON_UUID)) {
+                    scanArray.add(Pair(s, rssi))
+
+                    val dist = getBleDistance(s.power, rssi)
+                    info("${s.uuid}, ${s.major}, ${s.minor}, ${dist}")
+                }
+            }
+        }
+        mainUi.scanInfo.text = scanArray.getBeaconsText(signal = true, ios = true)
+    }
+    /** ////////////////////////////////////////////////////////////////////////////// **/
+    /**  ScanServer を起動する: send はサーバ送信 or スキャンのみ、 auto は自動送信ON or OFF **/
+    fun toggleService(send: Boolean = true, auto: Boolean = true) {
+
+        // BLE Scan が実行中でない
+        if (! sk2.getScanRunning()) {
+            val intent = Intent(this, ScanService::class.java)
+            intent.putExtra(SCANSERVICE_EXTRA_SEND, send)
+            intent.putExtra(SCANSERVICE_EXTRA_AUTO, auto)
+            intent.putExtra(SCANSERVICE_EXTRA_ALARM, false)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                this.startForegroundService(intent)
+            else
+                this.startService(intent)
+        } else {
+            warn("Scan Running")
+        }
+    }
+    /** ////////////////////////////////////////////////////////////////////////////// **/
+    /*** ScanService からの Broadcast Receiver ***/
+    private inner class ScanReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val message= intent.getSerializableExtra(EXTRA_TOAST) as String?
+            val scanResult = intent.getSerializableExtra(EXTRA_BLESCAN) as String?
+
+            // Toast 表示
+            if (! message.isNullOrEmpty())
+                toast(message!!)
+            // デバッグモードのときは(記録される)最新スキャンを表示
+            if (pref.getBoolean(PREF_DEBUG, false) && ! scanResult.isNullOrEmpty())
+                mainUi.scanInfo.text = scanResult
+        }
+    }
+
+    /** ////////////////////////////////////////////////////////////////////////////// **/
+    /*** SharedPreferences が変化したときのコールバック ***/
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, s: String) {
+        if (s == PREF_AUTO || s == SCAN_RUNNING)
+            setAutoSwitchState()
+    }
+    /** ////////////////////////////////////////////////////////////////////////////// **/
+    /*** Auto Switch の状態設定 ***/
+    private fun setAutoSwitchState() {
+        mainUi.autoSw.isChecked = sk2.getAutoRunning()
+    }
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** Doze Ignore パーミッションをチェックして許可を要求 ***/
     fun requestDozeIgnore() {
         // above Android Marshmallow(23) requires a REQUEST_IGNORE_BATTERY_OPTIMIZATIONS Permission
         // for running services under the Doze mode.
+        val intent = Intent()
+        val packageName = packageName
+        val pm = getSystemService(POWER_SERVICE) as PowerManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val powerManager = this.getSystemService(PowerManager::class.java)
-            if (!powerManager.isIgnoringBatteryOptimizations(getPackageName())) {
-                val intent = Intent(ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+            if (! pm.isIgnoringBatteryOptimizations(packageName)) {
+                intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
                 intent.data = Uri.parse("package:$packageName")
                 startActivity(intent)
             }
         }
     }
-    ////////////////////////////////////////////////////////////////////////////////
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** パーミッションをチェック ***/
     fun checkPermissions(permission: String): Boolean {
         return PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(this, permission)
     }
-    ////////////////////////////////////////
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** パーミッションをリクエスト ***/
     fun requestPermissions(permission: String) {
         val shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(this, permission)
@@ -248,7 +279,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     arrayOf(permission), REQUEST_PERMISSIONS_REQUEST_CODE)
         }
     }
-    ////////////////////////////////////////
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** パーミッションリクエストからの結果を処理 ***/
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
                                             grantResults: IntArray) {
@@ -258,10 +289,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 info("User interaction was cancelled.")
             } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission was granted.
-                mService!!.requestScanUpdates()
+                /** startService(false) **/
             } else {
                 // Permission denied.
-                setButtonsState(false)
+                /** setButtonsState(false) **/
                 Snackbar.make(
                         this.contentView!!,
                         LOCATION_PERMISSION_DENIED_MESSAGE,
@@ -279,78 +310,34 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             }
         }
     }
-    ////////////////////////////////////////
-    /*** Type を引数とした出席記録用： ScanService.sendInfoToServer() を Bind 経由で叩く ***/
-    fun attendance(type: Char) {
-        mService?.sendInfoToServer(type)
-    }
-    ////////////////////////////////////////
-    /*** ScanService からの Broadcast Receiver ***/
-    private inner class MyReceiver : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val message= intent.getSerializableExtra(EXTRA_TOAST) as String?
-            val lastscan = intent.getSerializableExtra(EXTRA_BLESCAN) as String?
 
-            // Toast 表示
-            if (! message.isNullOrEmpty())
-                toast(message!!)
-            // デバッグモードのときは(記録される)最新スキャンを表示
-            if (pref.getBoolean(PREF_DEBUG, false) && ! lastscan.isNullOrEmpty())
-                mainUi.scanInfo.text = lastscan
-        }
-    }
-    ////////////////////////////////////////
-    /*** SharedPreferences が変化したときのコールバック ***/
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, s: String) {
-        // Update the buttons state depending on whether location updates are being requested.
-        if (s == SCAN_RUNNING) {
-            setButtonsState(sk2.getScanRunning())
-        }
-    }
-    ////////////////////////////////////////
-    /*** スキャンON/OFFボタンの状態設定 ***/
-    private fun setButtonsState(requestingLocationUpdates: Boolean) {
-        if (requestingLocationUpdates) {
-            mainUi.startBt.isEnabled = false
-            mainUi.stopBt.isEnabled = true
-        } else {
-            mainUi.startBt.isEnabled = true
-            mainUi.stopBt.isEnabled = false
-        }
-    }
-    ////////////////////////////////////////
-    /*** バイブレーションを鳴らす ***/
-    @Suppress("DEPRECATION")
-    fun vibrate() {
-        if (vibrator != null) {
-            if (vibrator!!.hasVibrator()) vibrator!!.vibrate(ATTENDANCE_VIBRATE_MILLISEC)
-        }
-    }
 }
 
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
-////////////////////////////////////////////////////////////////////////////////
+
+/** ////////////////////////////////////////////////////////////////////////////// **/
 /*** UI構成 via Anko ***/
-class MainActivityUi: AnkoComponent<MainActivity> {
+    class MainActivityUi: AnkoComponent<MainActivity> {
     lateinit var userInfo: TextView
     lateinit var scanInfo: TextView
-    lateinit var startBt: Button
-    lateinit var stopBt: Button
     lateinit var attBt: Button
     lateinit var autoSw: Switch
 
     companion object {
-        val USER = 1; val AUTO = 2; val ATTEND = 3; val MENU = 4;
-        val UPDATE = 91;  val SEARCH = 92
+        val USER = 1;
+        val AUTO = 2;
+        val ATTEND = 3;
+        val MENU = 4;
 
         const val BUTTON_TEXT_AUTO = "Auto"
         const val TOAST_MAIN_AUTO_ON = "Auto ON"
         const val TOAST_MAIN_AUTO_OFF = "Auto OFF"
     }
-    ////////////////////////////////////////
+
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun createView(ui: AnkoContext<MainActivity>) = with(ui) {
         val sk2 = ui.owner.application as Sk2Globals
-        val pref = sk2.pref
+        val pref = Sk2Globals.pref
 
         relativeLayout {
             padding = dip(4)
@@ -369,10 +356,12 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                 textSize = TEXT_SIZE_LARGE
                 onClick {
                     if (isChecked) {
-                        ui.owner.mService!!.startInterval(pref.getBoolean(PREF_DEBUG, false))
+                        /**ui.owner.mService!!.startInterval(pref.getBoolean(PREF_DEBUG, false))**/
+                        ui.owner.toggleService(auto = true)
                         toast(TOAST_MAIN_AUTO_ON)
                     } else {
-                        ui.owner.mService!!.stopInterval()
+                        /**ui.owner.mService!!.stopInterval()**/
+                        ui.owner.toggleService(auto = false)
                         toast(TOAST_MAIN_AUTO_OFF)
                     }
                     pref.edit()
@@ -382,7 +371,7 @@ class MainActivityUi: AnkoComponent<MainActivity> {
             }.lparams {
                 alignParentTop(); alignParentEnd()
             }
-            ////////////////////////////////////////////////////////////////////////////////
+            /** ////////////////////////////////////////////////////////////////////////////// **/
             ////////////////////////////////////////
             scanInfo = textView("Scan Info") {
                 textColor = Color.BLACK
@@ -398,14 +387,20 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                 background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
                 allCaps = false
                 onClick {
-                    ui.owner.vibrate()
-                    ui.owner.attendance('M')
+                    /**ui.owner.vibrate()
+                    ui.owner.attendance('M')**/
+
+                    /*****************************************/
+
+                    ui.owner.toggleService(send = true, auto = false)
+
+                    /*****************************************/
                 }
             }.lparams {
-                width = dip(200); height = dip(200)//; margin = dip(50);
+                width = dip(200); height = dip(200); margin = dip(30);
                 /*below(UPDATE);*/ above(MENU); centerHorizontally(); centerVertically()
             }
-            ////////////////////////////////////////////////////////////////////////////////
+            /** ////////////////////////////////////////////////////////////////////////////// **/
             linearLayout {
                 id = MENU
                 ////////////////////////////////////////
@@ -413,7 +408,8 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                     imageResource = R.drawable.ic_history_32dp
                     background = ContextCompat.getDrawable(context, R.drawable.button_circle)
                     onClick {
-                        startActivity<RecordActivity>()
+                        startActivity<RecordPagerActivity>()
+                        /** startActivity<RecordActivity>()**/
                     }
                 }.lparams { width = dip(48); height = dip(48); margin = dip(8) }
                 ////////////////////////////////////////
@@ -433,32 +429,33 @@ class MainActivityUi: AnkoComponent<MainActivity> {
                     }
                 }.lparams { width = dip(48); height = dip(48); margin = dip(8) }
             }.lparams {
-                above(UPDATE); centerHorizontally()
+                /*above(UPDATE);*/ alignParentBottom(); centerHorizontally()
             }
-            ////////////////////////////////////////////////////////////////////////////////
+            /** ////////////////////////////////////////////////////////////////////////////// **/
+            /*
             linearLayout {
                 id = UPDATE
                 ////////////////////////////////////////
                 startBt = button("Start Scan Update") {
                     textSize = TEXT_SIZE_NORMAL
-                    onClick {
+                    onClick {/**
                         if (!ui.owner.checkPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)) {
                             ui.owner.requestPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)
                         } else {
                             ui.owner.mService?.requestScanUpdates()
-                        }
+                        }**/
                     }
                 }.lparams { weight = 1f }
                 ////////////////////////////////////////
                 stopBt = button("Stop Scan Update") {
                     textSize = TEXT_SIZE_NORMAL
                     onClick {
-                        ui.owner.mService?.removeScanUpdates()
+                        /**ui.owner.mService?.removeScanUpdates()**/
                     }
                 }.lparams { weight = 1f }
             }.lparams {
                 alignParentBottom(); centerHorizontally(); width = matchParent
-            }
+            }*/
         }
     }
 }
