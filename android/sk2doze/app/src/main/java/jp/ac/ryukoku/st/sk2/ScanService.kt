@@ -25,8 +25,9 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_UID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_ALARM
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_AUTO
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_SEND
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_INTERVAL_IN_MILLISECONDS
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_PERIOD_IN_MILLISECONDS
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_INTERVAL_IN_MILLISEC
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_INTERVAL_IN_MILLISEC_DEBUG
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_PERIOD_IN_MILLISEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.VALID_IBEACON_UUID
 import me.mattak.moment.Moment
 import no.nordicsemi.android.support.v18.scanner.*
@@ -159,7 +160,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
             /** BLE Scan **/
             sk2.setScanRunning(true)
             mScanner.startScan(scanFilters, scanSettings, mScanCallback)
-            Thread.sleep(SCAN_PERIOD_IN_MILLISECONDS)
+            Thread.sleep(SCAN_PERIOD_IN_MILLISEC)
             mScanner.stopScan(mScanCallback)
             sk2.setScanRunning(false)
 
@@ -167,7 +168,8 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
             /** 空でなければ最新スキャンに保存して、MainActivity にBroadcastで送る & サーバ送信 **/
             if (scanArray.isNotEmpty()) {
                 /** Broadcast Scan Result **/
-                sendBroadcastScanResult(scanArray.getBeaconsText(statistic = true, signal = true, ios = true))
+                sendBroadcastScanResult(scanArray.getBeaconsText(
+                        statistic = true, signal = true, ios = true))
 
                 /** Send to Server **/
                 if (send == null || send == true) // Alarm からのときも送信
@@ -187,7 +189,10 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         /** ////////////////////////////////////////////////////////////////////////////// **/
         /** Start Repeat **/
         if (auto == true) {
-            setAlarmService(SCAN_INTERVAL_IN_MILLISECONDS)
+            if (pref.getBoolean(PREF_DEBUG, false))
+                setAlarmService(SCAN_INTERVAL_IN_MILLISEC_DEBUG)
+            else
+                setAlarmService(SCAN_INTERVAL_IN_MILLISEC)
             Log.i(TAG, "Start Alarm")
         }
         return START_NOT_STICKY
@@ -275,7 +280,9 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
             Log.d(TAG,"SEND to sk2; $message")
 
             /** ローカル記録キューに追加（送信の可否に依存しない） **/
-            sk2.localQueue.push(AttendData(curDatetime, type, scanArray))
+            sk2.localQueue.push(
+                    Pair(addWeekday(scanArray.datetime.toString()), scanArray.getStatisticalList()))
+            Log.i(TAG, Pair(addWeekday(scanArray.datetime.toString()), scanArray.getStatisticalList()).toString())
 
             /** ブロードキャストメッセージを送信 **/
             sendBroadcastMessage(Sk2Globals.BROADCAST_ATTEND_SEND)

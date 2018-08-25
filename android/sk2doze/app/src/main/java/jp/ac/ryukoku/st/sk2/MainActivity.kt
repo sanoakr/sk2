@@ -1,7 +1,6 @@
 package jp.ac.ryukoku.st.sk2
 
 import android.Manifest
-import android.Manifest.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
@@ -9,12 +8,10 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
-import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.widget.Button
 import android.widget.Switch
 import android.widget.TextView
@@ -24,7 +21,6 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOCATION_PERMISSION_DENIED_MESS
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOCATION_PERMISSION_REQUEST_MESSAGE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_AUTO
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.REQUEST_PERMISSIONS_REQUEST_CODE
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_INTERVAL_IN_MILLISECONDS
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_OK
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SETTINGS
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_ATTEND
@@ -35,10 +31,7 @@ import me.mattak.moment.Moment
 import no.nordicsemi.android.support.v18.scanner.*
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
-import android.app.ActivityManager
 import android.content.*
-import android.service.voice.VoiceInteractionService.isActiveService
-import android.content.Context.POWER_SERVICE
 import android.os.Vibrator
 import android.support.v4.content.LocalBroadcastManager
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.ACTION_BROADCAST
@@ -67,10 +60,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     private lateinit var mScanner: BluetoothLeScannerCompat
     private lateinit var scanSettings: ScanSettings
     private lateinit var scanFilters: ArrayList<ScanFilter>
-
     /** Scan result Broadcast Reciever **/
     private var scanReceiver: ScanReceiver? = null
-
     /** バイブレータ **/
     private var vibrator: Vibrator? = null
 
@@ -114,7 +105,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         scanSettings = ScanSettings.Builder()
                 .setLegacy(false)
                 .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                .setReportDelay(SCAN_INTERVAL_IN_MILLISECONDS)
+                .setReportDelay(0)
                 .setUseHardwareBatchingIfSupported(false)
                 .build()
 
@@ -246,9 +237,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             val message= intent.getSerializableExtra(EXTRA_TOAST) as String?
             val scanResult = intent.getSerializableExtra(EXTRA_BLESCAN) as String?
 
-            // Toast 表示
+            /** message は Toast 表示 **/
             if (! message.isNullOrEmpty())
                 toast(message!!)
+            /** scanResult は Queue 登録 **/
             // デバッグモードのときは(記録される)最新スキャンを表示
             if (pref.getBoolean(PREF_DEBUG, false) && ! scanResult.isNullOrEmpty())
                 mainUi.scanInfo.text = scanResult
@@ -297,7 +289,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** パーミッションをリクエスト ***/
-    fun requestPermissions(permission: String) {
+    private fun requestPermissions(permission: String) {
         val shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(this, permission)
 
         if (shouldProvideRationale) {
@@ -360,10 +352,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     lateinit var autoSw: Switch
 
     companion object {
-        val USER = 1;
-        val AUTO = 2;
-        val ATTEND = 3;
-        val MENU = 4;
+        const val USER = 1;
+        const val AUTO = 2;
+        const val ATTEND = 3;
+        const val MENU = 4;
 
         const val BUTTON_TEXT_AUTO = "Auto"
         const val TOAST_MAIN_AUTO_ON = "Auto ON"
@@ -423,17 +415,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
                 allCaps = false
                 onClick {
-                    /**ui.owner.vibrate()
-                    ui.owner.attendance('M')**/
-
-                    /*****************************************/
-
+                    /** ui.owner.vibrate() **/
                     ui.owner.toggleService(send = true, auto = false)
-
-                    /*****************************************/
                 }
             }.lparams {
-                width = dip(200); height = dip(200); margin = dip(30);
+                width = dip(200); height = dip(200); margin = dip(30)
                 /*below(UPDATE);*/ above(MENU); centerHorizontally(); centerVertically()
             }
             /** ////////////////////////////////////////////////////////////////////////////// **/

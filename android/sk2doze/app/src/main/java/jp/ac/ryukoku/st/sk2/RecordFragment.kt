@@ -51,7 +51,7 @@ class RecordFragment : Fragment() {
                 swipeRefreshLayout {
                     onRefresh {
                         doAsync {
-                            val recAdapter = RecordAdapter(this@RecordFragment)
+                            val recAdapter = RecordAdapter()
                             uiThread {
                                 recordList.adapter = recAdapter
                                 isRefreshing = false /** Refresh 完了を通知 **/
@@ -63,7 +63,7 @@ class RecordFragment : Fragment() {
                     recordList = listView {
                         id = LISTVIEW
                         doAsync {
-                            val recAdapter = RecordAdapter(this@RecordFragment)
+                            val recAdapter = RecordAdapter()
                             uiThread {
                                 adapter = recAdapter
                             }
@@ -112,7 +112,7 @@ fun fetchRecord(): RecordsData {
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /** UI **/
-class RecordAdapter(var fragment: RecordFragment): BaseAdapter() {
+class RecordAdapter(): BaseAdapter() {
     val list = fetchRecord()
 
     /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -139,21 +139,21 @@ class RecordAdapter(var fragment: RecordFragment): BaseAdapter() {
                     }.lparams { horizontalGravity = right }
                 }.lparams { width = matchParent }
                 /** ////////////////////////////////////////////////////////////////////////////// **/
-                for (i in 0..2) {
-                    if (! item.hasNull(i)) {
+                for (ix in 0..2) {
+                    if (! item.hasNull(ix)) {
                         /** ////////////////////////////////////////////////////////////////////////////// **/
                         linearLayout {
                             padding = dip(3)
                             ////////////////////////////////////////
-                            textView("Majour=${item.get(i).first}") {
+                            textView("Majour=${item.get(ix).first}") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
                             }.lparams { horizontalGravity = left; width = dip(100) }
                             ////////////////////////////////////////
-                            textView("Minor=${item.get(i).second}") {
+                            textView("Minor=${item.get(ix).second}") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
                             }.lparams { horizontalGravity = left; width = dip(100) }
                             ////////////////////////////////////////
-                            textView("Distance=${item.get(i).third}") {
+                            textView("Distance=${item.get(ix).third}") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
                             }.lparams { horizontalGravity = right; weight = 2f; leftMargin = dip(4) }
                         }

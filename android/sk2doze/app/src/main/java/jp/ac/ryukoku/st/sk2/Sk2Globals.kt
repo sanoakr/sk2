@@ -20,7 +20,7 @@ import java.util.*
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
 class Sk2Globals: Application() {
-    ////////////////////////////////////////
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     companion object {
         const val APP_NAME = "sk2"
         const val APP_TITLE = "龍大理工学部出欠システム"
@@ -92,17 +92,13 @@ class Sk2Globals: Application() {
 
         /*** Timer ***/
         // BLE Scan インターバル
-        const val SCAN_PERIOD_IN_MILLISECONDS: Long = 3000                    // 3 sec.
-        const val SCAN_INTERVAL_IN_MILLISECONDS: Long = 60*1000               // 1 min.
+        const val SCAN_PERIOD_IN_MILLISEC: Long = 3000                   // 3 sec.
         // 自動記録のインターバル
-        /** prevents an app from stopping and starting BLE scans more than 5 times in a window of 30 seconds. **/
-        /** https://blog.classycode.com/undocumented-android-7-ble-behavior-changes-d1a9bd87d983 **/
-        const val AUTO_SENDING_INTERVAL_IN_MILLISECONDS: Long = 5*60*1000     // 5 min.
-        const val AUTO_SENDING_INTERVAL_IN_MILLISECONDS_DEBUG: Long = 10*1000 // デバック用 30 sec.
-        // BLE Scanner 強制再スタートのインターバル
-        const val WAKEUP_INTERVAL_IN_MILLISEC: Long = 10*60*1000              // 10 min.
-        // 最新のスキャン結果を送信記録に利用可能な時間差の最大値
-        const val ATTENDANCE_TIME_DIFFERENCE_SEC: Long = 60                   // 1 min.
+        const val SCAN_INTERVAL_IN_MILLISEC: Long = 10*60*1000           // 10 min.
+        const val SCAN_INTERVAL_IN_MILLISEC_DEBUG: Long = 60*1000        // 1 min.
+
+        /** Local Queue Lenght **/
+        const val LOCAL_QUEUE_MAX_LENGTH: Int = 100
 
         /*** Toast メッセージ ***/
         const val TEXT_OK = "OK"
@@ -140,53 +136,40 @@ class Sk2Globals: Application() {
                 "ebf59ccc-21f2-4558-9488-00f2b388e5e6", // ru-wifi
                 "00000000-87b3-1001-b000-001c4d975326"  // sekimoto's
         )
-        val UUID_MASK = "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"
+        //val UUID_MASK = "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"
 
         lateinit var pref: SharedPreferences
     }
+    /** ////////////////////////////////////////////////////////////////////////////// **/
+    /**  出席情報のローカル記録用キュー **/
+    var localQueue = Queue<Pair<String,List<Any>>>(mutableListOf(), LOCAL_QUEUE_MAX_LENGTH)
 
-    fun getSk2Pref(): SharedPreferences = pref
-    ////////////////////////////////////////
-    // Shared Preferences
-        // 出席情報のローカル記録用キュー
-    var localQueue = Queue<AttendData>(mutableListOf(), 100)
-    // 最新スキャン結果
-    var lastScan = ScanArray()
-
-    ////////////////////////////////////////////////////////////////////////////////
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onCreate() {
         super.onCreate()
         pref = getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
         // ローカルキューをリストア
         restoreQueue()
     }
-    ////////////////////////////////////////
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** ローカルキューを Json String に変換して SharedPreferences に保存 ***/
-    fun saveQueue(queue: Queue<AttendData> = Queue(mutableListOf())) {
+    fun saveQueue(queue: Queue<Pair<String,List<Any>>> = Queue(mutableListOf())) {
         val gson = Gson()
         val jsonString = gson.toJson(queue)
         pref.edit()
                 .putString(PREF_LOCAL_QUEUE, jsonString as String)
                 .apply()
     }
-    ////////////////////////////////////////
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** SharedPreferences からローカルキューの情報をリストア ***/
     fun restoreQueue() {
         val gson = Gson()
-        val jsonString = pref.getString(PREF_LOCAL_QUEUE, gson.toJson(Queue<AttendData>(mutableListOf())))
-        localQueue = gson.fromJson(jsonString, Queue<AttendData>(mutableListOf())::class.java)
+        val jsonString = pref.getString(PREF_LOCAL_QUEUE,
+                gson.toJson(Queue<Pair<String,List<Any>>>(mutableListOf())))
+        localQueue = gson.fromJson(jsonString,
+                Queue<Pair<String,List<Any>>>(mutableListOf())::class.java)
     }
-    ////////////////////////////////////////
-    /*** 最新スキャン結果を保存（最新スキャン結果は終了時クリアするので、そのときにしか使ってません） ***/
-    fun saveLastScan(scanarray: ScanArray = ScanArray()) {
-        val gson = Gson()
-        val jsonString = gson.toJson(scanarray)
-        pref.edit()
-                .putString(PREF_LAST_SCAN, jsonString as String)
-                .apply()
-    }
-    ////////////////////////////////////////
-    /*** ログアウト時にユーザ情報を持つ全てのSharedPreferenceをクリア ***/
+    /** ////////////////////////////////////////////////////////////////////////////// **/    /*** ログアウト時にユーザ情報を持つ全てのSharedPreferenceをクリア ***/
     fun logout() {
         pref.edit()
                 .putString(PREF_UID, "")
@@ -199,8 +182,6 @@ class Sk2Globals: Application() {
 
         // Clear Local Queue
         saveQueue()
-        // Clear lastscan
-        saveLastScan()
         // back to the Login Activity
         startActivity(intentFor<LoginActivity>().clearTop())
     }
