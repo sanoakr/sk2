@@ -9,6 +9,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.util.Log
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import me.mattak.moment.Moment
 import org.jetbrains.anko.clearTop
 import org.jetbrains.anko.intentFor
@@ -16,6 +17,7 @@ import org.jetbrains.anko.stopService
 import org.jetbrains.anko.toast
 import org.json.JSONStringer
 import java.lang.Math.pow
+import java.lang.reflect.Type
 import java.util.*
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -138,24 +140,29 @@ class Sk2Globals: Application() {
         )
         //val UUID_MASK = "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"
 
+        /**  SharedPreferences **/
         lateinit var pref: SharedPreferences
+        /**  出席情報のローカル記録用キュー **/
+        lateinit var localQueue: Queue<Triple<String,Char,List<List<Any>>>>
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
-    /**  出席情報のローカル記録用キュー **/
-    var localQueue = Queue<Pair<String,List<Any>>>(mutableListOf(), LOCAL_QUEUE_MAX_LENGTH)
 
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onCreate() {
         super.onCreate()
+        localQueue = Queue(mutableListOf(), LOCAL_QUEUE_MAX_LENGTH)
         pref = getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
         // ローカルキューをリストア
         restoreQueue()
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** ローカルキューを Json String に変換して SharedPreferences に保存 ***/
-    fun saveQueue(queue: Queue<Pair<String,List<Any>>> = Queue(mutableListOf())) {
+    fun saveQueue(clear: Boolean = false) {
+        if (clear) localQueue = Queue()
+
         val gson = Gson()
-        val jsonString = gson.toJson(queue)
+        val jsonString = gson.toJson(localQueue)
+
         pref.edit()
                 .putString(PREF_LOCAL_QUEUE, jsonString as String)
                 .apply()
@@ -165,9 +172,10 @@ class Sk2Globals: Application() {
     fun restoreQueue() {
         val gson = Gson()
         val jsonString = pref.getString(PREF_LOCAL_QUEUE,
-                gson.toJson(Queue<Pair<String,List<Any>>>(mutableListOf())))
-        localQueue = gson.fromJson(jsonString,
-                Queue<Pair<String,List<Any>>>(mutableListOf())::class.java)
+                gson.toJson(Queue<Triple<String,Char,List<List<Any>>>>(mutableListOf())))
+        val type: Type = object: TypeToken<Queue<Triple<String, Char, Collection<Collection<Any>>>>>(){}.type
+        localQueue = gson.fromJson<Queue<Triple<String, Char, List<List<Any>>>>>(jsonString, type)
+
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/    /*** ログアウト時にユーザ情報を持つ全てのSharedPreferenceをクリア ***/
     fun logout() {
@@ -181,7 +189,7 @@ class Sk2Globals: Application() {
                 .apply()
 
         // Clear Local Queue
-        saveQueue()
+        saveQueue(clear = true)
         // back to the Login Activity
         startActivity(intentFor<LoginActivity>().clearTop())
     }

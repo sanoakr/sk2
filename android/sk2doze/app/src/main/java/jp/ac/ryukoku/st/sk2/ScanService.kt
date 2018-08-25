@@ -1,7 +1,6 @@
 package jp.ac.ryukoku.st.sk2
 
 import android.app.*
-import android.app.PendingIntent.FLAG_CANCEL_CURRENT
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Context
 import android.content.Intent
@@ -280,9 +279,12 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
             Log.d(TAG,"SEND to sk2; $message")
 
             /** ローカル記録キューに追加（送信の可否に依存しない） **/
-            sk2.localQueue.push(
-                    Pair(addWeekday(scanArray.datetime.toString()), scanArray.getStatisticalList()))
-            Log.i(TAG, Pair(addWeekday(scanArray.datetime.toString()), scanArray.getStatisticalList()).toString())
+            Sk2Globals.localQueue.push(
+                    Triple(scanArray.datetime.toString(), type, scanArray.getStatisticalList()))
+            //Log.d(TAG, "${Sk2Globals.localQueue.count()}")
+            //Log.i(TAG, Pair(addWeekday(scanArray.datetime.toString()), scanArray.getStatisticalList()).toString())
+            sk2.saveQueue()
+            //sk2.restoreQueue()
 
             /** ブロードキャストメッセージを送信 **/
             sendBroadcastMessage(Sk2Globals.BROADCAST_ATTEND_SEND)

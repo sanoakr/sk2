@@ -122,6 +122,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         /** Scanning フラグをリセット **/
         sk2.setScanRunning(false)
         //mScanner.startScan(scanFilters, scanSettings, mScanCallback)
+
+        /** Local Queue をリストア **/
+        sk2.restoreQueue()
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onResume() {

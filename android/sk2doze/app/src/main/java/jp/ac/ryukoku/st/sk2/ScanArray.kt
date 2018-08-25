@@ -1,10 +1,8 @@
 package jp.ac.ryukoku.st.sk2
 
-import android.util.Log
 import com.neovisionaries.bluetooth.ble.advertising.ADStructure
 import com.neovisionaries.bluetooth.ble.advertising.IBeacon
 import me.mattak.moment.Moment
-import org.jetbrains.anko.InputConstraints
 import java.util.*
 
 /** ////////////////////////////////////////////////////////////////////////////// **/

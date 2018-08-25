@@ -1,9 +1,6 @@
 package jp.ac.ryukoku.st.sk2
 
-import android.util.Log
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.info
-import org.jetbrains.anko.warn
 import java.util.ArrayList
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
