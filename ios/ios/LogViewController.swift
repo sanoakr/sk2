@@ -79,6 +79,9 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 	@objc func showServerLog() {
 		Connection.connect()
 		
+		// セルを削除
+		myItems.removeAll()
+		
 		// UserDefaultの生成.
 		let myUserDefault:UserDefaults = UserDefaults()
 		// 登録されているUserDefaultから設定値を呼び出す.
@@ -110,8 +113,6 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 75, width: displayWidth, height: displayHeight - 135))
 		
 		// セルの高さ
-		//		myTableView.estimatedRowHeight = 100
-		//		myTableView.rowHeight = UITableViewAutomaticDimension
 		myTableView.rowHeight = 120
 		
 		// Cell名の登録をおこなう.
@@ -150,7 +151,8 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		print("ローカルログを表示")
 		
 		// 一旦テーブルを削除
-		myTableView.removeFromSuperview()
+		myItems.removeAll()
+//		myTableView.removeFromSuperview()
 		
 		// ローカルログの取得
 		if myUserDefault.array(forKey: "log") != nil {
@@ -164,38 +166,40 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 			// ログデータを取得しTableViewに渡す
 			myItems = localLog
 			
-			// Viewの高さと幅を取得する.
-			let displayWidth: CGFloat = self.view.frame.width
-			let displayHeight: CGFloat = self.view.frame.height
-			
-			// TableViewの生成(Status barの高さをずらして表示).
-			myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 75, width: displayWidth, height: displayHeight - 135))
-			
-			// セルの高さ
-			//		myTableView.estimatedRowHeight = 100
-			//		myTableView.rowHeight = UITableViewAutomaticDimension
-			myTableView.rowHeight = 120
-			
-			// Cell名の登録をおこなう.
-			myTableView.register(MyCell.self, forCellReuseIdentifier: NSStringFromClass(MyCell.self))
-			
-			// DataSourceを自身に設定する.
-			myTableView.dataSource = self
-			
-			// Delegateを自身に設定する.
-			myTableView.delegate = self
-			
-			// リフレッシュ
-			// UIRefreshControlのインスタンス作成
-			let refresh = UIRefreshControl()
-			myTableView.refreshControl = refresh
-			
-			// リフレッシュしたときの処理内容を設定
-			refresh.addTarget(self, action: #selector(LogViewController.localLogRefresh(sender:)), for: .valueChanged)
-			
-			// Viewに追加する.
-			self.view.addSubview(myTableView)
+		} else {
+			myItems.removeAll()
+			myItems.append(",,値がありません,,,,,,,,,")
 		}
+		
+		// Viewの高さと幅を取得する.
+		let displayWidth: CGFloat = self.view.frame.width
+		let displayHeight: CGFloat = self.view.frame.height
+		
+		// TableViewの生成(Status barの高さをずらして表示).
+		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 75, width: displayWidth, height: displayHeight - 135))
+		
+		// セルの高さ
+		myTableView.rowHeight = 120
+		
+		// Cell名の登録をおこなう.
+		myTableView.register(MyCell.self, forCellReuseIdentifier: NSStringFromClass(MyCell.self))
+		
+		// DataSourceを自身に設定する.
+		myTableView.dataSource = self
+		
+		// Delegateを自身に設定する.
+		myTableView.delegate = self
+		
+		// リフレッシュ
+		// UIRefreshControlのインスタンス作成
+		let refresh = UIRefreshControl()
+		myTableView.refreshControl = refresh
+		
+		// リフレッシュしたときの処理内容を設定
+		refresh.addTarget(self, action: #selector(LogViewController.localLogRefresh(sender:)), for: .valueChanged)
+		
+		// Viewに追加する.
+		self.view.addSubview(myTableView)
 	}
 	
 	// ローカルログをリフレッシュ
@@ -257,7 +261,17 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 			cell.labelVal2.text = "major:\(splitRead[6]) minor:\(splitRead[7]) rssi:\(splitRead[8]) "
 			cell.labelVal3.text = "major:\(splitRead[9]) minor:\(splitRead[10]) rssi:\(splitRead[11]) "
 		} else {
-			cell.labelDate.text = "値が不正です"
+			if myItems.count == 1 {
+				cell.labelDate.text = " 値がありません"
+				cell.labelVal1.text = "major: minor: rssi: "
+				cell.labelVal2.text = "major: minor: rssi: "
+				cell.labelVal3.text = "major: minor: rssi: "
+			} else {
+				cell.labelDate.text = " 値が不正です"
+				cell.labelVal1.text = "major: minor: rssi: "
+				cell.labelVal2.text = "major: minor: rssi: "
+				cell.labelVal3.text = "major: minor: rssi: "
+			}
 		}
 		return cell
 	}

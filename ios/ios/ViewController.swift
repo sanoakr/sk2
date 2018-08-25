@@ -28,6 +28,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	var attendBtn: UIButton!
 	var debugText : UITextView!
 	var labelUser : UILabel!
+	var labelAuto : UILabel!
 	var labelBeacon : UILabel!
 	
 	// iBeacon
@@ -53,10 +54,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// 登録されているUserDefaultから設定値を呼び出す
 		let autoSender:Int = myUserDefault.integer(forKey: "autoSender")
 		let user = myUserDefault.string(forKey: "user")
-		let engName = myUserDefault.string(forKey: "engName")
+//		let engName = myUserDefault.string(forKey: "engName")
 		let jpnName = myUserDefault.string(forKey: "jpnName")
 		//        let key = myUserDefault.string(forKey: "key")
-		let userInfo = user! + " / " + engName! + " / " + jpnName!
+		let userInfo = user! + " / " + jpnName!
 		
 		// 検証用ユーザーの場合はdebugモードにする
 		if(user == appDelegate.debugUser) {
@@ -77,7 +78,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// debugTextを生成
 		debugText = UITextView(frame: CGRect(x:10, y:self.view.frame.height / 2 - 180, width:self.view.frame.width - 20, height:160))
 		debugText.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
-		debugText.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)    // 背景色
+		debugText.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0)    // 背景色
 		debugText.isEditable = false    // 編集不可
 		debugText.textAlignment = NSTextAlignment.left    // センター寄せ
 		
@@ -107,6 +108,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// SwitchのOn/Off切り替わりの際に、呼ばれるイベントを設定する.
 		SWautoSender.addTarget(self, action: #selector(ViewController.onClickSWautoSender(sender:)), for: UIControlEvents.valueChanged)
 		self.view.addSubview(SWautoSender)  // SwitchをViewに追加
+		
+		// 説明ラベル
+		labelAuto = UILabel(frame: CGRect(x:0, y: 110, width:self.view.frame.width - 80, height:30))
+		labelAuto.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
+		labelAuto.textAlignment = NSTextAlignment.right    // センター寄せ
+		labelAuto.text = "自動送信"
+		//        labelUser.backgroundColor = UIColor.red
+		view.addSubview(labelAuto)  // Viewに追加
 		
 		// --------------------------------------------------------------------------------------------------------------------------
 		// 出席ボタンを設置
