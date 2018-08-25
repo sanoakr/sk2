@@ -39,6 +39,7 @@ import android.app.ActivityManager
 import android.content.*
 import android.service.voice.VoiceInteractionService.isActiveService
 import android.content.Context.POWER_SERVICE
+import android.os.Vibrator
 import android.support.v4.content.LocalBroadcastManager
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.ACTION_BROADCAST
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
@@ -70,6 +71,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     /** Scan result Broadcast Reciever **/
     private var scanReceiver: ScanReceiver? = null
 
+    /** バイブレータ **/
+    private var vibrator: Vibrator? = null
+
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /********************************************************************/
     /** /////////////////////////////////////// **/
@@ -88,6 +92,15 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
         /** Doze mode での実行許可を要求 (> 23M) **/
         requestDozeIgnore()
+
+        /** BLE のチェック **/
+        if (!sk2.checkBt()) {
+            // ダメならボタンをグレーアウト
+            mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
+            toast(Sk2Globals.TOAST_CHECK_BLE_OFF)
+        } else {
+            mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
+        }
 
         /** SharedPreference の変更を通知するリスナー **/
         pref.registerOnSharedPreferenceChangeListener(this)
@@ -112,6 +125,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         // フィルターが空だとバックグラウンドで止まる?
         //scanFilters = ArrayList() // ArrayList<ScanFilter>() // フィルタは空 == 全て受け取る
 
+        /** バイブレーション **/
+        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
         /** Scanning フラグをリセット **/
         sk2.setScanRunning(false)
         //mScanner.startScan(scanFilters, scanSettings, mScanCallback)
@@ -119,13 +135,25 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onResume() {
         super.onResume()
-        // ユーザ情報を確認、デバッグモード設定、空なら Login へ
+        /** ユーザ情報を確認、デバッグモード設定、空なら Login へ **/
         if (!checkInfo(mainUi))
             startActivity(intentFor<LoginActivity>().clearTop())
+
+        /** 自動モードの設定 **/
+        val auto = pref.getBoolean(PREF_AUTO, false)
+        mainUi.autoSw.isChecked = auto
+
+        if (auto)
+            toggleService(auto=true, send=false)
+        else
+            toggleService(auto=false, send=false)
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onDestroy() {
         mScanner.stopScan(mScanCallback)
+        // ローカルキューを保存
+        sk2.saveQueue()
+
         super.onDestroy()
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -237,6 +265,14 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     /*** Auto Switch の状態設定 ***/
     private fun setAutoSwitchState() {
         mainUi.autoSw.isChecked = sk2.getAutoRunning()
+    }
+    /** ////////////////////////////////////////////////////////////////////////////// **/
+    /*** バイブレーションを鳴らす ***/
+    @Suppress("DEPRECATION")
+    fun vibrate() {
+        if (vibrator != null) {
+            if (vibrator!!.hasVibrator()) vibrator!!.vibrate(Sk2Globals.ATTENDANCE_VIBRATE_MILLISEC)
+        }
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** Doze Ignore パーミッションをチェックして許可を要求 ***/
@@ -431,31 +467,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             }.lparams {
                 /*above(UPDATE);*/ alignParentBottom(); centerHorizontally()
             }
-            /** ////////////////////////////////////////////////////////////////////////////// **/
-            /*
-            linearLayout {
-                id = UPDATE
-                ////////////////////////////////////////
-                startBt = button("Start Scan Update") {
-                    textSize = TEXT_SIZE_NORMAL
-                    onClick {/**
-                        if (!ui.owner.checkPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                            ui.owner.requestPermissions(Manifest.permission.ACCESS_COARSE_LOCATION)
-                        } else {
-                            ui.owner.mService?.requestScanUpdates()
-                        }**/
-                    }
-                }.lparams { weight = 1f }
-                ////////////////////////////////////////
-                stopBt = button("Stop Scan Update") {
-                    textSize = TEXT_SIZE_NORMAL
-                    onClick {
-                        /**ui.owner.mService?.removeScanUpdates()**/
-                    }
-                }.lparams { weight = 1f }
-            }.lparams {
-                alignParentBottom(); centerHorizontally(); width = matchParent
-            }*/
         }
     }
 }

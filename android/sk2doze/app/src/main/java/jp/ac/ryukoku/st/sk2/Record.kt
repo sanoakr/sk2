@@ -14,7 +14,7 @@ class Record(): AnkoLogger {
     var datetime: String? = null // without the day of week
     var data = ArrayList<ArrayList<Double?>>() // (Major, Minor, Distance) の Array
 
-    // Primary initializer
+    /** Primary initializer **/
     init { // initialize data array of array  (3 x MAX_SEND_BEACON_NUM) used as Triple
         for (i in 1..Sk2Globals.MAX_SEND_BEACON_NUM) {
             val triple = arrayListOf<Double?>(null, null, null)
@@ -23,14 +23,14 @@ class Record(): AnkoLogger {
     }
 
     fun count(): Int = data.count()
-    // i 番目のビーコンの Major, Minor, Distance と Triple として取得
+    /** i 番目のビーコンの Major, Minor, Distance と Triple として取得 **/
     fun get(i: Int): Triple<Int?, Int?, Double?>
             = Triple(data[i][0]?.toInt(), data[i][1]?.toInt(), data[i][2])
-    // i 番目の Major
+    /** i 番目の Major **/
     fun getMajor(i: Int): Int? = data[i][0]?.toInt()
-    // i 番目の Minor
+    /** i 番目の Minor **/
     fun getMinor(i: Int): Int? = data[i][1]?.toInt()
-    // i 番目の Distance
+    /** i 番目の Distance **/
     fun getDistance(i: Int): Double? = data[i][2]
 
     fun hasNull(i: Int) = (getMajor(i) == null || getMinor(i) == null || getDistance(i) == null)
@@ -42,10 +42,9 @@ class Record(): AnkoLogger {
         data.forEach { d -> list.add(d.toString()) }
         return data.joinToString()
     }
-
-    // Secondary initializer
-    /** 文字列をパースして保存 **/
-    constructor(str: String): this() {
+    /** ////////////////////////////////////////////////////////////////////////////// **/
+    /** Secondary initializer **/
+    constructor(str: String): this() {    /** 文字列をパースして保存 **/
         if (str.isNotBlank()) {
             // ',' で分割
             val dataList = str.split(',')
@@ -81,6 +80,7 @@ class Record(): AnkoLogger {
 class RecordsData() {
     var record = ArrayList<Record>()
 
+    /** Secondary initializer **/
     constructor(data: String): this() {
         // data が空でなければ改行で分割して、それぞれを Record とする
         if (data.isNotBlank()) {
@@ -91,8 +91,8 @@ class RecordsData() {
         }
     }
     fun count(): Int = record.count()
-    // i 番目のレコード
+    /** i 番目のレコード **/
     fun get(i: Int): Record = record.get(i)
-    // i 番目のレコードの j 番目のBeacon情報 (Major, Minor, Distance)
+    /** i 番目のレコードの j 番目のBeacon情報 (Major, Minor, Distance) **/
     fun get(i: Int, j: Int): Triple<Int?, Int?, Double?> = get(i).get(j)
 }

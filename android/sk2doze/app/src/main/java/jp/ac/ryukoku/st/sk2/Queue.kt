@@ -6,7 +6,7 @@ import me.mattak.moment.Moment
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import java.util.*
-///////////////////////////////////////
+/** ////////////////////////////////////////////////////////////////////////////// **/
 /*** FIFO Queue: ローカルログ記録用 ***/
 class Queue <T>(list: MutableList<T>, size: Int = 100) {
     private var items: MutableList<T> = list
@@ -16,24 +16,16 @@ class Queue <T>(list: MutableList<T>, size: Int = 100) {
     fun count():Int = items.count()
     fun getItem(postion: Int):T = items[postion]
     override fun toString() = items.toString()
-
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     fun push(element: T){ // 先頭に PUSH
-        //info(count())
-        /*
-        items.forEach { e ->
-            if (e is AttendData) {
-                info("AttendData")
-            } else
-                info("Not an AttendData")
-        }*/
         if (element != null) {
             items.add(0, element)
             if (count() > maxsize) {
                 pop()
             }
         }
-        //info(count())
     }
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     fun pop(): T? { // 最後から POP
         if (isEmpty()){
             return null
@@ -41,14 +33,15 @@ class Queue <T>(list: MutableList<T>, size: Int = 100) {
             return items.removeAt(items.lastIndex)
         }
     }
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     fun peek():T?{ // 最後の要素を PEEK (消さない)
         return items.last()
     }
 }
-///////////////////////////////////////
+/** ////////////////////////////////////////////////////////////////////////////// **/
 /*** 出席データ用データクラス ***/
 class AttendData(attDatetime: Moment, attType: Char, sArray: ScanArray) {
-    var datetime = attDatetime  // データ提出日時（スキャン日時ではない）
+    var datetime = attDatetime  /** データ提出日時（スキャン日時ではない）**/
     var type = attType            // 'M'anual or 'A'uto
     var scanArray = sArray    // Moment() + ArrayList< Pair<ADStructure, Int> >
 

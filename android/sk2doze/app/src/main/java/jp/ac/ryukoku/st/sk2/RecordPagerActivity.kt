@@ -18,6 +18,7 @@ import org.jetbrains.anko.design.tabLayout
 import org.jetbrains.anko.support.v4.viewPager
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
+/** TabView 入りの 出席 Records **/
 class RecordPagerActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +27,7 @@ class RecordPagerActivity: AppCompatActivity() {
         val recordPagerUi = RecordPagerUi()
         recordPagerUi.setContentView(this)
         recordPagerUi.showPages(supportFragmentManager)
+        /** Tab Title **/
         recordPagerUi.setTabText(listOf(
                 TITLE_RECORD_TAB_SERVER,
                 TITLE_RECORD_TAB_LOCAL
@@ -34,6 +36,7 @@ class RecordPagerActivity: AppCompatActivity() {
     }
 }
 /** ////////////////////////////////////////////////////////////////////////////// **/
+/** UI **/
 class RecordPagerUi : AnkoComponent<RecordPagerActivity> {
     lateinit var viewPager: ViewPager
     lateinit var tabLayout: TabLayout
@@ -69,6 +72,7 @@ class RecordPagerUi : AnkoComponent<RecordPagerActivity> {
     }
 }
 /** ////////////////////////////////////////////////////////////////////////////// **/
+/** Flagment Adapter **/
 class RecordPageAdapter(fm: FragmentManager): FragmentPagerAdapter(fm) {
     override fun getItem(position: Int): Fragment? {
         return when (position) {

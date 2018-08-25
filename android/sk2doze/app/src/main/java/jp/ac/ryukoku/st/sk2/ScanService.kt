@@ -39,7 +39,8 @@ import java.net.InetSocketAddress
 import javax.net.ssl.SSLSocketFactory
 
 
-////////////////////////////////////////////////////////////////////////////////
+
+/** ////////////////////////////////////////////////////////////////////////////// **/
 /*** BLEスキャン・出席記録送信用サービスクラス ***/
 class ScanService : Service() /*, BootstrapNotifier*/ {
     companion object {
@@ -78,12 +79,9 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         super.onCreate()
         sk2 = this.application as Sk2Globals
         pref = Sk2Globals.pref
-
-        //sk2.setScanRunning(true)
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onDestroy() {
-        //sk2.setScanRunning(false)
         super.onDestroy()
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -101,6 +99,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         scanArray = ScanArray()
 
         /** ////////////////////////////////////////////////////////////////////////////// **/
+        /** Notification **/
         val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -123,7 +122,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
                 .setContentTitle(NOTIFICATION_TITLE_TEXT)
                 // android標準アイコンから
                 .setSmallIcon(android.R.drawable.btn_star)
-                .setContentText("Alarm Counter")
+                .setContentText("Sk2 content textr")
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
                 .setWhen(System.currentTimeMillis())
@@ -138,6 +137,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
                 notificationManager.notify(1, notification)
             }
         }
+        /** ////////////////////////////////////////////////////////////////////////////// **/
         /** Start Scan **/
         doAsync {
             /** Create & Start BLE Scanner **/
@@ -150,7 +150,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
                     .build()
 
             val builder = ScanFilter.Builder()
-            // Apple Manufacture ID 0x004c: iBeacon
+            /** Apple Manufacture ID 0x004c: iBeacon **/
             builder.setManufacturerData(0x004c, byteArrayOf())
             scanFilters = arrayListOf(builder.build())
             /** // フィルターが空だとバックグラウンドで止まる?
@@ -163,8 +163,8 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
             mScanner.stopScan(mScanCallback)
             sk2.setScanRunning(false)
 
+            /** ////////////////////////////////////////////////////////////////////////////// **/
             /** 空でなければ最新スキャンに保存して、MainActivity にBroadcastで送る & サーバ送信 **/
-            //Log.i("COUNT", "${scanArray.count()}, ${scanArray.getBeaconsText()}")
             if (scanArray.isNotEmpty()) {
                 /** Broadcast Scan Result **/
                 sendBroadcastScanResult(scanArray.getBeaconsText(statistic = true, signal = true, ios = true))
@@ -173,7 +173,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
                 if (send == null || send == true) // Alarm からのときも送信
                     sendInfoToServer(type)
             }
-
+            /** ////////////////////////////////////////////////////////////////////////////// **/
             /** Stop Service **/
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 stopForeground(Service.STOP_FOREGROUND_DETACH)
@@ -181,15 +181,15 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
                 stopForeground(true)
         }
 
+        /** ////////////////////////////////////////////////////////////////////////////// **/
         startForeground(1, notification)
 
+        /** ////////////////////////////////////////////////////////////////////////////// **/
         /** Start Repeat **/
         if (auto == true) {
             setAlarmService(SCAN_INTERVAL_IN_MILLISECONDS)
             Log.i(TAG, "Start Alarm")
         }
-
-        //return START_STICKY
         return START_NOT_STICKY
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -208,9 +208,9 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** BLE スキャン受診時のコールバック ***/
     private fun onReceivedBleScan(results: List<ScanResult>) {
-        // スキャン日時
+        /** スキャン日時 **/
         scanArray.datetime = Moment()
-        // ビーコン情報をパースして ScanArray() に保存
+        /** ビーコン情報をパースして ScanArray() に保存 **/
         results.forEach { r ->
             val bytes = r.scanRecord?.bytes
             val rssi = r.rssi
@@ -258,51 +258,50 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
             return
         }
 
-        // 送信データ用文字列
-        var message: String
-
+        var message: String  /** 送信データ用文字列 **/
+        /** ////////////////////////////////////////////////////////////////////////////// **/
         /*** ビーコンがあれば送信する ***/
         if (scanArray.count() > 0) {
 
-            // 日時、ユーザ、認証キー
+            /** 日時、ユーザ、認証キー **/
             val dtString = scanArray.datetime.format("yyy-MM-dd HH:mm:ss")
             val uid = pref.getString(PREF_UID, "")
             val key = pref.getString(PREF_KEY, "")
 
-            // 送信データは「ラベルなし」で生成
+            /** 送信データは「ラベルなし」で生成 **/
             message = "$uid,$key,$type,$dtString" +
                     scanArray.getBeaconsText(label=false, time=false, uuid=false,
                             signal=false, ios=false, statistic=true)
-
             Log.d(TAG,"SEND to sk2; $message")
 
-            // ローカル記録キューに追加（送信の可否に依存しない）
+            /** ローカル記録キューに追加（送信の可否に依存しない） **/
             sk2.localQueue.push(AttendData(curDatetime, type, scanArray))
 
-            // ブロードキャストメッセージを送信
+            /** ブロードキャストメッセージを送信 **/
             sendBroadcastMessage(Sk2Globals.BROADCAST_ATTEND_SEND)
 
+            /** ////////////////////////////////////////////////////////////////////////////// **/
             /*** サーバ接続 ***/
             doAsync {
                 try {
-                    // SSL Socket
+                    /** SSL Socket **/
                     val sslSocketFactory = SSLSocketFactory.getDefault()
                     val sslsocket = sslSocketFactory.createSocket()
 
-                    // SSL Connect with TimeOut
+                    /** SSL Connect with TimeOut **/
                     sslsocket.connect(InetSocketAddress(Sk2Globals.SERVER_HOSTNAME, Sk2Globals.SERVER_PORT), Sk2Globals.SERVER_TIMEOUT_MILLISEC)
 
-                    // 入出力バッファ
+                    /** 入出力バッファ **/
                     val input = sslsocket.inputStream
                     val output = sslsocket.outputStream
                     val bufReader = BufferedReader(InputStreamReader(input, "UTF-8"))
                     val bufWriter = BufferedWriter(OutputStreamWriter(output, "UTF-8"))
 
-                    // Send message
+                    /** Send message **/
                     bufWriter.write(message)
                     bufWriter.flush()
 
-                    // Receive message
+                    /** Receive message **/
                     val recMessage = bufReader.use(BufferedReader::readText)
 
                     if (recMessage == Sk2Globals.SERVER_REPLY_FAIL)
@@ -316,7 +315,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
                 }
             }
         } else {
-            // サーバエラーのブロードキャストメッセージ送信
+            /** サーバエラーのブロードキャストメッセージ送信 **/
             sendBroadcastMessage(Sk2Globals.BROADCAST_ATTEND_NO_BEACON)
         }
         return
@@ -351,7 +350,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         val indent = Intent(this, ScanService::class.java)
         val pendingIntent = PendingIntent.getService(this, 0, indent, 0)
 
-        // アラームを解除する
+        /** アラームを解除する **/
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.cancel(pendingIntent)
 

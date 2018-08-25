@@ -7,12 +7,13 @@ import me.mattak.moment.Moment
 import org.jetbrains.anko.InputConstraints
 import java.util.*
 
-////////////////////////////////////////////////////////////////////////////////
+/** ////////////////////////////////////////////////////////////////////////////// **/
 /*** BLEスキャン結果用データクラス ***/
 class ScanArray() {
     var datetime = Moment()
     var adArray = ArrayList<Pair<ADStructure, Int>>()
 
+    /** Secondary initializer **/
     constructor(moment: Moment, array: ArrayList<Pair<ADStructure, Int>>) : this() {
         datetime = moment
         adArray = array
@@ -28,17 +29,17 @@ class ScanArray() {
             false -> null
         }
     }
-
     fun add(scan: Pair<ADStructure, Int>): Int {
         adArray.add(scan)
         return adArray.size
     }
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     /** 統計出力 Rssi の上下を捨てて、TX, Rssi の平均値を計算 **/
     /** Map(UUID -> Map((Major, Minor) -> (Tx, Rssi))) **/
     fun getStatisticalList(): List<List<Any>> {
         var map = mutableMapOf<String, MutableList<Pair<Int, Int>>>()
 
-        /* Beacon ごとの信号リスト */
+        /** Beacon ごとの信号リスト **/
         adArray.forEach { (b, rssi) ->
             if (b is IBeacon) {
                 val uuidStr = "${b.uuid},${b.major},${b.minor}"
@@ -51,7 +52,7 @@ class ScanArray() {
                 }
             }
         }
-        /* RSSI の最大と最小を除いて平均 */
+        /** RSSI の最大と最小を除いて平均 **/
         var list = mutableListOf<List<Any>>()
         map.forEach { (k, v) ->
 
@@ -75,19 +76,17 @@ class ScanArray() {
                 }
                 pAvg /= count; rAvg /= count
 
-
                 val (uuid, major, minor) = k.split(',')
-
                 list.add(listOf(uuid, major.toInt(), minor.toInt(), pAvg, rAvg))
             }
         }
         return list
     }
-
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     /** ビーコン情報をテキストで **/
     fun getBeaconsText(label: Boolean = true, time: Boolean = true, statistic: Boolean = false,
                        uuid: Boolean = true, signal: Boolean = false, ios: Boolean = false): String {
-        // ラベル設定
+        /** ラベル設定 **/
         val uuLabel = if (label) "UUID=" else ","
         val mjLabel = if (label) "\n\tMajor=" else ","
         val mnLabel = if (label) ", Minor=" else ","
@@ -96,10 +95,10 @@ class ScanArray() {
 
         var beaconText = StringBuilder()
         if (adArray.isNotEmpty()) {
-            if (time)
             /** 取得日時を表示？ **/
+            if (time)
                 beaconText.append(datetime.toString() + "\n")
-
+            /** ////////////////////////////////////////////////////////////////////////////// **/
             /** 統計処理 **/
             if (statistic) {
                 val list = getStatisticalList()
@@ -131,6 +130,7 @@ class ScanArray() {
                 }
 
             }
+            /** ////////////////////////////////////////////////////////////////////////////// **/
             /** そのまま **/
             else {
                 adArray.forEach { (b, rssi) ->

@@ -31,6 +31,7 @@ import java.security.AccessController.getContext
 import javax.net.ssl.SSLSocketFactory
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
+/** サーバ記録用の Fragment **/
 class RecordFragment : Fragment() {
     lateinit var recordList: ListView
 
@@ -41,25 +42,24 @@ class RecordFragment : Fragment() {
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        //val pref = getContext()?.getSharedPreferences(Sk2Globals.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
-
+        /** ////////////////////////////////////////////////////////////////////////////// **/
         return UI {
             relativeLayout {
                 padding = dip(4)
-                ////////////////////////////////////////
-                // PULLスワイプでデータを再取得してViewを更新
+                /** ////////////////////////////////////////////////////////////////////////////// **/
+                /** PULLスワイプでデータを再取得してViewを更新 **/
                 swipeRefreshLayout {
                     onRefresh {
                         doAsync {
                             val recAdapter = RecordAdapter(this@RecordFragment)
                             uiThread {
                                 recordList.adapter = recAdapter
-                                isRefreshing = false // Refresh 完了を通知
+                                isRefreshing = false /** Refresh 完了を通知 **/
                             }
                         }
                     }
-                    ////////////////////////////////////////
-                    // データ表示用 ListView
+                    /** ////////////////////////////////////////////////////////////////////////////// **/
+                    /** データ表示用 ListView **/
                     recordList = listView {
                         id = LISTVIEW
                         doAsync {
@@ -77,66 +77,60 @@ class RecordFragment : Fragment() {
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /** サーバから出席データを取得する **/
 fun fetchRecord(): RecordsData {
-    //val pref = getContext()?.getSharedPreferences(Sk2Globals.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
     val uid = pref.getString(Sk2Globals.PREF_UID, "")   // ユーザ
     val key = pref.getString(Sk2Globals.PREF_KEY, "")   // 認証キー
 
-    // データ受信用
-    lateinit var rowRecord: String
+    lateinit var rowRecord: String /** データ受信用 **/
     try {
-        // SSL Socket
+        /** SSL Socket **/
         val sslSocketFactory = SSLSocketFactory.getDefault()
         val sslsocket = sslSocketFactory.createSocket()
 
-        // SSL Connect with TimeOut
+        /** SSL Connect with TimeOut **/
         sslsocket.connect(InetSocketAddress(Sk2Globals.SERVER_HOSTNAME, Sk2Globals.SERVER_INFO_PORT), Sk2Globals.SERVER_TIMEOUT_MILLISEC)
 
-        // 入出力バッファ
+        /** 入出力バッファ **/
         val input = sslsocket.inputStream
         val output = sslsocket.outputStream
         val bufReader = BufferedReader(InputStreamReader(input, "UTF-8"))
         val bufWriter = BufferedWriter(OutputStreamWriter(output, "UTF-8"))
 
-        // Send message
+        /** Send message **/
         val message = "$uid,$key"
         bufWriter.write(message)
         bufWriter.flush()
 
-        // Receive message
+        /** Receive message **/
         rowRecord = bufReader.use(BufferedReader::readText)
 
     } catch (e: Exception) {
-
-        // Record への代入時の split(',') で分割しないで全て最初の要素(uid)としてエラー文字列を扱う
+        /** Record への代入時の split(',') で分割しないで全て最初の要素(uid)としてエラー文字列を扱う **/
         rowRecord = "Server Error: " + e.toString().replace(',', ' ')
-        //toast(Sk2Globals.TOAST_CANT_CONNECT_SERVER)
     }
-    return RecordsData(rowRecord) // 改行で分割されて ArrayList<Record> へパース代入
+    return RecordsData(rowRecord) /** 改行で分割されて ArrayList<Record> へパース代入 **/
 }
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
+/** UI **/
 class RecordAdapter(var fragment: RecordFragment): BaseAdapter() {
-    //val sk2 = activity.application as Sk2Globals
     val list = fetchRecord()
-    //val list = fragment.fetchRecord()
 
-    ////////////////////////////////////////
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun getView(i: Int, v: View?, parent: ViewGroup?): View {
         val item = getItem(i)
-        //Log.d("DATA", item.toString())
         return with(parent!!.context) {
-            ////////////////////////////////////////
+            /** ////////////////////////////////////////////////////////////////////////////// **/
             verticalLayout {
-                ////////////////////////////////////////
+                /** ////////////////////////////////////////////////////////////////////////////// **/
                 linearLayout {
                     padding = dip(4)
-                    ////////////////////////////////////////
+                    /** ////////////////////////////////////////////////////////////////////////////// **/
                     textView(addWeekday(item.datetime)) {
                         textSize = Sk2Globals.TEXT_SIZE_LARGE
                         backgroundColor = Color.WHITE // for Huwai's initAdditionalStyle default Error.
                         typeface = Typeface.DEFAULT_BOLD
                     }.lparams { horizontalGravity = left; weight = 1f }
-                    ////////////////////////////////////////
+                    /** ////////////////////////////////////////////////////////////////////////////// **/
                     textView(item.type) {
                         textSize = Sk2Globals.TEXT_SIZE_LARGE
                         //textColor = Color.BLACK
@@ -144,9 +138,10 @@ class RecordAdapter(var fragment: RecordFragment): BaseAdapter() {
                         typeface = Typeface.DEFAULT_BOLD
                     }.lparams { horizontalGravity = right }
                 }.lparams { width = matchParent }
+                /** ////////////////////////////////////////////////////////////////////////////// **/
                 for (i in 0..2) {
                     if (! item.hasNull(i)) {
-                        ////////////////////////////////////////
+                        /** ////////////////////////////////////////////////////////////////////////////// **/
                         linearLayout {
                             padding = dip(3)
                             ////////////////////////////////////////
@@ -167,15 +162,15 @@ class RecordAdapter(var fragment: RecordFragment): BaseAdapter() {
             }
         }
     }
-    ////////////////////////////////////////
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun getItem(position: Int): Record {
         return list.get(position)
     }
-    ////////////////////////////////////////
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun getCount(): Int {
         return list.count()
     }
-    ////////////////////////////////////////
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun getItemId(position: Int): Long {
         return position.toLong()
     }
