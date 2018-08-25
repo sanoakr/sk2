@@ -1,6 +1,8 @@
 package jp.ac.ryukoku.st.sk2
 
 import android.app.*
+import android.app.PendingIntent.FLAG_CANCEL_CURRENT
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -90,7 +92,9 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         val auto = intent?.getBooleanExtra(SCANSERVICE_EXTRA_AUTO, false)
         val alarm = intent?.getBooleanExtra(SCANSERVICE_EXTRA_ALARM, false)
 
-        /** Type Check: Extra がなければ Alarm からの AUTO **/
+        Log.i(TAG, "on StartCommand: send=$send, auto=$auto, alarm=$alarm")
+
+        /** Type Check: Alarm からだと AUTO **/
         val type = if (alarm == true) 'A' else 'M'
 
         /** Initialize Scan Result **/
@@ -326,10 +330,11 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         intent.putExtra(SCANSERVICE_EXTRA_AUTO, true)
         intent.putExtra(SCANSERVICE_EXTRA_ALARM, true)
 
-        val startMillis = System.currentTimeMillis() + period
+        val pendingIntent= PendingIntent.getService(this, 0, intent,
+                FLAG_UPDATE_CURRENT) /** Update extra data **/
 
-        val pendingIntent= PendingIntent.getService(this, 0, intent, 0)
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val startMillis = System.currentTimeMillis() + period
 
         // Oreo 以降なら Doze から抜ける
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)

@@ -29,7 +29,6 @@ class Sk2Globals: Application() {
         const val TITLE_RECORD = "出席記録"
         const val TITLE_RECORD_TAB_SERVER = "on Server"
         const val TITLE_RECORD_TAB_LOCAL = "on Local"
-        const val TITLE_LOCALRECORD = "ローカル記録"
         const val TITLE_HELP = "ヘルプ"
 
         /*** SharedPreferences の名前 ***/

@@ -357,11 +357,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 onClick {
                     if (isChecked) {
                         /**ui.owner.mService!!.startInterval(pref.getBoolean(PREF_DEBUG, false))**/
-                        ui.owner.toggleService(auto = true)
+                        ui.owner.toggleService(auto = true, send = false)
                         toast(TOAST_MAIN_AUTO_ON)
                     } else {
                         /**ui.owner.mService!!.stopInterval()**/
-                        ui.owner.toggleService(auto = false)
+                        ui.owner.toggleService(auto = false, send = false)
                         toast(TOAST_MAIN_AUTO_OFF)
                     }
                     pref.edit()
