@@ -133,12 +133,12 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
 
         // デバッグモードの表示設定
         if (pref.getBoolean(PREF_DEBUG, false)) {
-            //mainUi.startBt.visibility = View.VISIBLE
-            //mainUi.stopBt.visibility = View.VISIBLE
+            mainUi.startBt.visibility = View.VISIBLE
+            mainUi.stopBt.visibility = View.VISIBLE
             mainUi.scanInfo.visibility = View.VISIBLE
         } else {
-            //mainUi.startBt.visibility = View.INVISIBLE
-            //mainUi.stopBt.visibility = View.INVISIBLE
+            mainUi.startBt.visibility = View.INVISIBLE
+            mainUi.stopBt.visibility = View.INVISIBLE
             mainUi.scanInfo.visibility = View.INVISIBLE
         }
 
@@ -191,7 +191,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         // check key life
         val now = System.currentTimeMillis()
         val over = (now - time) > lifetime
-        ***/
+         ***/
 
         return if (uid == "") { // 空ならダメ
             false
@@ -308,7 +308,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         }
     }
     ////////////////////////////////////////
-    /*** スキャンON/OFFボタンの状態設定（デバック時のみ表示） ***/
+    /*** スキャンON/OFFボタンの状態設定 ***/
     private fun setButtonsState(requestingLocationUpdates: Boolean) {
         if (requestingLocationUpdates) {
             mainUi.startBt.isEnabled = false
