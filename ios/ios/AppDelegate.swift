@@ -29,13 +29,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	// VC共通カラー
 	var backgroundColor = UIColor(red: 0.93, green: 0.94, blue: 0.95, alpha: 1)
-	var ifNormalColor = UIColor(red: 0.16, green: 0.50, blue: 0.73, alpha: 1)
+	var ifNormalColor = UIColor(red: 0.20, green: 0.60, blue: 0.86, alpha: 1)
 	var ifActiveColor = UIColor(red: 0.10, green: 0.74, blue: 0.61, alpha: 1)
-	var ifOnDownColor = UIColor(red: 0.09, green: 0.63, blue: 0.52, alpha: 1)
+	var ifOnDownColor = UIColor(red: 0.16, green: 0.50, blue: 0.73, alpha: 1)
 	var ifDisableColor = UIColor(red: 0.74, green: 0.76, blue: 0.78, alpha: 1)
-	
+	//UIColor(red: 0.09, green: 0.63, blue: 0.52, alpha: 1)
 	// 変数
-	var iconSize = 70
+	var iconSize = 60
 	var postInterval:Int = 60 //sec
 	
 	// background処理
