@@ -170,7 +170,8 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
                 textColor = Color.WHITE
                 backgroundColor = ContextCompat.getColor(ctx, R.color.colorPrimary)
                 onClick {
-                    ui.owner.attemptLogin(user.text.toString(), passwd.text.toString())
+                    /** remove user's leading and trailing blanks **/
+                    ui.owner.attemptLogin(user.text.toString().trim(), passwd.text.toString())
                 }
             }.lparams{
                 gravity = Gravity.CENTER_HORIZONTAL; topMargin = dip(16)

@@ -88,7 +88,7 @@ class Sk2Globals: Application() {
         const val SCAN_PERIOD_IN_MILLISEC: Long = 3000                   // 3 sec.
         // 自動記録のインターバル
         const val SCAN_INTERVAL_IN_MILLISEC: Long = 10*60*1000           // 10 min.
-        const val SCAN_INTERVAL_IN_MILLISEC_DEBUG: Long = 60*1000        // 1 min.
+        const val SCAN_INTERVAL_IN_MILLISEC_DEBUG: Long = 10*60*1000     // 10 min.
 
         /** Local Queue Lenght **/
         const val LOCAL_QUEUE_MAX_LENGTH: Int = 100
