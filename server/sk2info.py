@@ -28,7 +28,7 @@ Saltfile = salt_dir + "user.salt"
 # replying info key salt
 replySaltfile = salt_dir + "reply.salt"
 
-max_reverslines = 20
+max_reverslines = 100
 
 mac = re.compile("[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[[[[[0-9a-f]{2}")
 room_file = sk2_dir + "room.csv"
