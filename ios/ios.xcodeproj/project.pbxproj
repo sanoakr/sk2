@@ -17,6 +17,11 @@
 		D66428FE212C16280089C04E /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66428FD212C16280089C04E /* LoginViewController.swift */; };
 		D6642901212C162F0089C04E /* HelpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66428FF212C162E0089C04E /* HelpViewController.swift */; };
 		D6642902212C162F0089C04E /* LogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6642900212C162F0089C04E /* LogViewController.swift */; };
+		D664291521313D2B0089C04E /* logout.png in Resources */ = {isa = PBXBuildFile; fileRef = D664291221313D2B0089C04E /* logout.png */; };
+		D664291621313D2B0089C04E /* log.png in Resources */ = {isa = PBXBuildFile; fileRef = D664291321313D2B0089C04E /* log.png */; };
+		D664291921313D490089C04E /* help.png in Resources */ = {isa = PBXBuildFile; fileRef = D664291821313D490089C04E /* help.png */; };
+		D664291B21320D880089C04E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D664291A21320D880089C04E /* Images.xcassets */; };
+		D664291F21325DB70089C04E /* SplashViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D664291E21325DB70089C04E /* SplashViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +58,11 @@
 		D66428FD212C16280089C04E /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		D66428FF212C162E0089C04E /* HelpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpViewController.swift; sourceTree = "<group>"; };
 		D6642900212C162F0089C04E /* LogViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewController.swift; sourceTree = "<group>"; };
+		D664291221313D2B0089C04E /* logout.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logout.png; sourceTree = "<group>"; };
+		D664291321313D2B0089C04E /* log.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = log.png; sourceTree = "<group>"; };
+		D664291821313D490089C04E /* help.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = help.png; sourceTree = "<group>"; };
+		D664291A21320D880089C04E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		D664291E21325DB70089C04E /* SplashViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +113,7 @@
 		D66428CE212C154C0089C04E /* ios */ = {
 			isa = PBXGroup;
 			children = (
+				D664290721312C820089C04E /* img */,
 				D66428CF212C154C0089C04E /* AppDelegate.swift */,
 				D66428FF212C162E0089C04E /* HelpViewController.swift */,
 				D6642900212C162F0089C04E /* LogViewController.swift */,
@@ -112,6 +123,8 @@
 				D66428D6212C154C0089C04E /* Assets.xcassets */,
 				D66428D8212C154C0089C04E /* LaunchScreen.storyboard */,
 				D66428DB212C154C0089C04E /* Info.plist */,
+				D664291A21320D880089C04E /* Images.xcassets */,
+				D664291E21325DB70089C04E /* SplashViewController.swift */,
 			);
 			path = ios;
 			sourceTree = "<group>";
@@ -132,6 +145,16 @@
 				D66428F1212C154D0089C04E /* Info.plist */,
 			);
 			path = iosUITests;
+			sourceTree = "<group>";
+		};
+		D664290721312C820089C04E /* img */ = {
+			isa = PBXGroup;
+			children = (
+				D664291821313D490089C04E /* help.png */,
+				D664291321313D2B0089C04E /* log.png */,
+				D664291221313D2B0089C04E /* logout.png */,
+			);
+			path = img;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -240,7 +263,11 @@
 			files = (
 				D66428DA212C154C0089C04E /* LaunchScreen.storyboard in Resources */,
 				D66428D7212C154C0089C04E /* Assets.xcassets in Resources */,
+				D664291B21320D880089C04E /* Images.xcassets in Resources */,
+				D664291921313D490089C04E /* help.png in Resources */,
 				D66428D5212C154C0089C04E /* Main.storyboard in Resources */,
+				D664291521313D2B0089C04E /* logout.png in Resources */,
+				D664291621313D2B0089C04E /* log.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -268,6 +295,7 @@
 				D66428FE212C16280089C04E /* LoginViewController.swift in Sources */,
 				D6642902212C162F0089C04E /* LogViewController.swift in Sources */,
 				D66428D2212C154C0089C04E /* ViewController.swift in Sources */,
+				D664291F21325DB70089C04E /* SplashViewController.swift in Sources */,
 				D66428D0212C154C0089C04E /* AppDelegate.swift in Sources */,
 				D6642901212C162F0089C04E /* HelpViewController.swift in Sources */,
 			);

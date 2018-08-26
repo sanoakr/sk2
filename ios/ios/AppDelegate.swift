@@ -35,6 +35,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var ifDisableColor = UIColor(red: 0.74, green: 0.76, blue: 0.78, alpha: 1)
 	
 	// 変数
+	var iconSize = 70
 	var postInterval:Int = 60 //sec
 	
 	// background処理
@@ -48,35 +49,38 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		// 登録されているUserDefaultから設定値を呼び出す.
 		let autoSender:Int = myUserDefault.integer(forKey: "autoSender")
 		let debug:Int = myUserDefault.integer(forKey: "debug")
-		let user = myUserDefault.string(forKey: "user")
-		let key = myUserDefault.string(forKey: "key")
+//		let user = myUserDefault.string(forKey: "user")
+//		let key = myUserDefault.string(forKey: "key")
 		
 		print(autoSender)
 		print(debug)
 		
-		if(user == nil || key == nil) {
-			print("============ delegeteユーザーがセットされていないよ！ ============")
-			let login: LoginViewController = LoginViewController()
-			navigationController = UINavigationController(rootViewController: login)
-		} else {
-			
-			print("============ delegeteユーザーがセットされている！ ============")
-			let main: ViewController = ViewController()
-			navigationController = UINavigationController(rootViewController: main)
-			
-			// 認証した場合はタイムスタンプを確認
-			let timestamp:Int = myUserDefault.integer(forKey: "timestamp")
-			let term = Int(NSDate().timeIntervalSince1970) - timestamp
-			
-			print("term:\(term)")
-			
-			if(term > timeLimit) {
-				print("時間切れ")
-				let login: LoginViewController = LoginViewController()
-				navigationController = UINavigationController(rootViewController: login)
-				myUserDefault.set(nil, forKey: "timestamp")
-			}
-		}
+		let splash: SplashViewController = SplashViewController()
+		navigationController = UINavigationController(rootViewController: splash)
+
+//		if(user == nil || key == nil) {
+//			print("============ delegeteユーザーがセットされていないよ！ ============")
+//			let login: LoginViewController = LoginViewController()
+//			navigationController = UINavigationController(rootViewController: login)
+//		} else {
+//			
+//			print("============ delegeteユーザーがセットされている！ ============")
+//			let main: ViewController = ViewController()
+//			navigationController = UINavigationController(rootViewController: main)
+//			
+//			// 認証した場合はタイムスタンプを確認
+//			let timestamp:Int = myUserDefault.integer(forKey: "timestamp")
+//			let term = Int(NSDate().timeIntervalSince1970) - timestamp
+//			
+//			print("term:\(term)")
+//			
+//			if(term > timeLimit) {
+//				print("時間切れ")
+//				let login: LoginViewController = LoginViewController()
+//				navigationController = UINavigationController(rootViewController: login)
+//				myUserDefault.set(nil, forKey: "timestamp")
+//			}
+//		}
 		
 		self.window = UIWindow(frame: UIScreen.main.bounds)
 		self.window?.rootViewController = navigationController

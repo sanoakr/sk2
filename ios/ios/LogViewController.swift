@@ -47,7 +47,10 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		let segment: UISegmentedControl = UISegmentedControl(items: array as [AnyObject])
 		
 		// segmentの位置を設定
-		segment.center = CGPoint(x: Int(self.view.frame.width / 2), y: Int(barHeight + 55))
+		segment.frame = CGRect(x: 20, y: Int(barHeight + 55), width: Int(self.view.frame.width) - 40, height: 30)
+		
+		// 背景色を設定
+		segment.tintColor = appDelegate.ifNormalColor
 		
 		// ボタンを押した時の処理を設定
 		segment.addTarget(self, action: #selector(LogViewController.change(segment:)), for: UIControlEvents.valueChanged)
@@ -110,7 +113,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		let displayHeight: CGFloat = self.view.frame.height
 		
 		// TableViewの生成(Status barの高さをずらして表示).
-		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 75, width: displayWidth, height: displayHeight - 135))
+		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 95, width: displayWidth, height: displayHeight - 155))
 		
 		// セルの高さ
 		myTableView.rowHeight = 120
@@ -176,7 +179,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		let displayHeight: CGFloat = self.view.frame.height
 		
 		// TableViewの生成(Status barの高さをずらして表示).
-		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 75, width: displayWidth, height: displayHeight - 135))
+		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 95, width: displayWidth, height: displayHeight - 155))
 		
 		// セルの高さ
 		myTableView.rowHeight = 120
@@ -278,7 +281,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 	
 	// --------------------------------------------------------------------------------------------------------------------------
 	// 戻るボタンの動作
-	@objc func back(_ sender: UIButton) {// selectorで呼び出す場合Swift4からは「@objc」をつける。
+	@objc func back(_ sender: UIButton) {
 		self.dismiss(animated: true, completion: nil)
 	}
 }

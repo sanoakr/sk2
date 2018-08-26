@@ -25,13 +25,12 @@ class LoginViewController: UIViewController {
 		super.viewDidLoad()
 		
 		self.view.backgroundColor = appDelegate.backgroundColor  // 背景色をセット
+		self.navigationItem.hidesBackButton = true	//　バックボタンを消す
+		
 		// --------------------------------------------------------------------------------------------------------------------------
 		// ナビゲーション
 		self.navigationItem.title = "ログイン"
-		// 以下、有効にしてもタップしてヘルプが表示されずアプリが強制終了してしまう（2018/08/15）
-		leftBarButton = UIBarButtonItem(title: "ヘルプ", style: .plain, target: self, action: #selector(ViewController.helpView))
-		self.navigationItem.leftBarButtonItem = leftBarButton
-		
+
 		// --------------------------------------------------------------------------------------------------------------------------
 		// titleViewを生成
 		let titleView: UITextView = UITextView(frame: CGRect(x:10, y:100, width:self.view.frame.width - 20, height:100))
@@ -171,13 +170,6 @@ class LoginViewController: UIViewController {
 			// UIAlertを発動する.
 			present(myAlert, animated: true, completion: nil)
 		}
-	}
-	
-	// ヘルプの表示
-	@objc func helpView() {
-		let helpvc = HelpViewController()
-		helpvc.view.backgroundColor = UIColor(red: 0.6, green: 0.6, blue: 0.6, alpha: 1)  // 背景色
-		self.navigationController?.pushViewController(helpvc, animated: true)   //viewを表示
 	}
 }
 

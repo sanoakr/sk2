@@ -39,6 +39,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	var beaconFlg = false   //iBeaconの取得フラグ
 	var debugMode:Int = 0   //デバッグモードのフラグ
 	
+	// アイコン
+	let btnLogImageDefault :UIImage? = UIImage(named:"log.png")
+	let btnHelpImageDefault :UIImage? = UIImage(named:"help.png")
+	let btnLogoutImageDefault :UIImage? = UIImage(named:"logout.png")
+	
 	// UserDefaultの生成
 	let myUserDefault:UserDefaults = UserDefaults()
 	
@@ -50,6 +55,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		
 		// UI定義
 		let btnWidth = Int(self.view.frame.width / 3)
+		self.navigationItem.hidesBackButton = true	//　バックボタンを消す
+		// ナビゲーションバーの高さを取得する
+		let navigationBarHeight = self.navigationController?.navigationBar.frame.size.height
 		
 		// 登録されているUserDefaultから設定値を呼び出す
 		let autoSender:Int = myUserDefault.integer(forKey: "autoSender")
@@ -67,20 +75,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		
 		// --------------------------------------------------------------------------------------------------------------------------
 		// userを生成
-		labelUser = UILabel(frame: CGRect(x:0, y:70, width:self.view.frame.width, height:30))
+		labelUser = UILabel(frame: CGRect(x:0, y:navigationBarHeight! + 20, width:self.view.frame.width, height:50))
 		labelUser.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
-		labelUser.textAlignment = NSTextAlignment.center    // センター寄せ
-		labelUser.text = userInfo
+		labelUser.backgroundColor = #colorLiteral(red: 0.9019607843, green: 0.9137254902, blue: 0.9176470588, alpha: 1)
+		labelUser.textAlignment = NSTextAlignment.left    // 左寄せ
+		labelUser.text = " \(userInfo)"
 		//        labelUser.backgroundColor = UIColor.red
 		view.addSubview(labelUser)  // Viewに追加
 		
 		// --------------------------------------------------------------------------------------------------------------------------
 		// debugTextを生成
-		debugText = UITextView(frame: CGRect(x:10, y:self.view.frame.height / 2 - 180, width:self.view.frame.width - 20, height:160))
+		debugText = UITextView(frame: CGRect(x:10, y:navigationBarHeight! + 70, width:self.view.frame.width - 20, height:160))
 		debugText.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
 		debugText.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0)    // 背景色
 		debugText.isEditable = false    // 編集不可
-		debugText.textAlignment = NSTextAlignment.left    // センター寄せ
+		debugText.textAlignment = NSTextAlignment.left    // 左寄せ
 		
 		// デバッグモードの場合
 		if(debugMode == 1) {
@@ -98,7 +107,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// --------------------------------------------------------------------------------------------------------------------------
 		// 自動送信トグルスイッチを生成
 		let SWautoSender: UISwitch = UISwitch()
-		SWautoSender.layer.position = CGPoint(x: self.view.bounds.width - 50, y: 125)
+		SWautoSender.layer.position = CGPoint(x: self.view.bounds.width - 30, y: navigationBarHeight! + 45)
 		if(autoSender == 0) {
 			SWautoSender.isOn = false    // SwitchをOffに設定
 		} else if( autoSender == 1 ) {
@@ -110,7 +119,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		self.view.addSubview(SWautoSender)  // SwitchをViewに追加
 		
 		// 説明ラベル
-		labelAuto = UILabel(frame: CGRect(x:0, y: 110, width:self.view.frame.width - 80, height:30))
+		labelAuto = UILabel(frame: CGRect(x:0, y: navigationBarHeight! + 20, width:self.view.frame.width - 60, height:50))
 		labelAuto.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
 		labelAuto.textAlignment = NSTextAlignment.right    // センター寄せ
 		labelAuto.text = "自動送信"
@@ -119,17 +128,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		
 		// --------------------------------------------------------------------------------------------------------------------------
 		// 出席ボタンを設置
-		attendBtn = UIButton(frame: CGRect(x: (self.view.frame.width/2 - 100),y: (self.view.frame.height - 300),width: 200,height:200))
+		attendBtn = UIButton(frame: CGRect(x: (self.view.frame.width/2 - 100),y: (self.view.frame.height - 360),width: 200,height:200))
 		attendBtn.addTarget(self, action: #selector(ViewController.sendAttend(sender:)), for: .touchUpInside)
 		attendBtn.titleLabel?.lineBreakMode = .byWordWrapping
 		attendBtn.titleLabel?.numberOfLines = 0
 		attendBtn.titleLabel?.textAlignment = NSTextAlignment.center
-		attendBtn.titleLabel?.font = UIFont.systemFont(ofSize: 25)
+		attendBtn.titleLabel?.font = UIFont.systemFont(ofSize: 35)
 		attendBtn.layer.cornerRadius = attendBtn.frame.size.width * 0.5 //丸まり
 		attendBtn.layer.shadowOffset = CGSize(width: 0, height: 20 )
 		attendBtn.layer.shadowColor = UIColor.black.cgColor
 		attendBtn.layer.shadowRadius = 10
 		attendBtn.layer.shadowOpacity = 0.3
+		attendBtn.layer.borderColor = UIColor.white.cgColor
+		attendBtn.layer.borderWidth = 3
 		btnDisable()
 		view.addSubview(attendBtn)  // Viewに追加
 		
@@ -137,31 +148,42 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// ログボタンを設置
 		let logViewBtn = UIButton(
 			frame: CGRect(
-				x: 0,
-				y: Int(self.view.frame.height - 50),
-				width: btnWidth,
-				height: 50
+				x: Int(btnWidth - 80),
+				y: Int(self.view.frame.height - 120),
+				width: appDelegate.iconSize,
+				height: appDelegate.iconSize
 		))
-		
+		logViewBtn.setBackgroundImage(btnLogImageDefault!, for: .normal)
 		logViewBtn.setTitle("ログ", for: .normal)  //タイトル
-		logViewBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
+		logViewBtn.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+		logViewBtn.setTitleColor(appDelegate.ifNormalColor, for: .normal) // タイトルの色
+		logViewBtn.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: -100.0, right: 0.0)
 		logViewBtn.backgroundColor = appDelegate.ifNormalColor  //色
+		logViewBtn.layer.cornerRadius = logViewBtn.frame.size.width * 0.5 //丸まり
 		logViewBtn.addTarget(self, action: #selector(ViewController.logView(_:)), for: .touchUpInside)
+		logViewBtn.layer.borderColor = UIColor.white.cgColor
+		logViewBtn.layer.borderWidth = 3
 		view.addSubview(logViewBtn)  // Viewに追加
 		
 		// --------------------------------------------------------------------------------------------------------------------------
 		// ヘルプボタンを設置
 		let helpViewBtn = UIButton(
 			frame: CGRect(
-				x: btnWidth,
-				y: Int(self.view.frame.height - 50),
-				width: btnWidth,
-				height: 50
+				x: Int(self.view.frame.width / 2 - 40),
+				y: Int(self.view.frame.height - 120),
+				width: appDelegate.iconSize,
+				height: appDelegate.iconSize
 		))
+		helpViewBtn.setBackgroundImage(btnHelpImageDefault!, for: .normal)
 		helpViewBtn.setTitle("ヘルプ", for: .normal)  //タイトル
-		helpViewBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
+		helpViewBtn.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+		helpViewBtn.setTitleColor(appDelegate.ifNormalColor, for: .normal) // タイトルの色
+		helpViewBtn.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: -100.0, right: 0.0)
 		helpViewBtn.backgroundColor = appDelegate.ifNormalColor  //色
+		helpViewBtn.layer.cornerRadius = helpViewBtn.frame.size.width * 0.5 //丸まり
 		helpViewBtn.addTarget(self, action: #selector(ViewController.helpView(_:)), for: .touchUpInside)
+		helpViewBtn.layer.borderColor = UIColor.white.cgColor
+		helpViewBtn.layer.borderWidth = 3
 		view.addSubview(helpViewBtn)  // Viewに追加
 		
 		// --------------------------------------------------------------------------------------------------------------------------
@@ -169,16 +191,24 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		let logoutBtn = UIButton(
 			frame: CGRect(
 				x: btnWidth * 2,
-				y: Int(self.view.frame.height - 50),
-				width: btnWidth,
-				height: 50
+				y: Int(self.view.frame.height - 120),
+				width: appDelegate.iconSize,
+//				width: btnWidth,
+				height: appDelegate.iconSize
 		))
+//		logoutBtn.setImage(btnLogoutImageDefault!, for: .normal)
+		logoutBtn.setBackgroundImage(btnLogoutImageDefault!, for: .normal)
 		logoutBtn.setTitle("ログアウト", for: .normal)  //タイトル
-		logoutBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
+		logoutBtn.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+		logoutBtn.setTitleColor(appDelegate.ifNormalColor, for: .normal) // タイトルの色
+		logoutBtn.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: -100.0, right: 0.0)
 		logoutBtn.backgroundColor = appDelegate.ifNormalColor  //色
+		logoutBtn.layer.cornerRadius = logoutBtn.frame.size.width * 0.5 //丸まり
 		logoutBtn.addTarget(self, action: #selector(ViewController.onClickLogout(sender:)), for: .touchUpInside)
+		logoutBtn.layer.borderColor = UIColor.white.cgColor
+		logoutBtn.layer.borderWidth = 3
+//		logoutBtn.titleEdgeInsets = UIEdgeInsetsMake(0, -50, 0, 50);
 		view.addSubview(logoutBtn)  // Viewに追加
-		
 		
 		// --------------------------------------------------------------------------------------------------------------------------
 		// iBeacon 監視開始
