@@ -4,13 +4,11 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ListView
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.localQueue
 import org.jetbrains.anko.*
 import org.jetbrains.anko.support.v4.UI
 import org.jetbrains.anko.support.v4.onRefresh
@@ -92,7 +90,7 @@ class RecordLocalAdapter: BaseAdapter() {
                 }.lparams { width = matchParent }
                 /** ////////////////////////////////////////////////////////////////////////////// **/
                 for (ix in 0..2) {
-                    if (ix < beacons.count() &&  beacons[ix].count() == beacons[ix].filterNotNull().count() ) {
+                    if (ix < beacons.count()) {
                         /** ////////////////////////////////////////////////////////////////////////////// **/
                         linearLayout {
                             padding = dip(3)
@@ -105,8 +103,12 @@ class RecordLocalAdapter: BaseAdapter() {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
                             }.lparams { horizontalGravity = left; width = dip(60) }
                             ////////////////////////////////////////
-                            val tx = beacons[ix][3] as Double; val rssi = beacons[ix][4] as Double
-                            val dist = getBleDistance(tx.toInt(), rssi.toInt())
+                            //Log.e("CAST to Double from", "${beacons[ix][3]} ${beacons[ix][4]}")
+                            val tx: Int = if (beacons[ix][3] is Double)
+                                (beacons[ix][3] as Double).toInt() else 0
+                            val rssi: Int = if (beacons[ix][4] is Double)
+                            (beacons[ix][4] as Double).toInt() else 0
+                            val dist = getBleDistance(tx, rssi)
                             textView("Distance=$dist") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
                             }.lparams { horizontalGravity = right; weight = 2f; leftMargin = dip(4) }

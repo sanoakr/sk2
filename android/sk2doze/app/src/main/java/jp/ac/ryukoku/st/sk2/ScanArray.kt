@@ -9,7 +9,7 @@ import java.util.*
 /*** BLEスキャン結果用データクラス ***/
 class ScanArray() {
     var datetime = Moment()
-    var adArray = ArrayList<Pair<ADStructure, Int>>()
+    private var adArray = ArrayList<Pair<ADStructure, Int>>()
 
     /** Secondary initializer **/
     constructor(moment: Moment, array: ArrayList<Pair<ADStructure, Int>>) : this() {
@@ -35,7 +35,7 @@ class ScanArray() {
     /** 統計出力 Rssi の上下を捨てて、TX, Rssi の平均値を計算 **/
     /** Map(UUID -> Map((Major, Minor) -> (Tx, Rssi))) **/
     fun getStatisticalList(): List<List<Any>> {
-        var map = mutableMapOf<String, MutableList<Pair<Int, Int>>>()
+        val map = mutableMapOf<String, MutableList<Pair<Int, Int>>>()
 
         /** Beacon ごとの信号リスト **/
         adArray.forEach { (b, rssi) ->
@@ -51,7 +51,7 @@ class ScanArray() {
             }
         }
         /** RSSI の最大と最小を除いて平均 **/
-        var list = mutableListOf<List<Any>>()
+        val list = mutableListOf<List<Any>>()
         map.forEach { (k, v) ->
 
             if (v.count() != 0) {
@@ -61,8 +61,8 @@ class ScanArray() {
                 else
                     Pair(Int.MIN_VALUE, Int.MAX_VALUE)
 
-                var count = 0;
-                var pAvg = 0;
+                var count = 0
+                var pAvg = 0
                 var rAvg = 0
 
                 v.forEach { (power, rssi) ->
@@ -91,7 +91,7 @@ class ScanArray() {
         val dsLabel = if (label) ",\n\tDistance=" else ","
         val enLabel = if (label) "\n" else ""
 
-        var beaconText = StringBuilder()
+        val beaconText = StringBuilder()
         if (adArray.isNotEmpty()) {
             /** 取得日時を表示？ **/
             if (time)
@@ -109,16 +109,16 @@ class ScanArray() {
 
                     if (uuid)
                     /** UUID を表示？ **/
-                        beaconText.append("$uuLabel${mUuid}")
+                        beaconText.append("$uuLabel$mUuid")
 
                     /** 主要情報 **/
-                    beaconText.append("$mjLabel${mMajor}$mnLabel${mMinor}" +
+                    beaconText.append("$mjLabel$mMajor$mnLabel$mMinor" +
                             "$dsLabel${getBleDistance(mTx, mRssi)}$enLabel")
 
                     if (label) {
                         /** ラベル付きのときのみ **/
                         if (signal)
-                            beaconText.append("\tTxPower=${mTx}, RSSI=${mRssi}\n")
+                            beaconText.append("\tTxPower=$mTx, RSSI=$mRssi\n")
                         if (ios) {
                             /** iOS 対応の距離？とRanging を追加 **/
                             val (dist, ranging) = iOSgetBleDistance(mTx, mRssi)

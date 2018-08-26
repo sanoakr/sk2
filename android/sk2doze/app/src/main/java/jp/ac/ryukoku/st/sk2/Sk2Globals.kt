@@ -1,24 +1,16 @@
 package jp.ac.ryukoku.st.sk2
 
-import android.app.ActivityManager
 import android.app.Application
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
-import android.content.ServiceConnection
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import me.mattak.moment.Moment
 import org.jetbrains.anko.clearTop
 import org.jetbrains.anko.intentFor
-import org.jetbrains.anko.stopService
 import org.jetbrains.anko.toast
-import org.json.JSONStringer
-import java.lang.Math.pow
 import java.lang.reflect.Type
-import java.util.*
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
 class Sk2Globals: Application() {
@@ -43,7 +35,6 @@ class Sk2Globals: Application() {
         const val PREF_DEBUG = "debug"        // デバッグ
         const val PREF_AUTO = "auto"          // 自動送信
         const val PREF_LOCAL_QUEUE = "queue"  // ローカルキュー保存用
-        const val PREF_LAST_SCAN = "lastscan" // 最新スキャン保存用 /* not in use */
         /*** BLE Scan の実行自体を保存する SharedPreference のキー ***/
         const val SCAN_RUNNING = "scan_running"
         /*** login 情報の有効期限 ***/
@@ -121,7 +112,7 @@ class Sk2Globals: Application() {
         const val TOAST_CANT_CONNECT_SERVER = "サーバに接続できません"
 
         /*** パーミッション変更時のリクエストコード（任意の整数でよい） ***/
-        val REQUEST_PERMISSIONS_REQUEST_CODE = 34
+        const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
 
         /*** サーバ上の1レコードあたりのBeaconデータの上限 ***/
         const val MAX_SEND_BEACON_NUM: Int = 3

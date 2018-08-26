@@ -34,7 +34,7 @@ class Record(): AnkoLogger {
 
     /** 文字列として取得 **/
     override fun toString(): String {
-        var list = mutableListOf<String>()
+        val list = mutableListOf<String>()
         list.add(uid.toString()); list.add(type.toString()); list.add(datetime.toString())
         data.forEach { d -> list.add(d.toString()) }
         return data.joinToString()
@@ -75,7 +75,7 @@ class Record(): AnkoLogger {
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /*** サーバからの全記録を Array<Record> として保持するデータクラス ***/
 class RecordsData() {
-    var record = ArrayList<Record>()
+    private var record = ArrayList<Record>()
 
     /** Secondary initializer **/
     constructor(data: String): this() {
@@ -89,7 +89,7 @@ class RecordsData() {
     }
     fun count(): Int = record.count()
     /** i 番目のレコード **/
-    fun get(i: Int): Record = record.get(i)
+    fun get(i: Int): Record = record[i]
     /** i 番目のレコードの j 番目のBeacon情報 (Major, Minor, Distance) **/
     fun get(i: Int, j: Int): Triple<Int?, Int?, Double?> = get(i).get(j)
 }

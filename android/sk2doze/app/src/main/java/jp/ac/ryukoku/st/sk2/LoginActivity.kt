@@ -38,11 +38,12 @@ import java.net.InetSocketAddress
 import javax.net.ssl.SSLSocketFactory
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
-class LoginActivity : AppCompatActivity(), AnkoLogger {
+class LoginActivity : AppCompatActivity() {
+    companion object {
+        lateinit var sk2: Sk2Globals
+        lateinit var pref: SharedPreferences
+    }
     private var loginUi = LoginActivityUi()
-    lateinit var sk2: Sk2Globals
-    lateinit var pref: SharedPreferences
-
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,7 +117,7 @@ class LoginActivity : AppCompatActivity(), AnkoLogger {
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /** ログインする **/
-    fun login(user: String, result: String) {
+    private fun login(user: String, result: String) {
         if (result != SERVER_REPLY_AUTH_FAIL) { // サーバからの返信が失敗でなければ
             /** サーバ返信を ',' で分割 **/
             val v: List<String> = result.split(",")

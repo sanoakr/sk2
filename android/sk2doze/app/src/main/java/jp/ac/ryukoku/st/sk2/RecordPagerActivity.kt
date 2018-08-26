@@ -54,7 +54,7 @@ class RecordPagerUi : AnkoComponent<RecordPagerActivity> {
             }.lparams(width = matchParent, height = wrapContent)
 
             viewPager = viewPager {
-                id = Companion.VIEWPAGER
+                id = VIEWPAGER
                 offscreenPageLimit = 2
             }.lparams(width = matchParent, height = matchParent)
 

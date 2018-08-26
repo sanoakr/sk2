@@ -355,10 +355,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     lateinit var autoSw: Switch
 
     companion object {
-        const val USER = 1;
-        const val AUTO = 2;
-        const val ATTEND = 3;
-        const val MENU = 4;
+        const val USER = 1
+        const val AUTO = 2
+        const val ATTEND = 3
+        const val MENU = 4
 
         const val BUTTON_TEXT_AUTO = "Auto"
         const val TOAST_MAIN_AUTO_ON = "Auto ON"
@@ -418,7 +418,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
                 allCaps = false
                 onClick {
-                    /** ui.owner.vibrate() **/
+                    ui.owner.vibrate()
                     ui.owner.toggleService(send = true, auto = false)
                 }
             }.lparams {

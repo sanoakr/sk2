@@ -44,12 +44,12 @@ import javax.net.ssl.SSLSocketFactory
 /*** BLEスキャン・出席記録送信用サービスクラス ***/
 class ScanService : Service() /*, BootstrapNotifier*/ {
     companion object {
-        val TAG = this::class.java.simpleName
-    }
-    /*** my SharedPreferences ***/
-    lateinit var sk2: Sk2Globals
-    lateinit var pref: SharedPreferences
+        val TAG = this::class.java.simpleName!!
 
+        /*** my SharedPreferences ***/
+        lateinit var sk2: Sk2Globals
+        lateinit var pref: SharedPreferences
+    }
     /*** BLE Scanner ***/
     private lateinit var mScanner: BluetoothLeScannerCompat
     private lateinit var scanSettings: ScanSettings
@@ -80,10 +80,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         sk2 = this.application as Sk2Globals
         pref = Sk2Globals.pref
     }
-    /** ////////////////////////////////////////////////////////////////////////////// **/
-    override fun onDestroy() {
-        super.onDestroy()
-    }
+
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val send = intent?.getBooleanExtra(SCANSERVICE_EXTRA_SEND, false)
@@ -106,17 +103,17 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Notification　Channel 設定
             val channel = NotificationChannel(CHANNEL_ID, NOTIFICATION_TITLE_TEXT, NotificationManager.IMPORTANCE_LOW)
-            channel.setDescription("Silent Notification")
+            channel.description = "Silent Notification"
             // 通知音を消さないと毎回通知音が出てしまう
             // この辺りの設定はcleanにしてから変更
             channel.setSound(null, null)
             // 通知ランプを消す
             channel.enableLights(false)
-            channel.setLightColor(Color.BLACK)
+            channel.lightColor = Color.BLACK
             // 通知バイブレーション無し
             channel.enableVibration(false)
 
-            notificationManager.createNotificationChannel(channel);
+            notificationManager.createNotificationChannel(channel)
         }
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(NOTIFICATION_TITLE_TEXT)
@@ -224,7 +221,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
                     scanArray.add(Pair(s, rssi))
 
                     val dist = getBleDistance(s.power, rssi)
-                    Log.i(TAG,"${s.uuid}, ${s.major}, ${s.minor}, ${dist}")
+                    Log.i(TAG,"${s.uuid}, ${s.major}, ${s.minor}, $dist")
                 }
             }
         }
@@ -245,7 +242,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** 出席データをサーバに送信 ***/
-    fun sendInfoToServer(type: Char) { // not Boolean, couldn't return from in any async blocks
+    private fun sendInfoToServer(type: Char) { // not Boolean, couldn't return from in any async blocks
         val curDatetime = Moment() // 現在時刻
 
         Log.d(TAG, "Try to send an attendance info to the Server with type $type")
@@ -259,10 +256,9 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
             /** 失敗のブロードキャストメッセージを送信して終了 **/
             sendBroadcastMessage(Sk2Globals.BROADCAST_ATTEND_NO_VALITTIME)
             Log.d(TAG,"sendInfoToServer; Out of the time for be parmitted")
-            return
         }
 
-        var message: String  /** 送信データ用文字列 **/
+        val message: String  /** 送信データ用文字列 **/
         /** ////////////////////////////////////////////////////////////////////////////// **/
         /*** ビーコンがあれば送信する ***/
         if (scanArray.count() > 0) {
