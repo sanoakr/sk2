@@ -117,13 +117,13 @@ class RecordAdapter: BaseAdapter() {
                     padding = dip(4)
                     /** ////////////////////////////////////////////////////////////////////////////// **/
                     textView(addWeekday(item.datetime)) {
-                        textSize = Sk2Globals.TEXT_SIZE_LARGE
+                        textSize = Sk2Globals.TEXT_SIZE_Large
                         backgroundColor = Color.WHITE // for Huwai's initAdditionalStyle default Error.
                         typeface = Typeface.DEFAULT_BOLD
                     }.lparams { horizontalGravity = left; weight = 1f }
                     /** ////////////////////////////////////////////////////////////////////////////// **/
                     textView(item.type) {
-                        textSize = Sk2Globals.TEXT_SIZE_LARGE
+                        textSize = Sk2Globals.TEXT_SIZE_Large
                         //textColor = Color.BLACK
                         backgroundColor = Color.WHITE // for Huwai's initAdditionalStyle default Error.
                         typeface = Typeface.DEFAULT_BOLD

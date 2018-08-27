@@ -76,13 +76,13 @@ class RecordLocalAdapter: BaseAdapter() {
                     padding = dip(4)
                     /** ////////////////////////////////////////////////////////////////////////////// **/
                     textView(addWeekday(datetime)) {
-                        textSize = Sk2Globals.TEXT_SIZE_LARGE
+                        textSize = Sk2Globals.TEXT_SIZE_Large
                         backgroundColor = Color.WHITE // for Huwai's initAdditionalStyle default Error.
                         typeface = Typeface.DEFAULT_BOLD
                     }.lparams { horizontalGravity = left; weight = 1f }
                     /** ////////////////////////////////////////////////////////////////////////////// **/
                     textView(type.toString()) {
-                        textSize = Sk2Globals.TEXT_SIZE_LARGE
+                        textSize = Sk2Globals.TEXT_SIZE_Large
                         //textColor = Color.BLACK
                         backgroundColor = Color.WHITE // for Huwai's initAdditionalStyle default Error.
                         typeface = Typeface.DEFAULT_BOLD
@@ -107,7 +107,7 @@ class RecordLocalAdapter: BaseAdapter() {
                             val tx: Int = if (beacons[ix][3] is Double)
                                 (beacons[ix][3] as Double).toInt() else 0
                             val rssi: Int = if (beacons[ix][4] is Double)
-                            (beacons[ix][4] as Double).toInt() else 0
+                                (beacons[ix][4] as Double).toInt() else 0
                             val dist = getBleDistance(tx, rssi)
                             textView("Distance=$dist") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL

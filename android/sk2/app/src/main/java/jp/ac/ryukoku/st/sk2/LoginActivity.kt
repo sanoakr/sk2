@@ -1,16 +1,20 @@
 package jp.ac.ryukoku.st.sk2
 
 import android.app.Activity
+import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.text.InputType.*
 import android.view.Gravity
+import android.view.View
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_TEXT_LOGIN
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_BACKGROUND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_NORMAL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.HINT_PASSWD
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.HINT_UID
@@ -58,7 +62,11 @@ class LoginActivity : Activity() {
         sk2 = this.application as Sk2Globals
         pref = Sk2Globals.pref
 
-        title = "$TITLE_LOGIN: $APP_TITLE $APP_NAME"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            window.statusBarColor = COLOR_BACKGROUND
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+
+        }
         loginUi.setContentView(this)
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -70,7 +78,7 @@ class LoginActivity : Activity() {
             val today: Long = System.currentTimeMillis() / LOGIN_TIME_DAY_UNIT_MILLSEC
             if ( today - pref.getLong(PREF_LOGIN_TIME, 0L)/ LOGIN_TIME_DAY_UNIT_MILLSEC < LOGIN_EXPIRY_PERIOD_DAYS)
             /** そのままメインアクティビティへ **/
-                startActivity<MainActivity>()
+                startMain()
         }
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -142,11 +150,16 @@ class LoginActivity : Activity() {
 
             toast(TOAST_LOGIN_SUCCESS)
             /** メイン画面へ **/
-            startActivity<MainActivity>()
+            startMain()
         } else {
             // in fail
             toast(TOAST_LOGIN_FAIL)
         }
+    }
+    private fun startMain() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = (Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
     }
 }
 //@Suppress("EXPERIMENTAL_FEATURE_WARNING")

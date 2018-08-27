@@ -71,7 +71,7 @@ class Sk2Globals: Application() {
         const val TEXT_SIZE_NORMAL = 10f
         const val TEXT_SIZE_Large = 14f
         const val TEXT_SIZE_LARGE = 16f
-        const val TEXT_SIZE_ATTEND = 36f                    // 出席ボタン
+        const val TEXT_SIZE_ATTEND = 28f                    // 出席ボタン
 
         /** LoginActivity Button サイズ & テキスト **/
         const val BUTTON_TEXT_LOGIN = "ログイン"
@@ -102,6 +102,12 @@ class Sk2Globals: Application() {
         const val BROADCAST_ATTEND_NO_VALITTIME = "現在の時刻には送信できません"
         /** Debug Info Message **/
         const val SCAN_INFO_NOT_FOUND = "Any Beacons not found."
+
+        /** Logout Dialog **/
+        const val LOGOUT_DIALOG_TITLE = "ログアウト"
+        const val LOGOUT_DIALOG_MSG = "ログアウトしますか？"
+        const val LOGOUT_DIALOG_OK = "ログアウト"
+        const val LOGOUT_DIALOG_CANCEL = "キャンセル"
 
         /*** Nortification ***/
         const val NOTIFICATION_ID: Int = 123
@@ -137,6 +143,9 @@ class Sk2Globals: Application() {
         const val TOAST_LOGIN_ATTEMPT_ATMARK = "認証IDに @ 以降を含めないで下さい"
         const val TOAST_LOGIN_SUCCESS = "ログインします"
         const val TOAST_LOGIN_FAIL = "ログインに失敗しました"
+        // Auto Switch
+        const val TOAST_MAIN_AUTO_ON = "Auto ON"
+        const val TOAST_MAIN_AUTO_OFF = "Auto OFF"
         // Check BLE
         const val TOAST_CHECK_BLE_NON = "この端末のBLEアダプタが見つかりません"
         const val TOAST_CHECK_BLE_OFF = "Bluetoothをオンにしてください"

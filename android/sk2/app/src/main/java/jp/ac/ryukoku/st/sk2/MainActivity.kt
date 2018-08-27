@@ -35,6 +35,8 @@ import org.jetbrains.anko.sdk25.coroutines.onClick
 import android.content.*
 import android.graphics.drawable.ColorDrawable
 import android.os.Vibrator
+import android.support.v4.app.DialogFragment
+import android.support.v4.app.FragmentActivity
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.widget.TextViewCompat
 import android.support.v7.app.ActionBar
@@ -68,14 +70,18 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_PERIOD_IN_MILLISEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SWITCH_TEXT_AUTO
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_Large
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_TINY
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_MAIN_AUTO_OFF
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_MAIN_AUTO_ON
 import org.jetbrains.anko.appcompat.v7.linearLayoutCompat
 import org.w3c.dom.Text
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /** Sk2 Main Activity **/
-class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListener, AnkoLogger {
-    lateinit var sk2: Sk2Globals
-    lateinit var pref: SharedPreferences
+class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceChangeListener, AnkoLogger {
+    companion object {
+        lateinit var sk2: Sk2Globals
+        lateinit var pref: SharedPreferences
+    }
 
     private var mainUi = MainActivityUi()
 
@@ -97,7 +103,6 @@ class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListe
         sk2 = this.application as Sk2Globals
         pref = Sk2Globals.pref
 
-        title = "$APP_TITLE $APP_NAME"
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             window.statusBarColor = COLOR_BACKGROUND
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
@@ -173,6 +178,9 @@ class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListe
 
         super.onDestroy()
     }
+    /** ////////////////////////////////////////////////////////////////////////////// **/
+    /** Disable Back Key **/
+    override fun onBackPressed() {}
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** ユーザー情報のチェック ***/
     private fun checkInfo(ui: MainActivityUi): Boolean {
@@ -382,16 +390,13 @@ class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListe
     lateinit var autoSw: Switch
 
     companion object {
-        const val TITLE = 10
-        const val USER = 1
+        const val TITLE = 1
+        const val USER = 2
         const val AUTO = 3
-        const val ATTEND = 4
-        const val MENU = 5
-
-        const val TOAST_MAIN_AUTO_ON = "Auto ON"
-        const val TOAST_MAIN_AUTO_OFF = "Auto OFF"
+        const val SCAN = 4
+        const val ATTEND = 5
+        const val MENU = 6
     }
-
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun createView(ui: AnkoContext<MainActivity>) = with(ui) {
         val sk2 = ui.owner.application as Sk2Globals
@@ -399,7 +404,7 @@ class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListe
         relativeLayout {
             backgroundColor = COLOR_BACKGROUND
             ////////////////////////////////////////
-            textView("${APP_TITLE} ${APP_NAME}") {
+            textView("$APP_TITLE $APP_NAME") {
                 id = TITLE
                 textColor = Color.BLACK
                 textSize = TEXT_SIZE_LARGE
@@ -409,7 +414,7 @@ class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListe
             }.lparams { alignParentTop(); alignParentStart(); alignParentEnd()
                 centerHorizontally(); bottomMargin = dip(10)
             }
-            /** ////////////////////////////////////////////////////////////////////////////// **/            ////////////////////////////////////////
+            /** ////////////////////////////////////////////////////////////////////////////// **/
             userInfo = textView("User Info") {
                 id = USER
                 textColor = Color.BLACK
@@ -430,22 +435,24 @@ class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListe
                     }
                     sk2.setAutoRunning(isChecked)
                 }
-            }.lparams { below(TITLE); alignParentEnd() }
+            }.lparams { below(TITLE);  alignParentEnd() ; baselineOf(USER)}
             /** ////////////////////////////////////////////////////////////////////////////// **/
             scanInfo = textView("Scan Info") {
+                id = SCAN
                 textColor = Color.BLACK
                 textSize = TEXT_SIZE_TINY
             }.lparams {
                 below(USER); alignParentStart()
                 topMargin = dip(10); leftMargin = dip(10)
             }
+            ////////////////////////////////////////
             sendInfo = textView("Send Info") {
                 textColor = Color.BLACK
                 textSize = TEXT_SIZE_TINY
             }.lparams {
                 //below(TOP); alignParentEnd(); margin = dip(8)
             }.lparams {
-                below(AUTO); alignParentEnd()
+                below(AUTO); alignParentEnd(); baselineOf(SCAN)
                 topMargin = dip(10); rightMargin = dip(10)
             }
             /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -490,7 +497,9 @@ class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListe
                     imageResource = R.drawable.ic_logout_32dp
                     background = ContextCompat.getDrawable(context, R.drawable.button_circle)
                     onClick {
-                        sk2.logout()
+                        val dialog = LogoutDialog()
+                        // Dialogの表示
+                        dialog.show(ui.owner.supportFragmentManager, "LOGOUT")
                     }
                 }.lparams { width = dip(BUTTON_SIZE_MENU); height = dip(BUTTON_SIZE_MENU)
                     margin = dip(BUTTON_MARGIN_MENU) }
