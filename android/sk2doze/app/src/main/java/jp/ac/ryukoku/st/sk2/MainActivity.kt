@@ -37,6 +37,12 @@ import android.support.v4.content.LocalBroadcastManager
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.ACTION_BROADCAST
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_MARGIN_ATTEND
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_MARGIN_MENU
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_SIZE_ATTEND
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_SIZE_MENU
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_TEXT_ATTEND_FALSE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_TEXT_ATTEND_TRUE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_BLESCAN
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_TOAST
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NAME_START_TESTUSER
@@ -44,10 +50,13 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_DEBUG
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_UID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_USER_NAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_ALARM
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_AUTO
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_SEND
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_RUNNING
-
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_INFO_NOT_FOUND
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_PERIOD_CHECK_IN_MILLISEC
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_PERIOD_IN_MILLISEC
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SWITCH_TEXT_AUTO
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_TINY
+import org.jetbrains.anko.appcompat.v7.linearLayoutCompat
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /** Sk2 Main Activity **/
@@ -96,26 +105,22 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         /** SharedPreference の変更を通知するリスナー **/
         pref.registerOnSharedPreferenceChangeListener(this)
 
-        /** Scan result Broadcast Reciever **/
+        /** Broadcast Reciever from ScanService**/
         scanReceiver = ScanReceiver()
         LocalBroadcastManager.getInstance(this).registerReceiver(scanReceiver!!, IntentFilter(ACTION_BROADCAST))
 
-        /** Create & Start BLE Scanner **/
-        mScanner = BluetoothLeScannerCompat.getScanner()
-        scanSettings = ScanSettings.Builder()
-                .setLegacy(false)
-                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                .setReportDelay(0)
-                .setUseHardwareBatchingIfSupported(false)
-                .build()
-
-        val builder = ScanFilter.Builder()
-        // Apple Manufacture ID 0x004c
-        builder.setManufacturerData(0x004c, byteArrayOf())
-        scanFilters = arrayListOf( builder.build() )
-        // フィルターが空だとバックグラウンドで止まる?
-        //scanFilters = ArrayList() // ArrayList<ScanFilter>() // フィルタは空 == 全て受け取る
-
+        /** Create & Start BLE Scanner if DEBUG **/
+        if (pref.getBoolean(PREF_DEBUG, false)) {
+            mScanner = BluetoothLeScannerCompat.getScanner()
+            scanSettings = ScanSettings.Builder()
+                    .setLegacy(false)
+                    .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                    .setReportDelay(SCAN_PERIOD_IN_MILLISEC)
+                    .setUseHardwareBatchingIfSupported(false)
+                    .build()
+            scanFilters = ArrayList() // ArrayList<ScanFilter>() // フィルタは空 == 全て受け取る
+            mScanner.startScan(scanFilters, scanSettings, mScanCallback)
+        }
         /** バイブレーション **/
         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
@@ -134,13 +139,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             startActivity(intentFor<LoginActivity>().clearTop())
 
         /** 自動モードの設定 **/
-        val auto = pref.getBoolean(PREF_AUTO, false)
+        val auto = sk2.getAutoRunning()
         mainUi.autoSw.isChecked = auto
-
-        if (auto)
-            toggleService(auto=true, send=false)
-        else
-            toggleService(auto=false, send=false)
+        /** Alarm Service **/
+        if (auto) sk2.setAlarmService() else sk2.stopAlarmService()
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onDestroy() {
@@ -178,7 +180,6 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             true // O.K.
         }
     }
-
     /** /////////////////////////////////////// **/
     /** BLE スキャナのコールバック **/
     private val mScanCallback = object: ScanCallback() {
@@ -212,18 +213,26 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 }
             }
         }
-        mainUi.scanInfo.text = scanArray.getBeaconsText(signal = true, ios = true)
+        if (scanArray.count() > 0) {
+            mainUi.scanInfo.text = scanArray.getBeaconsText(signal = true, ios = true)
+            mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
+            mainUi.attBt.text = BUTTON_TEXT_ATTEND_TRUE
+        }
+        else {
+            mainUi.scanInfo.text = SCAN_INFO_NOT_FOUND
+            mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
+            mainUi.attBt.text = BUTTON_TEXT_ATTEND_FALSE
+        }
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
-    /**  ScanServer を起動する: send はサーバ送信 or スキャンのみ、 auto は自動送信ON or OFF **/
-    fun toggleService(send: Boolean = true, auto: Boolean = true) {
+    /**  ScanServer を起動する: send はサーバ送信 or スキャンのみ **/
+    fun toggleService(send: Boolean = true) {
 
         // BLE Scan が実行中でない
         if (! sk2.getScanRunning()) {
             val intent = Intent(this, ScanService::class.java)
             intent.putExtra(SCANSERVICE_EXTRA_SEND, send)
-            intent.putExtra(SCANSERVICE_EXTRA_AUTO, auto)
-            intent.putExtra(SCANSERVICE_EXTRA_ALARM, false)
+            intent.putExtra(SCANSERVICE_EXTRA_ALARM, false) // Always false
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 this.startForegroundService(intent)
@@ -243,17 +252,15 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             /** message は Toast 表示 **/
             if (! message.isNullOrEmpty())
                 toast(message!!)
-            /** scanResult は Queue 登録 **/
-            // デバッグモードのときは(記録される)最新スキャンを表示
+            /** scanResult は SendInfo へ表示 **/
             if (pref.getBoolean(PREF_DEBUG, false) && ! scanResult.isNullOrEmpty())
-                mainUi.scanInfo.text = scanResult
+                mainUi.sendInfo.text = scanResult
         }
     }
-
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** SharedPreferences が変化したときのコールバック ***/
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, s: String) {
-        if (s == PREF_AUTO || s == SCAN_RUNNING)
+        if (s == PREF_AUTO) // || s == SCAN_RUNNING)
             setAutoSwitchState()
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -271,7 +278,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** Doze Ignore パーミッションをチェックして許可を要求 ***/
-    fun requestDozeIgnore() {
+    private fun requestDozeIgnore() {
         // above Android Marshmallow(23) requires a REQUEST_IGNORE_BATTERY_OPTIMIZATIONS Permission
         // for running services under the Doze mode.
         val intent = Intent()
@@ -341,26 +348,24 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
             }
         }
     }
-
 }
 
 @Suppress("EXPERIMENTAL_FEATURE_WARNING")
-
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /*** UI構成 via Anko ***/
     class MainActivityUi: AnkoComponent<MainActivity> {
     lateinit var userInfo: TextView
     lateinit var scanInfo: TextView
+    lateinit var sendInfo: TextView
     lateinit var attBt: Button
     lateinit var autoSw: Switch
 
     companion object {
         const val USER = 1
-        const val AUTO = 2
-        const val ATTEND = 3
-        const val MENU = 4
+        const val AUTO = 3
+        const val ATTEND = 4
+        const val MENU = 5
 
-        const val BUTTON_TEXT_AUTO = "Auto"
         const val TOAST_MAIN_AUTO_ON = "Auto ON"
         const val TOAST_MAIN_AUTO_OFF = "Auto OFF"
     }
@@ -368,50 +373,48 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun createView(ui: AnkoContext<MainActivity>) = with(ui) {
         val sk2 = ui.owner.application as Sk2Globals
-        val pref = Sk2Globals.pref
 
         relativeLayout {
-            padding = dip(4)
+            padding = dip(10)
             ////////////////////////////////////////
             userInfo = textView("User Info") {
                 id = USER
                 textColor = Color.BLACK
                 textSize = TEXT_SIZE_LARGE
-            }.lparams {
-                alignParentTop(); alignParentStart()
-            }
+            }.lparams { alignParentTop(); alignParentStart() }
             ////////////////////////////////////////
             autoSw = switch {
                 id = AUTO
-                text = BUTTON_TEXT_AUTO
+                text = SWITCH_TEXT_AUTO
                 textSize = TEXT_SIZE_LARGE
                 onClick {
                     if (isChecked) {
-                        /**ui.owner.mService!!.startInterval(pref.getBoolean(PREF_DEBUG, false))**/
-                        ui.owner.toggleService(auto = true, send = false)
+                        sk2.setAlarmService()
                         toast(TOAST_MAIN_AUTO_ON)
                     } else {
-                        /**ui.owner.mService!!.stopInterval()**/
-                        ui.owner.toggleService(auto = false, send = false)
+                        sk2.stopAlarmService()
                         toast(TOAST_MAIN_AUTO_OFF)
                     }
-                    pref.edit()
-                            .putBoolean(PREF_AUTO, isChecked)
-                            .apply()
+                    sk2.setAutoRunning(isChecked)
                 }
-            }.lparams {
-                alignParentTop(); alignParentEnd()
-            }
+            }.lparams { alignParentTop(); alignParentEnd() }
             /** ////////////////////////////////////////////////////////////////////////////// **/
-            ////////////////////////////////////////
             scanInfo = textView("Scan Info") {
                 textColor = Color.BLACK
-                textSize = TEXT_SIZE_NORMAL
+                textSize = TEXT_SIZE_TINY
             }.lparams {
-                below(USER); alignParentStart(); margin = dip(8)
+                below(USER); alignParentStart()
             }
-            ////////////////////////////////////////
-            attBt = button("出席") {
+            sendInfo = textView("Send Info") {
+                textColor = Color.BLACK
+                textSize = TEXT_SIZE_TINY
+            }.lparams {
+                //below(TOP); alignParentEnd(); margin = dip(8)
+            }.lparams {
+                below(AUTO); alignParentEnd()
+            }
+            /** ////////////////////////////////////////////////////////////////////////////// **/
+            attBt = button(BUTTON_TEXT_ATTEND_TRUE) {
                 id = ATTEND
                 textColor = Color.WHITE
                 textSize = TEXT_SIZE_ATTEND
@@ -419,11 +422,12 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 allCaps = false
                 onClick {
                     ui.owner.vibrate()
-                    ui.owner.toggleService(send = true, auto = false)
+                    ui.owner.toggleService(send=true)
                 }
             }.lparams {
-                width = dip(200); height = dip(200); margin = dip(30)
-                /*below(UPDATE);*/ above(MENU); centerHorizontally(); centerVertically()
+                width = dip(BUTTON_SIZE_ATTEND); height = dip(BUTTON_SIZE_ATTEND)
+                margin = dip(BUTTON_MARGIN_ATTEND)
+                above(MENU); centerInParent()
             }
             /** ////////////////////////////////////////////////////////////////////////////// **/
             linearLayout {
@@ -434,9 +438,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     background = ContextCompat.getDrawable(context, R.drawable.button_circle)
                     onClick {
                         startActivity<RecordPagerActivity>()
-                        /** startActivity<RecordActivity>()**/
                     }
-                }.lparams { width = dip(48); height = dip(48); margin = dip(8) }
+                }.lparams { width = dip(BUTTON_SIZE_MENU); height = dip(BUTTON_SIZE_MENU)
+                    margin = dip(BUTTON_MARGIN_MENU) }
                 ////////////////////////////////////////
                 imageButton {
                     imageResource = R.drawable.ic_live_help_32dp
@@ -444,7 +448,8 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     onClick {
                         startActivity<HelpActivity>()
                     }
-                }.lparams { width = dip(48); height = dip(48); margin = dip(8) }
+                }.lparams { width = dip(BUTTON_SIZE_MENU); height = dip(BUTTON_SIZE_MENU)
+                    margin = dip(BUTTON_MARGIN_MENU) }
                 ////////////////////////////////////////
                 imageButton {
                     imageResource = R.drawable.ic_logout_32dp
@@ -452,9 +457,10 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     onClick {
                         sk2.logout()
                     }
-                }.lparams { width = dip(48); height = dip(48); margin = dip(8) }
+                }.lparams { width = dip(BUTTON_SIZE_MENU); height = dip(BUTTON_SIZE_MENU)
+                    margin = dip(BUTTON_MARGIN_MENU) }
             }.lparams {
-                /*above(UPDATE);*/ alignParentBottom(); centerHorizontally()
+                alignParentBottom(); centerHorizontally()
             }
         }
     }

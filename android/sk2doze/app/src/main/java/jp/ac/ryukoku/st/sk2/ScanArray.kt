@@ -88,7 +88,7 @@ class ScanArray() {
         val uuLabel = if (label) "UUID=" else ","
         val mjLabel = if (label) "\n\tMajor=" else ","
         val mnLabel = if (label) ", Minor=" else ","
-        val dsLabel = if (label) ",\n\tDistance=" else ","
+        val dsLabel = if (label) "\n\tDistance=" else ","
         val enLabel = if (label) "\n" else ""
 
         val beaconText = StringBuilder()
@@ -112,8 +112,9 @@ class ScanArray() {
                         beaconText.append("$uuLabel$mUuid")
 
                     /** 主要情報 **/
+                    val distance = "%.6f".format(getBleDistance(mTx, mRssi))
                     beaconText.append("$mjLabel$mMajor$mnLabel$mMinor" +
-                            "$dsLabel${getBleDistance(mTx, mRssi)}$enLabel")
+                            "$dsLabel$distance$enLabel")
 
                     if (label) {
                         /** ラベル付きのときのみ **/
@@ -122,7 +123,8 @@ class ScanArray() {
                         if (ios) {
                             /** iOS 対応の距離？とRanging を追加 **/
                             val (dist, ranging) = iOSgetBleDistance(mTx, mRssi)
-                            beaconText.append("\tiOS Distance?=$dist, Ranging=$ranging\n")
+                            beaconText.append("\tiOS Distance?=${"%.6f".format(dist)}," +
+                                    "\n\tiOS Ranging=$ranging\n")
                         }
                     }
                 }
@@ -138,8 +140,9 @@ class ScanArray() {
                             beaconText.append("$uuLabel${b.uuid}")
 
                         /** 主要情報 **/
+                        val distance = "%.6f".format(getBleDistance(b.power, rssi))
                         beaconText.append("$mjLabel${b.major}$mnLabel${b.minor}" +
-                                "$dsLabel${getBleDistance(b.power, rssi)}$enLabel")
+                                "$dsLabel$distance$enLabel")
 
                         if (label) {/** ラベル付きのときのみ **/
                             if (signal)
@@ -147,7 +150,8 @@ class ScanArray() {
                             if (ios) {
                                 /** iOS 対応の距離？とRanging を追加 **/
                                 val (dist, ranging) = iOSgetBleDistance(b.power, rssi)
-                                beaconText.append("\tiOS Distance?=$dist, Ranging=$ranging\n")
+                                beaconText.append("\tiOS Distance?=${"%.6f".format(dist)}" +
+                                        "\n\tiOS Ranging=$ranging\n")
                             }
 
                         }

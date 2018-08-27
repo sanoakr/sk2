@@ -1,7 +1,6 @@
 package jp.ac.ryukoku.st.sk2
 
 import android.app.*
-import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -22,10 +21,7 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_DEBUG
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_KEY
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_UID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_ALARM
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_AUTO
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_SEND
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_INTERVAL_IN_MILLISEC
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_INTERVAL_IN_MILLISEC_DEBUG
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_PERIOD_IN_MILLISEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.VALID_IBEACON_UUID
 import me.mattak.moment.Moment
@@ -37,8 +33,6 @@ import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.net.InetSocketAddress
 import javax.net.ssl.SSLSocketFactory
-
-
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /*** BLEスキャン・出席記録送信用サービスクラス ***/
@@ -84,10 +78,9 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val send = intent?.getBooleanExtra(SCANSERVICE_EXTRA_SEND, false)
-        val auto = intent?.getBooleanExtra(SCANSERVICE_EXTRA_AUTO, false)
         val alarm = intent?.getBooleanExtra(SCANSERVICE_EXTRA_ALARM, false)
 
-        Log.i(TAG, "on StartCommand: send=$send, auto=$auto, alarm=$alarm")
+        Log.i(TAG, "on StartCommand: send=$send, alarm=$alarm")
 
         /** Type Check: Alarm からだと AUTO **/
         val type = if (alarm == true) 'A' else 'M'
@@ -126,15 +119,6 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
                 .build()
 
         /** ////////////////////////////////////////////////////////////////////////////// **/
-        /** Stop Repeat and Service **/
-        if (auto == false) { // Alarm からでなくて、停止 Extra があるとき
-            stopAlarmService()
-            Log.i(TAG, "Stop Alarm")
-            doAsync {
-                notificationManager.notify(1, notification)
-            }
-        }
-        /** ////////////////////////////////////////////////////////////////////////////// **/
         /** Start Scan **/
         doAsync {
             /** Create & Start BLE Scanner **/
@@ -142,7 +126,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
             scanSettings = ScanSettings.Builder()
                     .setLegacy(false)
                     .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                    .setReportDelay(0)
+                    .setReportDelay(SCAN_PERIOD_IN_MILLISEC)
                     .setUseHardwareBatchingIfSupported(false)
                     .build()
 
@@ -161,15 +145,9 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
             sk2.setScanRunning(false)
 
             /** ////////////////////////////////////////////////////////////////////////////// **/
-            /** 空でなければ最新スキャンに保存して、MainActivity にBroadcastで送る & サーバ送信 **/
-            if (scanArray.isNotEmpty()) {
-                /** Broadcast Scan Result **/
-                sendBroadcastScanResult(scanArray.getBeaconsText(
-                        statistic = true, signal = true, ios = true))
-
-                /** Send to Server **/
-                if (send == null || send == true) // Alarm からのときも送信
-                    sendInfoToServer(type)
+            /** 空でなければサーバ送信 **/
+            if (scanArray.isNotEmpty() && send == true) {
+                sendInfoToServer(type)
             }
             /** ////////////////////////////////////////////////////////////////////////////// **/
             /** Stop Service **/
@@ -183,14 +161,9 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         startForeground(1, notification)
 
         /** ////////////////////////////////////////////////////////////////////////////// **/
-        /** Start Repeat **/
-        if (auto == true) {
-            if (pref.getBoolean(PREF_DEBUG, false))
-                setAlarmService(SCAN_INTERVAL_IN_MILLISEC_DEBUG)
-            else
-                setAlarmService(SCAN_INTERVAL_IN_MILLISEC)
-            Log.i(TAG, "Start Alarm")
-        }
+        /** Set Next Alarm for Repeat **/
+        if (sk2.getAutoRunning()) sk2.setAlarmService()
+
         return START_NOT_STICKY
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -277,12 +250,11 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
             /** ローカル記録キューに追加（送信の可否に依存しない） **/
             Sk2Globals.localQueue.push(
                     Triple(scanArray.datetime.toString(), type, scanArray.getStatisticalList()))
-            //Log.d(TAG, "${Sk2Globals.localQueue.count()}")
-            //Log.i(TAG, Pair(addWeekday(scanArray.datetime.toString()), scanArray.getStatisticalList()).toString())
             sk2.saveQueue()
-            //sk2.restoreQueue()
 
             /** ブロードキャストメッセージを送信 **/
+            sendBroadcastScanResult(scanArray.getBeaconsText(
+                    statistic = true, signal = true, ios = true))
             sendBroadcastMessage(Sk2Globals.BROADCAST_ATTEND_SEND)
 
             /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -324,41 +296,5 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
             sendBroadcastMessage(Sk2Globals.BROADCAST_ATTEND_NO_BEACON)
         }
         return
-    }
-    /** ////////////////////////////////////////////////////////////////////////////// **/
-    /*** Alarm をセット ***/
-    private fun setAlarmService(period: Long) {
-        val intent = Intent(this, ScanService::class.java)
-        /** Alarm からは、サーバ送信 + 自動継続 **/
-        intent.putExtra(SCANSERVICE_EXTRA_SEND, true)
-        intent.putExtra(SCANSERVICE_EXTRA_AUTO, true)
-        intent.putExtra(SCANSERVICE_EXTRA_ALARM, true)
-
-        val pendingIntent= PendingIntent.getService(this, 0, intent,
-                FLAG_UPDATE_CURRENT) /** Update extra data **/
-
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val startMillis = System.currentTimeMillis() + period
-
-        // Oreo 以降なら Doze から抜ける
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, startMillis, pendingIntent)
-        else
-            alarmManager.set(AlarmManager.RTC_WAKEUP, startMillis, pendingIntent)
-
-        sk2.setAutoRunning(true)
-    }
-
-    /** ////////////////////////////////////////////////////////////////////////////// **/
-    /*** Alarm を解除 ***/
-    private fun stopAlarmService() {
-        val indent = Intent(this, ScanService::class.java)
-        val pendingIntent = PendingIntent.getService(this, 0, indent, 0)
-
-        /** アラームを解除する **/
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.cancel(pendingIntent)
-
-        sk2.setAutoRunning(false)
     }
 }

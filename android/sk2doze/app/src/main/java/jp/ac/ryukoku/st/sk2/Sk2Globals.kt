@@ -1,10 +1,14 @@
 package jp.ac.ryukoku.st.sk2
 
+import android.app.AlarmManager
 import android.app.Application
+import android.app.PendingIntent
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.os.Build
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.jetbrains.anko.clearTop
@@ -55,9 +59,19 @@ class Sk2Globals: Application() {
         const val NAME_START_TESTUSER = "testuser"         // デバッグユーザー名の開始文字
 
         /*** View テキストサイズ ***/
+        const val TEXT_SIZE_TINY = 8f
         const val TEXT_SIZE_NORMAL = 10f
-        const val TEXT_SIZE_LARGE = 12f
+        const val TEXT_SIZE_LARGE = 16f
         const val TEXT_SIZE_ATTEND = 36f                    // 出席ボタン
+
+        /** Button サイズ & テキスト **/
+        const val BUTTON_SIZE_ATTEND = 200
+        const val BUTTON_MARGIN_ATTEND = 50
+        const val BUTTON_TEXT_ATTEND_TRUE = "出席"
+        const val BUTTON_TEXT_ATTEND_FALSE = "利用不可"
+        const val BUTTON_SIZE_MENU = 60
+        const val BUTTON_MARGIN_MENU = 20
+        const val SWITCH_TEXT_AUTO = "AUTO"
 
         /*** ScanService Extras ***/
         const val SCANSERVICE_EXTRA_SEND = "send_to_server"
@@ -72,6 +86,8 @@ class Sk2Globals: Application() {
         const val BROADCAST_ATTEND_SEND = "出席"
         const val BROADCAST_ATTEND_NO_BEACON = "ビーコンが見つかりません"
         const val BROADCAST_ATTEND_NO_VALITTIME = "現在の時刻には送信できません"
+        /** Debug Info Message **/
+        const val SCAN_INFO_NOT_FOUND = "Any Beacons not found."
 
         /*** Nortification ***/
         const val NOTIFICATION_ID: Int = 123
@@ -84,11 +100,16 @@ class Sk2Globals: Application() {
         const val NOTIFICATION_CHANNEL_NAME_TEXT = "Sk2 BLE Scanner & Attendance Foreground Service"
 
         /*** Timer ***/
-        // BLE Scan インターバル
-        const val SCAN_PERIOD_IN_MILLISEC: Long = 3000                   // 3 sec.
+        // BLE Scan する時間長
+        const val SCAN_PERIOD_IN_MILLISEC: Long = 3000
+        const val SCAN_PERIOD_CHECK_IN_MILLISEC: Long = 1000
+        const val SCAN_INTERVAL_CHECK_IN_MILLISEC: Long = 5000
         // 自動記録のインターバル
-        const val SCAN_INTERVAL_IN_MILLISEC: Long = 10*60*1000           // 10 min.
-        const val SCAN_INTERVAL_IN_MILLISEC_DEBUG: Long = 10*60*1000     // 10 min.
+        const val AUTO_SEND_INTERVAL_IN_MILLISEC: Long = 10*60*1000
+        const val AUTO_SEND_INTERVAL_IN_MILLISEC_DEBUG: Long = 1*60*1000
+        /** Alarm **/
+        // リクエストコード
+        const val ALARM_REQUEST_CODE_AUTO = 0
 
         /** Local Queue Lenght **/
         const val LOCAL_QUEUE_MAX_LENGTH: Int = 100
@@ -208,6 +229,46 @@ class Sk2Globals: Application() {
                 .putBoolean(PREF_AUTO, running)
                 .apply()
     }
+    /** ////////////////////////////////////////////////////////////////////////////// **/
+    /*** Alarm をセット ***/
+    fun setAlarmService() {
+        val intent = Intent(this, ScanService::class.java)
+        /** Alarm からは、サーバ送信 + 自動継続 **/
+        intent.putExtra(SCANSERVICE_EXTRA_SEND, true)
+        intent.putExtra(SCANSERVICE_EXTRA_ALARM, true)
+
+        val pendingIntent= PendingIntent.getService(this, ALARM_REQUEST_CODE_AUTO,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT) /** Update extra data **/
+
+        // check debug
+        val interval = if (pref.getBoolean(PREF_DEBUG, false)) AUTO_SEND_INTERVAL_IN_MILLISEC_DEBUG
+        else AUTO_SEND_INTERVAL_IN_MILLISEC
+        // interval
+        val startMillis = System.currentTimeMillis() + interval
+
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        /** Oreo 以降なら Doze から抜ける **/
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, startMillis, pendingIntent)
+        else
+            alarmManager.set(AlarmManager.RTC_WAKEUP, startMillis, pendingIntent)
+
+        setAutoRunning(true)
+    }
+    /** ////////////////////////////////////////////////////////////////////////////// **/
+    /*** Alarm を解除 ***/
+    fun stopAlarmService() {
+        val indent = Intent(this, ScanService::class.java)
+        val pendingIntent = PendingIntent.getService(this, ALARM_REQUEST_CODE_AUTO,
+                indent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        /** アラームを解除する **/
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.cancel(pendingIntent)
+
+        setAutoRunning(false)
+    }
+
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** BLE デバイスがあるか？ ***/
     private fun hasBLE(): Boolean {
