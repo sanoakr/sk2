@@ -1,6 +1,7 @@
 package jp.ac.ryukoku.st.sk2
 
 import android.Manifest
+import android.app.Activity
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
@@ -32,8 +33,16 @@ import no.nordicsemi.android.support.v18.scanner.*
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import android.content.*
+import android.graphics.drawable.ColorDrawable
 import android.os.Vibrator
 import android.support.v4.content.LocalBroadcastManager
+import android.support.v4.widget.TextViewCompat
+import android.support.v7.app.ActionBar
+import android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM
+import android.support.v7.app.ActionBar.DISPLAY_USE_LOGO
+import android.view.Gravity
+import android.view.View
+import jp.ac.ryukoku.st.sk2.R.id.center_horizontal
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.ACTION_BROADCAST
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
@@ -43,6 +52,8 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_SIZE_ATTEND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_SIZE_MENU
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_TEXT_ATTEND_FALSE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_TEXT_ATTEND_TRUE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_BACKGROUND
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_BACKGROUND_TITLE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_BLESCAN
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_TOAST
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NAME_START_TESTUSER
@@ -55,14 +66,17 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_INFO_NOT_FOUND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_PERIOD_CHECK_IN_MILLISEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_PERIOD_IN_MILLISEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SWITCH_TEXT_AUTO
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_Large
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_TINY
 import org.jetbrains.anko.appcompat.v7.linearLayoutCompat
+import org.w3c.dom.Text
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /** Sk2 Main Activity **/
-class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceChangeListener, AnkoLogger {
+class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListener, AnkoLogger {
     lateinit var sk2: Sk2Globals
     lateinit var pref: SharedPreferences
+
     private var mainUi = MainActivityUi()
 
     /*** BLE Scanner ***/
@@ -84,6 +98,11 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         pref = Sk2Globals.pref
 
         title = "$APP_TITLE $APP_NAME"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            window.statusBarColor = COLOR_BACKGROUND
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+
+        }
         mainUi.setContentView(this)
 
         /** (ゆるい)位置情報へのパーミッションをリクエスト **/
@@ -119,7 +138,9 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     .setUseHardwareBatchingIfSupported(false)
                     .build()
             scanFilters = ArrayList() // ArrayList<ScanFilter>() // フィルタは空 == 全て受け取る
-            mScanner.startScan(scanFilters, scanSettings, mScanCallback)
+
+            if (sk2.checkBt())
+                mScanner.startScan(scanFilters, scanSettings, mScanCallback)
         }
         /** バイブレーション **/
         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -361,6 +382,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
     lateinit var autoSw: Switch
 
     companion object {
+        const val TITLE = 10
         const val USER = 1
         const val AUTO = 3
         const val ATTEND = 4
@@ -375,18 +397,29 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
         val sk2 = ui.owner.application as Sk2Globals
 
         relativeLayout {
-            padding = dip(10)
+            backgroundColor = COLOR_BACKGROUND
             ////////////////////////////////////////
+            textView("${APP_TITLE} ${APP_NAME}") {
+                id = TITLE
+                textColor = Color.BLACK
+                textSize = TEXT_SIZE_LARGE
+                backgroundColor = COLOR_BACKGROUND_TITLE
+                topPadding = dip(10); bottomPadding = dip(10)
+                gravity = Gravity.CENTER_HORIZONTAL
+            }.lparams { alignParentTop(); alignParentStart(); alignParentEnd()
+                centerHorizontally(); bottomMargin = dip(10)
+            }
+            /** ////////////////////////////////////////////////////////////////////////////// **/            ////////////////////////////////////////
             userInfo = textView("User Info") {
                 id = USER
                 textColor = Color.BLACK
-                textSize = TEXT_SIZE_LARGE
-            }.lparams { alignParentTop(); alignParentStart() }
+                textSize = TEXT_SIZE_Large
+            }.lparams { below(TITLE); alignParentStart() }
             ////////////////////////////////////////
             autoSw = switch {
                 id = AUTO
                 text = SWITCH_TEXT_AUTO
-                textSize = TEXT_SIZE_LARGE
+                textSize = TEXT_SIZE_Large
                 onClick {
                     if (isChecked) {
                         sk2.setAlarmService()
@@ -397,13 +430,14 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                     }
                     sk2.setAutoRunning(isChecked)
                 }
-            }.lparams { alignParentTop(); alignParentEnd() }
+            }.lparams { below(TITLE); alignParentEnd() }
             /** ////////////////////////////////////////////////////////////////////////////// **/
             scanInfo = textView("Scan Info") {
                 textColor = Color.BLACK
                 textSize = TEXT_SIZE_TINY
             }.lparams {
                 below(USER); alignParentStart()
+                topMargin = dip(10); leftMargin = dip(10)
             }
             sendInfo = textView("Send Info") {
                 textColor = Color.BLACK
@@ -412,6 +446,7 @@ class MainActivity : AppCompatActivity(), SharedPreferences.OnSharedPreferenceCh
                 //below(TOP); alignParentEnd(); margin = dip(8)
             }.lparams {
                 below(AUTO); alignParentEnd()
+                topMargin = dip(10); rightMargin = dip(10)
             }
             /** ////////////////////////////////////////////////////////////////////////////// **/
             attBt = button(BUTTON_TEXT_ATTEND_TRUE) {

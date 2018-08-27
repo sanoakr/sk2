@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Build
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -24,7 +25,7 @@ class Sk2Globals: Application() {
         const val APP_TITLE = "龍大理工学部出欠システム"
 
         const val TITLE_LOGIN = "ログイン"
-        const val TITLE_RECORD = "出席記録"
+        const val TITLE_RECORD = "出席ログ"
         const val TITLE_RECORD_TAB_SERVER = "on Server"
         const val TITLE_RECORD_TAB_LOCAL = "on Local"
         const val TITLE_HELP = "ヘルプ"
@@ -58,13 +59,26 @@ class Sk2Globals: Application() {
         const val SERVER_REPLY_FAIL = "fail"
         const val NAME_START_TESTUSER = "testuser"         // デバッグユーザー名の開始文字
 
+        /*** View カラー ***/
+        var COLOR_BACKGROUND = Color.rgb((255*0.93).toInt(), (255*0.94).toInt(), (255*0.95).toInt())
+        var COLOR_BACKGROUND_TITLE = Color.rgb((255*0.9).toInt(), (255*0.9).toInt(), (255*0.9).toInt())
+        var COLOR_NORMAL = Color.rgb( (255*0.20).toInt(), (255*0.60).toInt(), (255*0.86).toInt())
+        var COLOR_ACTIVE = Color.rgb( (255*0.10).toInt(), (255*0.74).toInt(), (255*0.61).toInt())
+        var COLOR_ONDOWN = Color.rgb( (255*0.16).toInt(), (255*0.50).toInt(), (255*0.73).toInt())
+        var COLOR_DISABLE = Color.rgb( (255*0.74).toInt(), (255*0.76).toInt(), (255*0.78).toInt())
         /*** View テキストサイズ ***/
         const val TEXT_SIZE_TINY = 8f
         const val TEXT_SIZE_NORMAL = 10f
+        const val TEXT_SIZE_Large = 14f
         const val TEXT_SIZE_LARGE = 16f
         const val TEXT_SIZE_ATTEND = 36f                    // 出席ボタン
 
-        /** Button サイズ & テキスト **/
+        /** LoginActivity Button サイズ & テキスト **/
+        const val BUTTON_TEXT_LOGIN = "ログイン"
+        const val HINT_UID = "全学統合認証ID"
+        const val HINT_PASSWD = "パスワード"
+
+        /** MainActivity Button サイズ & テキスト **/
         const val BUTTON_SIZE_ATTEND = 200
         const val BUTTON_MARGIN_ATTEND = 50
         const val BUTTON_TEXT_ATTEND_TRUE = "出席"

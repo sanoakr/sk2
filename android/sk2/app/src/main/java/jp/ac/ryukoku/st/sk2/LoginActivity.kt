@@ -1,5 +1,6 @@
 package jp.ac.ryukoku.st.sk2
 
+import android.app.Activity
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
@@ -9,6 +10,10 @@ import android.text.InputType.*
 import android.view.Gravity
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_TEXT_LOGIN
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_NORMAL
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.HINT_PASSWD
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.HINT_UID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGIN_EXPIRY_PERIOD_DAYS
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGIN_TIME_DAY_UNIT_MILLSEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_KEY
@@ -21,6 +26,9 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_PORT
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_REPLY_AUTH_FAIL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_REPLY_FAIL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_TIMEOUT_MILLISEC
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_LARGE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_Large
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_NORMAL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TITLE_LOGIN
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_CANT_CONNECT_SERVER
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOGIN_ATTEMPT_ATMARK
@@ -38,7 +46,7 @@ import java.net.InetSocketAddress
 import javax.net.ssl.SSLSocketFactory
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : Activity() {
     companion object {
         lateinit var sk2: Sk2Globals
         lateinit var pref: SharedPreferences
@@ -146,35 +154,62 @@ class LoginActivity : AppCompatActivity() {
 /** UI構成 via Anko **/
 class LoginActivityUi: AnkoComponent<LoginActivity> {
     companion object {
-        const val HINT_UID = "学籍番号ID"
-        const val HINT_PASSWD = "パスワード"
-
-        const val BUTTON_TEXT_LOGIN = "Login"
+        const val TITLE = 1
+        const val LABEL = 2
+        const val USER = 3
+        const val PASS = 4
+        const val LOGIN = 5
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun createView(ui: AnkoContext<LoginActivity>) = with(ui) {
-        verticalLayout {
+        relativeLayout {
             padding = dip(16)
+            backgroundColor = Sk2Globals.COLOR_BACKGROUND
+            /** ////////////////////////////////////////////////////////////////////////////// **/
+            textView("$APP_TITLE $APP_NAME") {
+                id = TITLE
+                textSize = TEXT_SIZE_LARGE
+                textColor = Color.BLACK
+            }.lparams{
+                centerHorizontally(); alignParentTop()
+                topMargin = dip(100); bottomMargin = dip(50)
+            }
+            /** ////////////////////////////////////////////////////////////////////////////// **/
+            textView("$HINT_UID / $HINT_PASSWD") {
+                id = LABEL
+                textSize = TEXT_SIZE_Large
+                textColor = Color.BLACK
+            }.lparams{
+                below(TITLE); leftMargin = dip(4)
+            }
             /** ////////////////////////////////////////////////////////////////////////////// **/
             val user = editText {
+                id = USER
+                textSize = TEXT_SIZE_LARGE
                 hint = HINT_UID
                 inputType = TYPE_TEXT_VARIATION_EMAIL_ADDRESS
-            }
+            }.lparams { below(LABEL); width = matchParent }
             /** ////////////////////////////////////////////////////////////////////////////// **/
             val passwd = editText {
+                id = PASS
+                textSize = TEXT_SIZE_LARGE
                 hint = HINT_PASSWD
                 inputType = TYPE_CLASS_TEXT or TYPE_TEXT_VARIATION_PASSWORD
-            }
+            }.lparams { below(USER); width = matchParent }
             /** ////////////////////////////////////////////////////////////////////////////// **/
             button(BUTTON_TEXT_LOGIN) {
+                id = LOGIN
                 textColor = Color.WHITE
-                backgroundColor = ContextCompat.getColor(ctx, R.color.colorPrimary)
+                textSize = TEXT_SIZE_LARGE
+                padding = dip(0)
+                backgroundColor = COLOR_NORMAL
                 onClick {
                     /** remove user's leading and trailing blanks **/
                     ui.owner.attemptLogin(user.text.toString().trim(), passwd.text.toString())
                 }
-            }.lparams{
-                gravity = Gravity.CENTER_HORIZONTAL; topMargin = dip(16)
+            }.lparams {
+                below(PASS); centerHorizontally(); width = matchParent
+                topMargin = dip(50)
             }
         }
     }
