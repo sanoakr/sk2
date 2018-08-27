@@ -24,7 +24,7 @@ import javax.net.ssl.SSLSocketFactory
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /** サーバ記録用の Fragment **/
 class RecordFragment : Fragment() {
-    lateinit var recordList: ListView
+    private lateinit var recordList: ListView
 
     companion object {
         const val LISTVIEW = 1

@@ -24,7 +24,6 @@ class Sk2Globals: Application() {
         const val APP_NAME = "sk2"
         const val APP_TITLE = "龍大理工学部出欠システム"
 
-        const val TITLE_LOGIN = "ログイン"
         const val TITLE_RECORD = "出席ログ"
         const val TITLE_RECORD_TAB_SERVER = "on Server"
         const val TITLE_RECORD_TAB_LOCAL = "on Local"
@@ -62,10 +61,10 @@ class Sk2Globals: Application() {
         /*** View カラー ***/
         var COLOR_BACKGROUND = Color.rgb((255*0.93).toInt(), (255*0.94).toInt(), (255*0.95).toInt())
         var COLOR_BACKGROUND_TITLE = Color.rgb((255*0.9).toInt(), (255*0.9).toInt(), (255*0.9).toInt())
-        var COLOR_NORMAL = Color.rgb( (255*0.20).toInt(), (255*0.60).toInt(), (255*0.86).toInt())
-        var COLOR_ACTIVE = Color.rgb( (255*0.10).toInt(), (255*0.74).toInt(), (255*0.61).toInt())
-        var COLOR_ONDOWN = Color.rgb( (255*0.16).toInt(), (255*0.50).toInt(), (255*0.73).toInt())
-        var COLOR_DISABLE = Color.rgb( (255*0.74).toInt(), (255*0.76).toInt(), (255*0.78).toInt())
+        var COLOR_NORMAL = Color.rgb( (255*0.20).toInt(), (255*0.60).toInt(), (255*0.86).toInt()) //#3399db
+        //var COLOR_ACTIVE = Color.rgb( (255*0.10).toInt(), (255*0.74).toInt(), (255*0.61).toInt())
+        //var COLOR_ONDOWN = Color.rgb( (255*0.16).toInt(), (255*0.50).toInt(), (255*0.73).toInt())
+        //var COLOR_DISABLE = Color.rgb( (255*0.74).toInt(), (255*0.76).toInt(), (255*0.78).toInt())
         /*** View テキストサイズ ***/
         const val TEXT_SIZE_TINY = 8f
         const val TEXT_SIZE_NORMAL = 10f
@@ -89,8 +88,7 @@ class Sk2Globals: Application() {
 
         /*** ScanService Extras ***/
         const val SCANSERVICE_EXTRA_SEND = "send_to_server"
-        const val SCANSERVICE_EXTRA_AUTO = "auto_interval"
-        const val SCANSERVICE_EXTRA_ALARM = "from_alarm"
+                const val SCANSERVICE_EXTRA_ALARM = "from_alarm"
 
         /*** Broadcast Extras ***/
         const val ACTION_BROADCAST = "$APP_NAME.broadcast"
@@ -110,24 +108,21 @@ class Sk2Globals: Application() {
         const val LOGOUT_DIALOG_CANCEL = "キャンセル"
 
         /*** Nortification ***/
-        const val NOTIFICATION_ID: Int = 123
-        const val CHANNEL_ID = "channel_123"
-        const val EXTRA_STARTED_FROM_NOTIFICATION = "$APP_NAME.started_from_notification"
+        const val NOTIFICATION_ID: Int = 1
+        const val CHANNEL_ID = "channel_sk2"
+        const val CHANNEL_DESCRIPTION = "Sk2 Silent Notification"
         /*** Nortification メッセージ ***/
-        const val NOTIFICATION_TITLE_TEXT = "sk2 サーバへの出席データ送信"
-        const val NOTIFICATION_ACTION_LAUNCE_TEXT = "sk2 アプリを起動"
-        //const val NOTIFICATION_STOP_SCAN_TEXT = "BLE スキャンを停止"
-        const val NOTIFICATION_CHANNEL_NAME_TEXT = "Sk2 BLE Scanner & Attendance Foreground Service"
+        const val NOTIFICATION_TITLE_TEXT = "sk2"
+        const val NOTIFICATION_TEXT_STARTFORGROUND = "Foreground サービスを開始"
+        const val NOTIFICATION_TEXT_SEND = "出席データを送信"
 
         /*** Timer ***/
         // BLE Scan する時間長
         const val SCAN_PERIOD_IN_MILLISEC: Long = 3000
-        const val SCAN_PERIOD_CHECK_IN_MILLISEC: Long = 1000
-        const val SCAN_INTERVAL_CHECK_IN_MILLISEC: Long = 5000
         // 自動記録のインターバル
         const val AUTO_SEND_INTERVAL_IN_MILLISEC: Long = 10*60*1000
         const val AUTO_SEND_INTERVAL_IN_MILLISEC_DEBUG: Long = 1*60*1000
-        /** Alarm **/
+        /** Auto Interval Alarm **/
         // リクエストコード
         const val ALARM_REQUEST_CODE_AUTO = 0
 
@@ -253,7 +248,7 @@ class Sk2Globals: Application() {
                 .apply()
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
-    /*** Alarm をセット ***/
+    /*** Auto Interval Alarm をセット ***/
     fun setAlarmService() {
         val intent = Intent(this, ScanService::class.java)
         /** Alarm からは、サーバ送信 + 自動継続 **/
@@ -279,7 +274,7 @@ class Sk2Globals: Application() {
         setAutoRunning(true)
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
-    /*** Alarm を解除 ***/
+    /*** Auto Interval Alarm を解除 ***/
     fun stopAlarmService() {
         val indent = Intent(this, ScanService::class.java)
         val pendingIntent = PendingIntent.getService(this, ALARM_REQUEST_CODE_AUTO,

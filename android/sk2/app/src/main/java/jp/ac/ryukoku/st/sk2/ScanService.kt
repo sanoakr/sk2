@@ -13,9 +13,13 @@ import android.util.Log
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
 import com.neovisionaries.bluetooth.ble.advertising.IBeacon
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.ACTION_BROADCAST
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.CHANNEL_DESCRIPTION
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.CHANNEL_ID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_BLESCAN
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_TOAST
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NOTIFICATION_ID
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NOTIFICATION_TEXT_SEND
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NOTIFICATION_TEXT_STARTFORGROUND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NOTIFICATION_TITLE_TEXT
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_DEBUG
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_KEY
@@ -51,19 +55,21 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
     /** Scan Result **/
     private lateinit var scanArray: ScanArray
 
-    /**
-    /*** Notification Manager ***/
-    private var mNotificationManager: NotificationManager? = null
 
-    private val notification: Notification
+    /*** Notification Manager ***/
+    private var pendingIntent: PendingIntent? = null
+    private var notificationManager: NotificationManager? = null
+
+    private val notificationBuilder: NotificationCompat.Builder
         get() {
-            val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+            return NotificationCompat.Builder(this, CHANNEL_ID)
                     .setContentTitle(NOTIFICATION_TITLE_TEXT)
-                    .setContentText("通知の内容")
+                    .setContentText("Sk2 Content Text")
                     .setSmallIcon(R.drawable.ic_launcher_background)
-            return builder.build()
+                    //.setSmallIcon(android.R.drawable.btn_star)
+                    .setAutoCancel(true)
         }
-    **/
+
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onBind(intent: Intent): IBinder? {
         throw UnsupportedOperationException("Not yet implemented")
@@ -73,6 +79,23 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         super.onCreate()
         sk2 = this.application as Sk2Globals
         pref = Sk2Globals.pref
+
+        /** Notification **/
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        /** Notification　Channel 設定 **/
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(CHANNEL_ID, NOTIFICATION_TITLE_TEXT,
+                    NotificationManager.IMPORTANCE_LOW)
+            channel.description = CHANNEL_DESCRIPTION
+            channel.setSound(null, null)
+            channel.enableLights(false)
+            channel.lightColor = Color.BLACK
+            channel.enableVibration(false)
+
+            notificationManager?.createNotificationChannel(channel)
+        }
+        pendingIntent = PendingIntent.getActivity(this, 0,
+                Intent(this, MainActivity::class.java), 0)
     }
 
     /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -88,35 +111,9 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         /** Initialize Scan Result **/
         scanArray = ScanArray()
 
+
+
         /** ////////////////////////////////////////////////////////////////////////////// **/
-        /** Notification **/
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Notification　Channel 設定
-            val channel = NotificationChannel(CHANNEL_ID, NOTIFICATION_TITLE_TEXT, NotificationManager.IMPORTANCE_LOW)
-            channel.description = "Silent Notification"
-            // 通知音を消さないと毎回通知音が出てしまう
-            // この辺りの設定はcleanにしてから変更
-            channel.setSound(null, null)
-            // 通知ランプを消す
-            channel.enableLights(false)
-            channel.lightColor = Color.BLACK
-            // 通知バイブレーション無し
-            channel.enableVibration(false)
-
-            notificationManager.createNotificationChannel(channel)
-        }
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle(NOTIFICATION_TITLE_TEXT)
-                // android標準アイコンから
-                .setSmallIcon(android.R.drawable.btn_star)
-                .setContentText("Sk2 content textr")
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
-                .setWhen(System.currentTimeMillis())
-                .build()
 
         /** ////////////////////////////////////////////////////////////////////////////// **/
         /** Start Scan **/
@@ -158,7 +155,12 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
         }
 
         /** ////////////////////////////////////////////////////////////////////////////// **/
-        startForeground(1, notification)
+        val notification = notificationBuilder
+                .setContentText(NOTIFICATION_TEXT_STARTFORGROUND)
+                .setContentIntent(pendingIntent)
+                .setWhen(System.currentTimeMillis())
+                .build()
+        startForeground(NOTIFICATION_ID, notification)
 
         /** ////////////////////////////////////////////////////////////////////////////// **/
         /** Set Next Alarm for Repeat **/
@@ -256,6 +258,14 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
             sendBroadcastScanResult(scanArray.getBeaconsText(
                     statistic = true, signal = true, ios = true))
             sendBroadcastMessage(Sk2Globals.BROADCAST_ATTEND_SEND)
+
+            /** Notification を送信 **/
+            val notification = notificationBuilder
+                    .setContentText(NOTIFICATION_TEXT_SEND)
+                    .setContentIntent(pendingIntent)
+                    .setWhen(System.currentTimeMillis())
+                    .build()
+            notificationManager?.notify(NOTIFICATION_ID, notification)
 
             /** ////////////////////////////////////////////////////////////////////////////// **/
             /*** サーバ接続 ***/

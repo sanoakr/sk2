@@ -3,12 +3,9 @@ package jp.ac.ryukoku.st.sk2
 import android.app.Activity
 import android.graphics.Color
 import android.os.Build
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_BACKGROUND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_HELP_URI
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TITLE_HELP
@@ -36,7 +33,7 @@ class HelpActivityUi: AnkoComponent<HelpActivity> {
         relativeLayout {
             backgroundColor = COLOR_BACKGROUND
             ////////////////////////////////////////
-            textView("$TITLE_HELP") {
+            textView(TITLE_HELP) {
                 id = TITLE
                 textColor = Color.BLACK
                 textSize = Sk2Globals.TEXT_SIZE_LARGE

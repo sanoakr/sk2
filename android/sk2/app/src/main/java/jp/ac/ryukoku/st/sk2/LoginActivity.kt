@@ -5,11 +5,8 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Build
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
 import android.text.InputType.*
-import android.view.Gravity
 import android.view.View
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
@@ -32,8 +29,6 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_REPLY_FAIL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_TIMEOUT_MILLISEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_LARGE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_Large
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_NORMAL
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TITLE_LOGIN
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_CANT_CONNECT_SERVER
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOGIN_ATTEMPT_ATMARK
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOGIN_ATTEMPT_PASSWD

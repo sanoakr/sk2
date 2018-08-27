@@ -1,7 +1,6 @@
 package jp.ac.ryukoku.st.sk2
 
 import android.Manifest
-import android.app.Activity
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
@@ -12,7 +11,6 @@ import android.provider.Settings
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
 import android.widget.Button
 import android.widget.Switch
 import android.widget.TextView
@@ -26,25 +24,17 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_OK
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SETTINGS
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_ATTEND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_LARGE
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_NORMAL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.VALID_IBEACON_UUID
 import me.mattak.moment.Moment
 import no.nordicsemi.android.support.v18.scanner.*
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import android.content.*
-import android.graphics.drawable.ColorDrawable
 import android.os.Vibrator
-import android.support.v4.app.DialogFragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.LocalBroadcastManager
-import android.support.v4.widget.TextViewCompat
-import android.support.v7.app.ActionBar
-import android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM
-import android.support.v7.app.ActionBar.DISPLAY_USE_LOGO
 import android.view.Gravity
 import android.view.View
-import jp.ac.ryukoku.st.sk2.R.id.center_horizontal
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.ACTION_BROADCAST
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
@@ -65,15 +55,12 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_USER_NAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_ALARM
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_SEND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_INFO_NOT_FOUND
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_PERIOD_CHECK_IN_MILLISEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_PERIOD_IN_MILLISEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SWITCH_TEXT_AUTO
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_Large
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_TINY
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_MAIN_AUTO_OFF
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_MAIN_AUTO_ON
-import org.jetbrains.anko.appcompat.v7.linearLayoutCompat
-import org.w3c.dom.Text
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /** Sk2 Main Activity **/
@@ -238,7 +225,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
                     scanArray.add(Pair(s, rssi))
 
                     val dist = getBleDistance(s.power, rssi)
-                    info("${s.uuid}, ${s.major}, ${s.minor}, ${dist}")
+                    info("${s.uuid}, ${s.major}, ${s.minor}, $dist")
                 }
             }
         }
@@ -323,7 +310,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** パーミッションをチェック ***/
-    fun checkPermissions(permission: String): Boolean {
+    private fun checkPermissions(permission: String): Boolean {
         return PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(this, permission)
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -352,28 +339,28 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
                                             grantResults: IntArray) {
         info("onRequestPermissionResult")
         if (requestCode == REQUEST_PERMISSIONS_REQUEST_CODE) {
-            if (grantResults.size <= 0) {
-                info("User interaction was cancelled.")
-            } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission was granted.
-                /** startService(false) **/
-            } else {
-                // Permission denied.
-                /** setButtonsState(false) **/
-                Snackbar.make(
-                        this.contentView!!,
-                        LOCATION_PERMISSION_DENIED_MESSAGE,
-                        Snackbar.LENGTH_INDEFINITE)
-                        .setAction(TEXT_SETTINGS) {
-                            // Build intent that displays the App settings screen.
-                            val intent = Intent()
-                            intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                            val uri = Uri.fromParts("package",
-                                    BuildConfig.APPLICATION_ID, null)
-                            intent.data = uri
-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            startActivity(intent)
-                        }.show()
+            when {
+                grantResults.isEmpty() ->
+                    info("User interaction was cancelled.")
+                grantResults[0] == PackageManager.PERMISSION_GRANTED -> {
+                    // Permission was granted.
+                }
+                else -> // Permission denied.
+                    /** setButtonsState(false) **/
+                    Snackbar.make(
+                            this.contentView!!,
+                            LOCATION_PERMISSION_DENIED_MESSAGE,
+                            Snackbar.LENGTH_INDEFINITE)
+                            .setAction(TEXT_SETTINGS) {
+                                // Build intent that displays the App settings screen.
+                                val intent = Intent()
+                                intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                                val uri = Uri.fromParts("package",
+                                        BuildConfig.APPLICATION_ID, null)
+                                intent.data = uri
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                startActivity(intent)
+                            }.show()
             }
         }
     }

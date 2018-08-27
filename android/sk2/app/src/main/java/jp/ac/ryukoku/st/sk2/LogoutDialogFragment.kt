@@ -11,15 +11,19 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGOUT_DIALOG_MSG
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGOUT_DIALOG_OK
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGOUT_DIALOG_TITLE
 
+/** ////////////////////////////////////////////////////////////////////////////// **/
+/** Logout Alert Dialog **/
 class LogoutDialog : DialogFragment() {
-
-    var onOkClickListener : DialogInterface.OnClickListener?
-            = DialogInterface.OnClickListener { dialog, id ->
+    /** YES **/
+    private var onOkClickListener : DialogInterface.OnClickListener?
+            = DialogInterface.OnClickListener { _, _ ->
         sk2.logout()
     }
-    var onCancelClickListener : DialogInterface.OnClickListener?
+    /** CANCEL **/
+    private var onCancelClickListener : DialogInterface.OnClickListener?
             = DialogInterface.OnClickListener { _, _ -> }
 
+    /** ダイアログを作成 **/
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         // Use the Builder class for convenient dialog construction
         val builder = AlertDialog.Builder(activity)
@@ -30,10 +34,9 @@ class LogoutDialog : DialogFragment() {
         // Create the AlertDialog object and return it
         return builder.create()
     }
-
+    /** onPause でダイアログを閉じる **/
     override fun onPause() {
         super.onPause()
-        // onPause でダイアログを閉じる場合
         dismiss()
     }
 }

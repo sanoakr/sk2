@@ -1,6 +1,5 @@
 package jp.ac.ryukoku.st.sk2
 
-import android.app.Activity
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -10,11 +9,8 @@ import android.support.v4.app.FragmentActivity
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
-import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
 import android.view.View
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_BACKGROUND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_BACKGROUND_TITLE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_LARGE
@@ -50,8 +46,8 @@ class RecordPagerActivity: FragmentActivity() {
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /** UI **/
 class RecordPagerUi : AnkoComponent<RecordPagerActivity> {
-    lateinit var viewPager: ViewPager
-    lateinit var tabLayout: TabLayout
+    private lateinit var viewPager: ViewPager
+    private lateinit var tabLayout: TabLayout
 
     companion object {
         const val VIEWPAGER = 1
@@ -61,7 +57,7 @@ class RecordPagerUi : AnkoComponent<RecordPagerActivity> {
         verticalLayout {
             backgroundColor = COLOR_BACKGROUND
             ////////////////////////////////////////
-            textView("$TITLE_RECORD") {
+            textView(TITLE_RECORD) {
                 textColor = Color.BLACK
                 textSize = TEXT_SIZE_LARGE
                 backgroundColor = COLOR_BACKGROUND_TITLE

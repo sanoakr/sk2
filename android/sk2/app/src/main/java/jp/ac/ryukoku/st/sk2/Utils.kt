@@ -17,7 +17,7 @@ fun getWeekDayString(moment: Moment): String {
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /*** 日時文字列に曜日を挿入 ***/
 fun addWeekday(dt: String?): String {
-    var dwt = if (dt != null) dt else ""
+    var dwt = dt ?: ""
 
     try {
         val calendar = Calendar.getInstance()
