@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType.*
+import android.util.Log
 import android.view.View
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
@@ -17,6 +18,7 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.HINT_PASSWD
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.HINT_UID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGIN_EXPIRY_PERIOD_DAYS
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGIN_TIME_DAY_UNIT_MILLSEC
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NAME_START_TESTUSER
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_KEY
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_LOGIN_TIME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_ROOM_JSON
@@ -82,7 +84,7 @@ class LoginActivity : Activity() {
     fun attemptLogin(user: String, passwd: String) {
         when {
             user.isBlank() -> toast(TOAST_LOGIN_ATTEMPT_UID)
-            passwd.isBlank() -> toast(TOAST_LOGIN_ATTEMPT_PASSWD)
+            ! user.startsWith(NAME_START_TESTUSER) && passwd.isBlank() -> toast(TOAST_LOGIN_ATTEMPT_PASSWD)
             user.contains('@') -> toast(TOAST_LOGIN_ATTEMPT_ATMARK)
         }
         /** sk2 サーバで認証してログイン **/
@@ -131,6 +133,7 @@ class LoginActivity : Activity() {
     /** ログインする **/
     private fun login(user: String, result: String) {
         if (result != SERVER_REPLY_AUTH_FAIL) { // サーバからの返信が失敗でなければ
+            Log.d("XXX", result)
             /** サーバ返信を ',' で分割 **/
             val v: List<String> = result.split(",", limit = 4)
             val time: Long = System.currentTimeMillis() // 現在時刻
