@@ -39,6 +39,7 @@ class Sk2Globals: Application() {
         const val PREF_DEBUG = "debug"        // デバッグ
         const val PREF_AUTO = "auto"          // 自動送信
         const val PREF_LOCAL_QUEUE = "queue"  // ローカルキュー保存用
+        const val PREF_ROOM_JSON = "room_json"// AP情報 JSON
         /*** BLE Scan の実行自体を保存する SharedPreference のキー ***/
         const val SCAN_RUNNING = "scan_running"
         /*** login 情報の有効期限 ***/

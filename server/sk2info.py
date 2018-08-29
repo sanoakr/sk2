@@ -30,8 +30,9 @@ replySaltfile = salt_dir + "reply.salt"
 
 max_reverslines = 100
 
-mac = re.compile("[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[[[[[0-9a-f]{2}")
-room_file = sk2_dir + "room.csv"
+#mac = re.compile("[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[[[[[0-9a-f]{2}")
+#room_file = sk2_dir + "room.csv"
+
 
 class AsyncClient(asyncio.Protocol):
     def connection_made(self, transport):
@@ -40,11 +41,11 @@ class AsyncClient(asyncio.Protocol):
         self.transport = transport
 
     def data_received(self, data):
-        message = data.decode() # to data string
+        message = data.decode()  # to data string
         logger.info('Received: {!r}...'.format(message[0:15]))
         pieces = message.split(',')
 
-        # history info        
+        # history info
         if len(pieces) == 2:
             user = pieces[0]
             key = pieces[1]
@@ -66,10 +67,10 @@ class AsyncClient(asyncio.Protocol):
 
                 if rflag:
                     s_message = s_message.rstrip('\n')
-                    mac_list = mac.findall(s_message)
-                    for m in mac_list:
-                        if m in room_map:
-                            s_message = s_message.replace(m, room_map[m])
+                    #mac_list = mac.findall(s_message)
+                    # for m in mac_list:
+                    #    if m in room_map:
+                    #        s_message = s_message.replace(m, room_map[m])
                     logger.info("Get history {} ".format(user))
                 else:
                     s_message = "Error"
@@ -81,7 +82,7 @@ class AsyncClient(asyncio.Protocol):
             s_message = "Wrong format"
             logger.info("Wrong format {} ".format(user))
 
-        self.transport.write(s_message.encode()) # data bytes
+        self.transport.write(s_message.encode())  # data bytes
         logger.info('Sent: {!r}...'.format(s_message[0:40]))
 
         self.transport.close()
@@ -89,20 +90,22 @@ class AsyncClient(asyncio.Protocol):
         return
 
 # make dictionary : bssid -> room
-def room_table(filename):
-    try:
-        with open(filename) as f:
-            room = {}
-            for line in f:
-                data = line.split(',')
-                room[data[9].strip()] = "{0}{1}{2} {3}".format(data[0],data[1],data[2],data[4])
-    except:
-        return False
-    return room
+# def room_table(filename):
+#     try:
+#         with open(filename) as f:
+#             room = {}
+#             for line in f:
+#                 data = line.split(',')
+#                 room[data[9].strip()] = "{0}{1}{2} {3}".format(data[0],data[1],data[2],data[4])
+#     except:
+#         return False
+#     return room
 
 # read lines from EOF
+
+
 def readlines_reverse(fp, read_max):
-    position = fp.seek(0, os.SEEK_END) - 2 # eliminate last newline
+    position = fp.seek(0, os.SEEK_END) - 2  # eliminate last newline
     line = ''
     count = 0
     while position >= 0 and count < read_max:
@@ -126,9 +129,8 @@ if __name__ == '__main__':
         fileHandler.setLevel(DEBUG)
         formatter = Formatter('%(asctime)s:%(message)s')
         fileHandler.setFormatter(formatter)
-        logger.setLevel(DEBUG) 
+        logger.setLevel(DEBUG)
         logger.addHandler(fileHandler)
-        
 
     logger.info('logfile: {}'.format(log))
     logger.info('data directorye: {}'.format(data_dir))
@@ -143,12 +145,12 @@ if __name__ == '__main__':
         logger.info('read reply salt: {}'.format(replySaltfile))
 
     # make BSSID to ROOM table
-    room_map = room_table(room_file)
-    if room_map:
-        logger.info("read BSSID-Room table: {}".format(room_file))
-    else:
-        logger.info("Error: can't read BSSID-Room table: {}".format(room_file))
-        exit()
+    # room_map = room_table(room_file)
+    # if room_map:
+    #     logger.info("read BSSID-Room table: {}".format(room_file))
+    # else:
+    #     logger.info("Error: can't read BSSID-Room table: {}".format(room_file))
+    #     exit()
 
     # make asyncio loop
     loop = asyncio.get_event_loop()
@@ -156,9 +158,9 @@ if __name__ == '__main__':
     context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
     context.load_cert_chain(certfile=Certfile, keyfile=Keyfile)
     coro = loop.create_server(AsyncClient,
-        host=server_ip,
-        port=server_port,
-        ssl=context)
+                              host=server_ip,
+                              port=server_port,
+                              ssl=context)
     #coro = loop.create_server(AsyncClient, server_ip, server_port)
     server = loop.run_until_complete(coro)
     logger.info('start sk2 info: {}'.format(server.sockets[0].getsockname()))

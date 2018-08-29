@@ -21,24 +21,25 @@ db_args = {"user": "sk2",
            "passwd": "sk2loglog",
            "host": "localhost",
            "db": "sk2"
-}
+           }
 db_tbl = "st"
 
 sk2_dir = "/usr/local/sk2/"
 data_dir = sk2_dir + "data/"
 salt_dir = sk2_dir + "key/"
+room_jsonfile = sk2_dir + "Seta_wifi_001.json"
 log = r"/usr/local/sk2/log/sk2.log"
 
 # EDS
 eds = "setaeds.seta.ryukoku.ac.jp"
-eds_sbase = "o=Ryukoku,c=JP" 
+eds_sbase = "o=Ryukoku,c=JP"
 Certfile = "/etc/letsencrypt/live/sk2.st.ryukoku.ac.jp/fullchain.pem"
 Keyfile = "/etc/letsencrypt/live/sk2.st.ryukoku.ac.jp/privkey.pem"
 
 # Reply Messages
-REPLY_MESSAGE_SUCCESS="success"
-REPLY_MESSAGE_AUTHFAIL="authfail"
-REPLY_MESSAGE_FAIL="fail"
+REPLY_MESSAGE_SUCCESS = "success"
+REPLY_MESSAGE_AUTHFAIL = "authfail"
+REPLY_MESSAGE_FAIL = "fail"
 
 # date encoding salt
 Saltfile = salt_dir + "user.salt"
@@ -48,14 +49,15 @@ replySaltfile = salt_dir + "reply.salt"
 # for test
 TESTUSER = "testuser"
 
+
 class AsyncClient(asyncio.Protocol):
     def connection_made(self, transport):
         peername = transport.get_extra_info('peername')
-        logger.info('Connectted from {}'.format(peername)) 
+        logger.info('Connectted from {}'.format(peername))
         self.transport = transport
 
     def data_received(self, data):
-        message = data.decode() # to data string
+        message = data.decode()  # to data string
         logger.info('Received: {!r}...'.format(message[0:15]))
         pieces = message.split(',')
 
@@ -69,16 +71,19 @@ class AsyncClient(asyncio.Protocol):
                 auth = self.ldapAuth(user, pwd)
 
             if auth:
-                (gcos, name) = auth # md5 encode with reply.salt
-                reply_key = hashlib.md5((user + reply_salt).encode()).hexdigest() # reply access key
-                reply_msg = "{},{},{}".format(reply_key, gcos, name)
+                (gcos, name) = auth  # md5 encode with reply.salt
+                reply_key = hashlib.md5(
+                    (user + reply_salt).encode()).hexdigest()  # reply access key
+                with open(room_jsonfile) as f:
+                    json = f.read().rstrip('\n')
+                reply_msg = "{},{},{},{}".format(reply_key, gcos, name, json)
                 logger.info("AUTH success {} ".format(user))
             else:
                 reply_msg = REPLY_MESSAGE_AUTHFAIL
                 logger.info("AUTH fail {} ".format(user))
 
         # sk2 Log write
-        elif len(pieces) >= 7: # 7 = user(1)/key(1)/marker(1)/datetime(1)/beacon0(3)
+        elif len(pieces) >= 7:  # 7 = user(1)/key(1)/marker(1)/datetime(1)/beacon0(3)
             user = pieces[0]
             key = pieces[1]
 
@@ -93,7 +98,7 @@ class AsyncClient(asyncio.Protocol):
             # md5 encode username(uid) with salt
             md5_uid = hashlib.md5((user + salt).encode()).hexdigest()
             filename = data_dir + md5_uid
-            md5_message = ','.join( [md5_uid] + pieces[2:] )
+            md5_message = ','.join([md5_uid] + pieces[2:])
 
             # to textfile
             try:
@@ -110,7 +115,7 @@ class AsyncClient(asyncio.Protocol):
             for i in range(13):
                 if i >= len(pieces):
                     pieces.append(None)
-                elif pieces[i] == '': 
+                elif pieces[i] == '':
                     pieces[i] = None
 
             # to database
@@ -124,8 +129,10 @@ class AsyncClient(asyncio.Protocol):
                             + "(%s, %s, %s, %s, %s, %s,"
                             + " %s, %s, %s, %s, %s, %s)",
                             (pieces[0], pieces[2], pieces[3],
-                             int(pieces[4] or 0), int(pieces[5] or 0), float(pieces[6] or 0.0),
-                             int(pieces[7] or 0), int(pieces[8] or 0), float(pieces[9] or 0.0),
+                             int(pieces[4] or 0), int(
+                                 pieces[5] or 0), float(pieces[6] or 0.0),
+                             int(pieces[7] or 0), int(
+                                 pieces[8] or 0), float(pieces[9] or 0.0),
                              int(pieces[10] or 0), int(pieces[11] or 0), float(pieces[12] or 0.0)))
 
         # Fail
@@ -133,7 +140,7 @@ class AsyncClient(asyncio.Protocol):
             reply_msg = REPLY_MESSAGE_FAIL
             logger.info("LOG any fail {} ".format(user))
 
-        self.transport.write(reply_msg.encode()) # data bytes
+        self.transport.write(reply_msg.encode())  # data bytes
         logger.info('Sent: {!r}'.format(reply_msg))
 
         self.transport.close()
@@ -143,8 +150,9 @@ class AsyncClient(asyncio.Protocol):
     def ldapAuth(self, id, ps):
         try:
             s = ldap3.Server(eds, use_ssl=True)
-            c = ldap3.Connection(s, auto_bind=True) 
-            c.search(search_base=eds_sbase, search_filter="(uid={})".format(id))
+            c = ldap3.Connection(s, auto_bind=True)
+            c.search(search_base=eds_sbase,
+                     search_filter="(uid={})".format(id))
             dn = c.response[0]['dn']
         except:
             logger.info("ldap search error {}".format(id))
@@ -152,9 +160,11 @@ class AsyncClient(asyncio.Protocol):
 
         try:
             c = ldap3.Connection(s, auto_bind=True, user=dn, password=ps)
-            c.search(search_base=eds_sbase, search_filter="(uid={})".format(id), attributes=['gecos', 'displayName'])
+            c.search(search_base=eds_sbase, search_filter="(uid={})".format(
+                id), attributes=['gecos', 'displayName'])
             gecos = c.response[0]['raw_attributes']['gecos'][0].decode("utf-8")
-            name =  c.response[0]['raw_attributes']['displayName'][0].decode("utf-8")
+            name = c.response[0]['raw_attributes']['displayName'][0].decode(
+                "utf-8")
             return (gecos, name)
         except:
             return False
@@ -168,7 +178,7 @@ if __name__ == '__main__':
         fileHandler.setLevel(DEBUG)
         formatter = Formatter('%(asctime)s:%(message)s')
         fileHandler.setFormatter(formatter)
-        logger.setLevel(DEBUG) 
+        logger.setLevel(DEBUG)
         logger.addHandler(fileHandler)
 
     logger.info('logfile: {}'.format(log))
@@ -188,7 +198,8 @@ if __name__ == '__main__':
     # with ssl
     context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
     context.load_cert_chain(certfile=Certfile, keyfile=Keyfile)
-    coro = loop.create_server(AsyncClient, host=server_ip, port=server_port, ssl=context)
+    coro = loop.create_server(
+        AsyncClient, host=server_ip, port=server_port, ssl=context)
 
     #coro = loop.create_server(AsyncClient, server_ip, server_port)
     server = loop.run_until_complete(coro)
@@ -205,4 +216,3 @@ if __name__ == '__main__':
     loop.run_until_complete(server.wait_closed())
     loop.close()
     logger.info('stop sk2 atternd.')
-

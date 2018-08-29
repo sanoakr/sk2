@@ -19,6 +19,7 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGIN_EXPIRY_PERIOD_DAYS
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGIN_TIME_DAY_UNIT_MILLSEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_KEY
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_LOGIN_TIME
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_ROOM_JSON
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_UID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_USER_NAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_COMMAND_AUTH
@@ -131,16 +132,18 @@ class LoginActivity : Activity() {
     private fun login(user: String, result: String) {
         if (result != SERVER_REPLY_AUTH_FAIL) { // サーバからの返信が失敗でなければ
             /** サーバ返信を ',' で分割 **/
-            val v: List<String> = result.split(",")
+            val v: List<String> = result.split(",", limit = 4)
             val time: Long = System.currentTimeMillis() // 現在時刻
             /** ユーザ名の空白は全て半角スペース一つに圧縮 **/
             val clrName: String = v[2].replace(Regex("\\s+"), " ")
+            val json = v[3]
 
             pref.edit() // SharedPreference に保存
                     .putString(PREF_UID, user)
                     .putString(PREF_KEY, v[0])
                     .putString(PREF_USER_NAME, clrName)
                     .putLong(PREF_LOGIN_TIME, time)     // not in use
+                    .putString(PREF_ROOM_JSON, json)
                     .apply()
 
             toast(TOAST_LOGIN_SUCCESS)
