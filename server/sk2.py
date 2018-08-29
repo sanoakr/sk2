@@ -27,7 +27,6 @@ db_tbl = "st"
 sk2_dir = "/usr/local/sk2/"
 data_dir = sk2_dir + "data/"
 salt_dir = sk2_dir + "key/"
-room_jsonfile = sk2_dir + "Seta_wifi_001.json"
 log = r"/usr/local/sk2/log/sk2.log"
 
 # EDS
@@ -45,6 +44,8 @@ REPLY_MESSAGE_FAIL = "fail"
 Saltfile = salt_dir + "user.salt"
 # replying info key salt
 replySaltfile = salt_dir + "reply.salt"
+# room_jsonfile
+room_jsonfile = sk2_dir + "Seta_wifi_001.json"
 
 # for test
 TESTUSER = "testuser"
@@ -74,8 +75,6 @@ class AsyncClient(asyncio.Protocol):
                 (gcos, name) = auth  # md5 encode with reply.salt
                 reply_key = hashlib.md5(
                     (user + reply_salt).encode()).hexdigest()  # reply access key
-                with open(room_jsonfile) as f:
-                    json = f.read().rstrip('\n')
                 reply_msg = "{},{},{},{}".format(reply_key, gcos, name, json)
                 logger.info("AUTH success {} ".format(user))
             else:
@@ -192,6 +191,10 @@ if __name__ == '__main__':
     with open(replySaltfile) as rf:
         reply_salt = rf.readline()
         logger.info('read reply salt: {}'.format(replySaltfile))
+    # Json file
+    with open(room_jsonfile) as f:
+        json = f.read().rstrip('\n')
+        logger.info("read AP JSON file: {}".format(room_jsonfile))
 
     # make asyncio loop
     loop = asyncio.get_event_loop()
