@@ -109,9 +109,11 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
         if (!sk2.checkBt()) {
             // ダメならボタンをグレーアウト
             mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
+            mainUi.attBt.text = BUTTON_TEXT_ATTEND_FALSE
             toast(Sk2Globals.TOAST_CHECK_BLE_OFF)
         } else {
             mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
+            mainUi.attBt.text = BUTTON_TEXT_ATTEND_TRUE
         }
 
         /** SharedPreference の変更を通知するリスナー **/
