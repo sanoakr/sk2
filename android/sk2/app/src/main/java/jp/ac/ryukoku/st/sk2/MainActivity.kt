@@ -131,9 +131,6 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
                     .setUseHardwareBatchingIfSupported(false)
                     .build()
             scanFilters = ArrayList() // ArrayList<ScanFilter>() // フィルタは空 == 全て受け取る
-
-            if (sk2.checkBt())
-                mScanner.startScan(scanFilters, scanSettings, mScanCallback)
         }
         /** バイブレーション **/
         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
@@ -157,6 +154,14 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
         mainUi.autoSw.isChecked = auto
         /** Alarm Service **/
         if (auto) sk2.setAlarmService() else sk2.stopAlarmService()
+        /** BLE Scan 開始 **/
+        if (sk2.checkBt()) {
+            try {
+                mScanner.startScan(scanFilters, scanSettings, mScanCallback)
+            } catch (e: Exception) {
+                warn("BLE Scanner has been already started")
+            }
+        }
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onDestroy() {

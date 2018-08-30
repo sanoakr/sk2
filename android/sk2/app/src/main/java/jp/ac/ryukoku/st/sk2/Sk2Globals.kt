@@ -149,7 +149,8 @@ class Sk2Globals: Application(), AnkoLogger {
         // Server
         const val TOAST_CANT_CONNECT_SERVER = "サーバに接続できません"
         // Log Records
-        const val TOAST_LOG_NO_RECORDS = "ログデータがありません。"
+        const val TOAST_LOG_NO_LOCAL_RECORDS = "ローカルログはありません。"
+        const val TOAST_LOG_NO_SERVER_RECORDS = "サーバログはありません。"
 
         /*** パーミッション変更時のリクエストコード（任意の整数でよい） ***/
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34

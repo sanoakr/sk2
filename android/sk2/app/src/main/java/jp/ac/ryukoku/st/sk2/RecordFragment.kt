@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ListView
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOG_NO_RECORDS
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOG_NO_SERVER_RECORDS
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.VALID_IBEACON_UUID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.apNameMap
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.pref
@@ -61,7 +61,7 @@ class RecordFragment : Fragment() {
                             uiThread {
                                 adapter = recAdapter
                                 if (recAdapter.list.isEmpty())
-                                    toast(TOAST_LOG_NO_RECORDS)
+                                    toast(TOAST_LOG_NO_SERVER_RECORDS)
                             }
                         }
                     }
