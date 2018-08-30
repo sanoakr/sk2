@@ -9,6 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ListView
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOG_NO_RECORDS
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.VALID_IBEACON_UUID
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.apNameMap
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.pref
 import org.jetbrains.anko.*
 import org.jetbrains.anko.support.v4.UI
@@ -57,6 +60,8 @@ class RecordFragment : Fragment() {
                             val recAdapter = RecordAdapter()
                             uiThread {
                                 adapter = recAdapter
+                                if (recAdapter.list.isEmpty())
+                                    toast(TOAST_LOG_NO_RECORDS)
                             }
                         }
                     }
@@ -132,19 +137,26 @@ class RecordAdapter: BaseAdapter() {
                 /** ////////////////////////////////////////////////////////////////////////////// **/
                 for (ix in 0..2) {
                     if (! item.hasNull(ix)) {
+                        val uuid = VALID_IBEACON_UUID[0]  /** be supposed ru-wifi **/
+                        val major = item.getMajor(ix)
+                        val minor = item.getMinor(ix)
                         /** ////////////////////////////////////////////////////////////////////////////// **/
                         linearLayout {
                             padding = dip(3)
                             ////////////////////////////////////////
-                            textView("Majour=${item.get(ix).first}") {
+                            textView("Name=${apNameMap[Triple(uuid, major, minor)]}") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
-                            }.lparams { horizontalGravity = left; width = dip(60) }
-                            ////////////////////////////////////////
-                            textView("Minor=${item.get(ix).second}") {
+                            }.lparams { horizontalGravity = left; width = dip(150) }
+                            textView("Major=$major") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
-                            }.lparams { horizontalGravity = left; width = dip(60) }
+                            }.lparams { horizontalGravity = left; width = dip(50) }
                             ////////////////////////////////////////
-                            textView("Distance=${item.get(ix).third}") {
+                            textView("Minor=$minor") {
+                                textSize = Sk2Globals.TEXT_SIZE_NORMAL
+                            }.lparams { horizontalGravity = left; width = dip(50) }
+                            ////////////////////////////////////////
+                            val dist = "%.6f".format(item.getDistance(ix))
+                            textView("Distance=$dist") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
                             }.lparams { horizontalGravity = right; weight = 2f; leftMargin = dip(4) }
                         }

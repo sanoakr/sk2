@@ -61,6 +61,7 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_Large
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_TINY
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_MAIN_AUTO_OFF
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_MAIN_AUTO_ON
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.apNameMap
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /** Sk2 Main Activity **/
@@ -230,7 +231,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
             }
         }
         if (scanArray.count() > 0) {
-            mainUi.scanInfo.text = scanArray.getBeaconsText(signal = true, ios = true)
+            mainUi.scanInfo.text = scanArray.getBeaconsText(signal = true, ios = true, map = apNameMap)
             mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
             mainUi.attBt.text = BUTTON_TEXT_ATTEND_TRUE
         }

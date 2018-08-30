@@ -12,9 +12,7 @@ import android.graphics.Color
 import android.os.Build
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import org.jetbrains.anko.clearTop
-import org.jetbrains.anko.intentFor
-import org.jetbrains.anko.toast
+import org.jetbrains.anko.*
 import java.lang.reflect.Type
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -150,6 +148,8 @@ class Sk2Globals: Application() {
         const val LOCATION_PERMISSION_DENIED_MESSAGE = "位置情報へのアクセスが許可されませんでした"
         // Server
         const val TOAST_CANT_CONNECT_SERVER = "サーバに接続できません"
+        // Log Records
+        const val TOAST_LOG_NO_RECORDS = "ログデータがありません。"
 
         /*** パーミッション変更時のリクエストコード（任意の整数でよい） ***/
         const val REQUEST_PERMISSIONS_REQUEST_CODE = 34
@@ -169,12 +169,20 @@ class Sk2Globals: Application() {
                 "ebf59ccc-21f2-4558-9488-00f2b388e5e6", // ru-wifi
                 "00000000-87b3-1001-b000-001c4d975326"  // sekimoto's
         )
-        //val UUID_MASK = "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"
+        /*** AP Map の Key ***/
+        const val APMAP_KEY_BEACON = "beaconIdParams"
+        const val APMAP_KEY_BEACON_UUID = "uuid"
+        const val APMAP_KEY_BEACON_MAJOR = "major"
+        const val APMAP_KEY_BEACON_MINOR = "minor"
+        const val APMAP_KEY_NAME = "name"
 
         /**  SharedPreferences **/
         lateinit var pref: SharedPreferences
         /**  出席情報のローカル記録用キュー **/
-        lateinit var localQueue: Queue<Triple<String,Char,List<List<Any>>>>
+        lateinit var localQueue: Queue<Triple<String,Char,List<StatBeacon>>>
+        /**  AP情報の Map **/
+        lateinit var apInfos: List<Map<String, Any>>
+        lateinit var apNameMap: MutableMap<Triple<String, Int, Int>, String>
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
 
@@ -185,6 +193,28 @@ class Sk2Globals: Application() {
         pref = getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
         // ローカルキューをリストア
         restoreQueue()
+    }
+    /** ////////////////////////////////////////////////////////////////////////////// **/
+    /*** サーバからの AP JSON ファイルを List<Map> にして、さらに (Major, Minor) => Name の Map をつくる **/
+    fun readApMap() {
+        /** JSON から List<Map> **/
+        val gson = Gson()
+        val jsonString = pref.getString(PREF_ROOM_JSON, gson.toJson(mapOf<String, Any>()))
+        if (jsonString != null) {
+            val type: Type = object : TypeToken<List<Map<String, Any>>>() {}.type
+            apInfos = gson.fromJson(jsonString, type)
+        }
+        /** List<Map> から (Major, Minor) => Name **/
+        apNameMap = mutableMapOf()
+        apInfos.forEach { ap ->
+            if (ap.containsKey(APMAP_KEY_BEACON) && ap.containsKey(APMAP_KEY_NAME)) {
+                val beacon = ap[APMAP_KEY_BEACON] as Map<String, String>
+                val uuid = beacon[APMAP_KEY_BEACON_UUID] as String
+                val major = (beacon[APMAP_KEY_BEACON_MAJOR] as Double).toInt()
+                val minor = (beacon[APMAP_KEY_BEACON_MINOR] as Double).toInt()
+                apNameMap[Triple(uuid, major, minor)] = ap[APMAP_KEY_NAME] as String
+            }
+        }
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** ローカルキューを Json String に変換して SharedPreferences に保存 ***/
@@ -203,12 +233,12 @@ class Sk2Globals: Application() {
     fun restoreQueue() {
         val gson = Gson()
         val jsonString = pref.getString(PREF_LOCAL_QUEUE,
-                gson.toJson(Queue<Triple<String,Char,List<List<Any>>>>(mutableListOf())))
-        val type: Type = object: TypeToken<Queue<Triple<String, Char, Collection<Collection<Any>>>>>(){}.type
-        localQueue = gson.fromJson<Queue<Triple<String, Char, List<List<Any>>>>>(jsonString, type)
-
+                gson.toJson(Queue<Triple<String,Char,List<StatBeacon>>>(mutableListOf())))
+        val type: Type = object: TypeToken<Queue<Triple<String, Char, Collection<StatBeacon>>>>(){}.type
+        localQueue = gson.fromJson<Queue<Triple<String, Char, List<StatBeacon>>>>(jsonString, type)
     }
-    /** ////////////////////////////////////////////////////////////////////////////// **/    /*** ログアウト時にユーザ情報を持つ全てのSharedPreferenceをクリア ***/
+    /** ////////////////////////////////////////////////////////////////////////////// **/
+    /*** ログアウト時にユーザ情報を持つ全てのSharedPreferenceをクリア ***/
     fun logout() {
         pref.edit()
                 .putString(PREF_UID, "")

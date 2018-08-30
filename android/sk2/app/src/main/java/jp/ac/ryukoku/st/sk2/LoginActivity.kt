@@ -70,8 +70,8 @@ class LoginActivity : Activity() {
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onResume() {
         super.onResume()
-        /** ユーザIDが空でなければ、**/
-        if (pref.getString(PREF_UID, "").isNotBlank()) {
+        /** ユーザIDが空でなければ && 教室AP情報を持っていれば **/
+        if (pref.getString(PREF_UID, "").isNotBlank() && pref.getString(PREF_ROOM_JSON, "").isNotBlank()) {
             /** 期限を確認して **/
             val today: Long = System.currentTimeMillis() / LOGIN_TIME_DAY_UNIT_MILLSEC
             if ( today - pref.getLong(PREF_LOGIN_TIME, 0L)/ LOGIN_TIME_DAY_UNIT_MILLSEC < LOGIN_EXPIRY_PERIOD_DAYS)
@@ -148,7 +148,6 @@ class LoginActivity : Activity() {
                     .putLong(PREF_LOGIN_TIME, time)     // not in use
                     .putString(PREF_ROOM_JSON, json)
                     .apply()
-
             toast(TOAST_LOGIN_SUCCESS)
             /** メイン画面へ **/
             startMain()
@@ -157,7 +156,12 @@ class LoginActivity : Activity() {
             toast(TOAST_LOGIN_FAIL)
         }
     }
+    /** ////////////////////////////////////////////////////////////////////////////// **/
+    /** メイン画面へ **/
     private fun startMain() {
+        /** AP Map を作成 **/
+        sk2.readApMap()
+
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = (Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)

@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ListView
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOG_NO_RECORDS
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.apNameMap
 import org.jetbrains.anko.*
 import org.jetbrains.anko.support.v4.UI
 import org.jetbrains.anko.support.v4.onRefresh
@@ -50,6 +52,8 @@ class RecordLocalFragment : Fragment() {
                             val recAdapter = RecordLocalAdapter()
                             uiThread {
                                 adapter = recAdapter
+                                if (recAdapter.list.isEmpty())
+                                    toast(TOAST_LOG_NO_RECORDS)
                             }
                         }
                     }
@@ -91,24 +95,29 @@ class RecordLocalAdapter: BaseAdapter() {
                 /** ////////////////////////////////////////////////////////////////////////////// **/
                 for (ix in 0..2) {
                     if (ix < beacons.count()) {
+                        val uuid = beacons[ix].uuid
+                        val major = beacons[ix].major
+                        val minor = beacons[ix].minor
                         /** ////////////////////////////////////////////////////////////////////////////// **/
                         linearLayout {
                             padding = dip(3)
                             ////////////////////////////////////////
-                            textView("Majour=${beacons[ix][1]}") {
+                            textView("Name=${apNameMap[Triple(uuid, major, minor)]}") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
-                            }.lparams { horizontalGravity = left; width = dip(60) }
+                            }.lparams { horizontalGravity = left; width = dip(150) }
                             ////////////////////////////////////////
-                            textView("Minor=${beacons[ix][2]}") {
+                            textView("Major=$major") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
-                            }.lparams { horizontalGravity = left; width = dip(60) }
+                            }.lparams { horizontalGravity = left; width = dip(50) }
+                            ////////////////////////////////////////
+                            textView("Minor=$minor") {
+                                textSize = Sk2Globals.TEXT_SIZE_NORMAL
+                            }.lparams { horizontalGravity = left; width = dip(50) }
                             ////////////////////////////////////////
                             //Log.e("CAST to Double from", "${beacons[ix][3]} ${beacons[ix][4]}")
-                            val tx: Int = if (beacons[ix][3] is Double)
-                                (beacons[ix][3] as Double).toInt() else 0
-                            val rssi: Int = if (beacons[ix][4] is Double)
-                                (beacons[ix][4] as Double).toInt() else 0
-                            val dist = getBleDistance(tx, rssi)
+                            val tx: Int = beacons[ix].power
+                            val rssi: Int = beacons[ix].rssi
+                            val dist = "%.6f".format(getBleDistance(tx, rssi))
                             textView("Distance=$dist") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
                             }.lparams { horizontalGravity = right; weight = 2f; leftMargin = dip(4) }
@@ -119,7 +128,7 @@ class RecordLocalAdapter: BaseAdapter() {
         }
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
-    override fun getItem(position: Int): Triple<String, Char, List<List<Any>>> {
+    override fun getItem(position: Int): Triple<String, Char, List<StatBeacon>> {
         return list.get(position)
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/

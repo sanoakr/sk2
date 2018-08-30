@@ -6,6 +6,15 @@ import me.mattak.moment.Moment
 import java.util.*
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
+/** Beacon Data **/
+class StatBeacon(u: String, ma: Int, mi: Int, pw: Int, rs: Int) {
+    var uuid:String = u
+    var major: Int = ma
+    var minor: Int = mi
+    var power: Int = pw
+    var rssi: Int = rs
+}
+/** ////////////////////////////////////////////////////////////////////////////// **/
 /*** BLEスキャン結果用データクラス ***/
 class ScanArray() {
     var datetime = Moment()
@@ -34,7 +43,7 @@ class ScanArray() {
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /** 統計出力 Rssi の上下を捨てて、TX, Rssi の平均値を計算 **/
     /** Map(UUID -> Map((Major, Minor) -> (Tx, Rssi))) **/
-    fun getStatisticalList(): List<List<Any>> {
+    fun getStatisticalList(): List<StatBeacon> {
         val map = mutableMapOf<String, MutableList<Pair<Int, Int>>>()
 
         /** Beacon ごとの信号リスト **/
@@ -51,7 +60,7 @@ class ScanArray() {
             }
         }
         /** RSSI の最大と最小を除いて平均 **/
-        val list = mutableListOf<List<Any>>()
+        val list = mutableListOf<StatBeacon>()
         map.forEach { (k, v) ->
 
             if (v.count() != 0) {
@@ -62,8 +71,8 @@ class ScanArray() {
                     Pair(Int.MIN_VALUE, Int.MAX_VALUE)
 
                 var count = 0
-                var pAvg = 0
-                var rAvg = 0
+                var pAvg: Double = 0.0
+                var rAvg: Double = 0.0
 
                 v.forEach { (power, rssi) ->
                     if (rssi != max || rssi != min) {
@@ -75,7 +84,7 @@ class ScanArray() {
                 pAvg /= count; rAvg /= count
 
                 val (uuid, major, minor) = k.split(',')
-                list.add(listOf(uuid, major.toInt(), minor.toInt(), pAvg, rAvg))
+                list.add(StatBeacon(uuid, major.toInt(), minor.toInt(), pAvg.toInt(), rAvg.toInt()))
             }
         }
         return list
@@ -83,7 +92,8 @@ class ScanArray() {
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /** ビーコン情報をテキストで **/
     fun getBeaconsText(label: Boolean = true, time: Boolean = true, statistic: Boolean = false,
-                       uuid: Boolean = true, signal: Boolean = false, ios: Boolean = false): String {
+                       uuid: Boolean = true, signal: Boolean = false, ios: Boolean = false,
+                       map: MutableMap<Triple<String, Int, Int>, String> = mutableMapOf()): String {
         /** ラベル設定 **/
         val uuLabel = if (label) "UUID=" else ","
         val mjLabel = if (label) "\n\tMajor=" else ","
@@ -101,11 +111,11 @@ class ScanArray() {
             if (statistic) {
                 val list = getStatisticalList()
                 list.forEach { e ->
-                    val mUuid = e[0] as String
-                    val mMajor = e[1] as Int
-                    val mMinor = e[2] as Int
-                    val mTx = e[3] as Int
-                    val mRssi = e[4] as Int
+                    val mUuid = e.uuid
+                    val mMajor = e.major
+                    val mMinor = e.minor
+                    val mTx = e.power
+                    val mRssi = e.rssi
 
                     if (uuid)
                     /** UUID を表示？ **/
@@ -118,6 +128,8 @@ class ScanArray() {
 
                     if (label) {
                         /** ラベル付きのときのみ **/
+                        if (map.isNotEmpty())
+                            beaconText.append("\tName=${map[Triple(mUuid, mMajor, mMinor)]}\n")
                         if (signal)
                             beaconText.append("\tTxPower=$mTx, RSSI=$mRssi\n")
                         if (ios) {
@@ -145,6 +157,8 @@ class ScanArray() {
                                 "$dsLabel$distance$enLabel")
 
                         if (label) {/** ラベル付きのときのみ **/
+                            if (map.isNotEmpty())
+                                beaconText.append("\tName=${map[Triple(b.uuid.toString(), b.major, b.minor)]}\n")
                             if (signal)
                                 beaconText.append("\tTxPower=${b.power}, RSSI=$rssi\n")
                             if (ios) {

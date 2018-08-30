@@ -16,7 +16,9 @@ import org.jetbrains.anko.*
 class HelpActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        HelpActivityUi().setContentView(this)
+
+        val helpUi = HelpActivityUi()
+        helpUi.setContentView(this)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             window.statusBarColor = COLOR_BACKGROUND
@@ -30,6 +32,7 @@ class HelpActivityUi: AnkoComponent<HelpActivity> {
         const val TITLE = 1
     }
     override fun createView(ui: AnkoContext<HelpActivity>) = with(ui) {
+
         relativeLayout {
             backgroundColor = COLOR_BACKGROUND
             ////////////////////////////////////////

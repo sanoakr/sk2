@@ -9,28 +9,31 @@ class Record(): AnkoLogger {
     var uid: String? = null
     var type: String? = null
     var datetime: String? = null // without the day of week
-    var data = ArrayList<ArrayList<Double?>>() // (Major, Minor, Distance) の Array
+    var data = ArrayList<Pair<ArrayList<Double?>, String?>>() // ((Major, Minor, Distance), Name)
 
     /** Primary initializer **/
-    init { // initialize data array of array  (3 x MAX_SEND_BEACON_NUM) used as Triple
+    init { // initialize data array of array  (4 x MAX_SEND_BEACON_NUM) used as Triple
         for (i in 1..Sk2Globals.MAX_SEND_BEACON_NUM) {
-            val triple = arrayListOf<Double?>(null, null, null)
-            data.add(triple)
+            val quad: Pair<ArrayList<Double?>, String?> = Pair(arrayListOf<Double?>(null, null, null), null)
+            data.add(quad)
         }
     }
 
     fun count(): Int = data.count()
-    /** i 番目のビーコンの Major, Minor, Distance と Triple として取得 **/
-    fun get(i: Int): Triple<Int?, Int?, Double?>
-            = Triple(data[i][0]?.toInt(), data[i][1]?.toInt(), data[i][2])
+    /** i 番目のビーコンの Major, Minor, Distance, Name を Pair<Triple, String> として取得 **/
+    fun get(i: Int): Pair<Triple<Int?, Int?, Double?>, String?>
+            = Pair(Triple(data[i].first[0]?.toInt(), data[i].first[1]?.toInt(), data[i].first[2]), data[i].second)
     /** i 番目の Major **/
-    fun getMajor(i: Int): Int? = data[i][0]?.toInt()
+    fun getMajor(i: Int): Int? = data[i].first[0]?.toInt()
     /** i 番目の Minor **/
-    fun getMinor(i: Int): Int? = data[i][1]?.toInt()
+    fun getMinor(i: Int): Int? = data[i].first[1]?.toInt()
     /** i 番目の Distance **/
-    fun getDistance(i: Int): Double? = data[i][2]
+    fun getDistance(i: Int): Double? = data[i].first[2]
+    /** i 番目の Name **/
+    fun getName(i: Int): String? = data[i].second
 
-    fun hasNull(i: Int) = (getMajor(i) == null || getMinor(i) == null || getDistance(i) == null)
+    fun hasNull(i: Int) = (getMajor(i) == null || getMinor(i) == null
+            || getDistance(i) == null) // Name は null でも良い
 
     /** 文字列として取得 **/
     override fun toString(): String {
@@ -63,9 +66,9 @@ class Record(): AnkoLogger {
                     val doubleVal = dataList[i].toDoubleOrNull()
                     //warn("$i $n $m $doubleVal")
                     if (doubleVal != null)
-                        data[n][m] = doubleVal
+                        data[n].first[m] = doubleVal
                     else
-                        data[n][m] = 0.0
+                        data[n].first[m] = 0.0
                 }
             }
         }
@@ -88,8 +91,9 @@ class RecordsData() {
         }
     }
     fun count(): Int = record.count()
+    fun isEmpty(): Boolean = record.isEmpty()
     /** i 番目のレコード **/
     fun get(i: Int): Record = record[i]
-    /** i 番目のレコードの j 番目のBeacon情報 (Major, Minor, Distance) **/
-    fun get(i: Int, j: Int): Triple<Int?, Int?, Double?> = get(i).get(j)
+    /** i 番目のレコードの j 番目のBeacon情報 ((Major, Minor, Distance), Name) **/
+    fun get(i: Int, j: Int): Pair<Triple<Int?, Int?, Double?>, String?> = get(i).get(j)
 }

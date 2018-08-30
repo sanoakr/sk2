@@ -28,6 +28,7 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_ALARM
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_SEND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_PERIOD_IN_MILLISEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.VALID_IBEACON_UUID
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.apNameMap
 import me.mattak.moment.Moment
 import no.nordicsemi.android.support.v18.scanner.*
 import org.jetbrains.anko.doAsync
@@ -256,7 +257,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
 
             /** ブロードキャストメッセージを送信 **/
             sendBroadcastScanResult(scanArray.getBeaconsText(
-                    statistic = true, signal = true, ios = true))
+                    statistic = true, signal = true, ios = true, map = apNameMap))
             sendBroadcastMessage(Sk2Globals.BROADCAST_ATTEND_SEND)
 
             /** Notification を送信 **/
