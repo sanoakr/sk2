@@ -65,11 +65,12 @@ class RecordLocalFragment : Fragment() {
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /** UI **/
-class RecordLocalAdapter: BaseAdapter() {
+class RecordLocalAdapter: BaseAdapter(), AnkoLogger {
     val list = Sk2Globals.localQueue
 
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun getView(i: Int, v: View?, parent: ViewGroup?): View {
+        info(list)
         val (datetime, type, beacons) = getItem(i)
 
         return with(parent!!.context) {

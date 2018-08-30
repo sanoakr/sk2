@@ -16,7 +16,7 @@ import org.jetbrains.anko.*
 import java.lang.reflect.Type
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
-class Sk2Globals: Application() {
+class Sk2Globals: Application(), AnkoLogger {
     /** ////////////////////////////////////////////////////////////////////////////// **/
     companion object {
         const val APP_NAME = "sk2"
@@ -235,7 +235,14 @@ class Sk2Globals: Application() {
         val jsonString = pref.getString(PREF_LOCAL_QUEUE,
                 gson.toJson(Queue<Triple<String,Char,List<StatBeacon>>>(mutableListOf())))
         val type: Type = object: TypeToken<Queue<Triple<String, Char, Collection<StatBeacon>>>>(){}.type
-        localQueue = gson.fromJson<Queue<Triple<String, Char, List<StatBeacon>>>>(jsonString, type)
+        val queue: Queue<Triple<String, Char,List<StatBeacon>>> = gson.fromJson<Queue<Triple<String, Char, List<StatBeacon>>>>(jsonString, type)
+
+        /** remove recodes null data contained **/
+        localQueue.clear()
+        queue.items.forEach {r ->
+            if (r.toList().any { e -> e != null })
+                localQueue.push(r)
+        }
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** ログアウト時にユーザ情報を持つ全てのSharedPreferenceをクリア ***/

@@ -29,9 +29,12 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_SEND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_PERIOD_IN_MILLISEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.VALID_IBEACON_UUID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.apNameMap
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.localQueue
 import me.mattak.moment.Moment
 import no.nordicsemi.android.support.v18.scanner.*
+import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.info
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.InputStreamReader
@@ -41,7 +44,7 @@ import javax.net.ssl.SSLSocketFactory
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /*** BLEスキャン・出席記録送信用サービスクラス ***/
-class ScanService : Service() /*, BootstrapNotifier*/ {
+class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
     companion object {
         val TAG = this::class.java.simpleName!!
 
@@ -251,6 +254,7 @@ class ScanService : Service() /*, BootstrapNotifier*/ {
             Log.d(TAG,"SEND to sk2; $message")
 
             /** ローカル記録キューに追加（送信の可否に依存しない） **/
+            info(localQueue)
             Sk2Globals.localQueue.push(
                     Triple(scanArray.datetime.toString(), type, scanArray.getStatisticalList()))
             sk2.saveQueue()
