@@ -18,7 +18,7 @@
         android:name=".Sk2Globals"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="sk2"
+        android:label="理工出席"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 

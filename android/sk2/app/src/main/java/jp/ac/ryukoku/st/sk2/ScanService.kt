@@ -69,7 +69,7 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
             return NotificationCompat.Builder(this, CHANNEL_ID)
                     .setContentTitle(NOTIFICATION_TITLE_TEXT)
                     .setContentText("Sk2 Content Text")
-                    .setSmallIcon(R.drawable.ic_launcher_background)
+                    .setSmallIcon(R.drawable.ic_stat_sk2)
                     //.setSmallIcon(android.R.drawable.btn_star)
                     .setAutoCancel(true)
         }

@@ -33,6 +33,7 @@ import android.content.*
 import android.os.Vibrator
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.LocalBroadcastManager
+import android.support.v7.appcompat.R.attr.colorControlActivated
 import android.view.Gravity
 import android.view.View
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.ACTION_BROADCAST
@@ -44,8 +45,12 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_SIZE_ATTEND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_SIZE_MENU
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_TEXT_ATTEND_FALSE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_TEXT_ATTEND_TRUE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_TEXT_EXIT
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_TEXT_HELP
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_TEXT_LOG
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_BACKGROUND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_BACKGROUND_TITLE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_NORMAL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_BLESCAN
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_TOAST
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NAME_START_TESTUSER
@@ -58,6 +63,7 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_INFO_NOT_FOUND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_PERIOD_IN_MILLISEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SWITCH_TEXT_AUTO
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_Large
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_NORMAL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_TINY
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_MAIN_AUTO_OFF
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_MAIN_AUTO_ON
@@ -391,6 +397,9 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
         const val SCAN = 4
         const val ATTEND = 5
         const val MENU = 6
+        const val LOG = 61
+        const val HELP = 62
+        const val EXIT = 63
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun createView(ui: AnkoContext<MainActivity>) = with(ui) {
@@ -470,36 +479,63 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
             linearLayout {
                 id = MENU
                 ////////////////////////////////////////
-                imageButton {
-                    imageResource = R.drawable.ic_history_32dp
-                    background = ContextCompat.getDrawable(context, R.drawable.button_circle)
-                    onClick {
-                        startActivity<RecordPagerActivity>()
+                relativeLayout {
+                    imageButton {
+                        id = LOG
+                        imageResource = R.drawable.ic_action_record
+                        background = ContextCompat.getDrawable(context, R.drawable.button_menu)
+                        onClick {
+                            startActivity<RecordPagerActivity>()
+                        }
+                    }.lparams {
+                        width = dip(BUTTON_SIZE_MENU); height = dip(BUTTON_SIZE_MENU)
+                        horizontalMargin = dip(BUTTON_MARGIN_MENU)
                     }
-                }.lparams { width = dip(BUTTON_SIZE_MENU); height = dip(BUTTON_SIZE_MENU)
-                    margin = dip(BUTTON_MARGIN_MENU) }
+                    textView(BUTTON_TEXT_LOG) {
+                        textSize = TEXT_SIZE_NORMAL
+
+                    }.lparams { below(LOG); centerHorizontally() }
+                }
                 ////////////////////////////////////////
-                imageButton {
-                    imageResource = R.drawable.ic_live_help_32dp
-                    background = ContextCompat.getDrawable(context, R.drawable.button_circle)
-                    onClick {
-                        startActivity<HelpActivity>()
+                relativeLayout {
+                    imageButton {
+                        id = HELP
+                        imageResource = R.drawable.ic_action_help
+                        background = ContextCompat.getDrawable(context, R.drawable.button_menu)
+                        onClick {
+                            startActivity<HelpActivity>()
+                        }
+                    }.lparams {
+                        width = dip(BUTTON_SIZE_MENU); height = dip(BUTTON_SIZE_MENU)
+                       horizontalMargin = dip(BUTTON_MARGIN_MENU)
                     }
-                }.lparams { width = dip(BUTTON_SIZE_MENU); height = dip(BUTTON_SIZE_MENU)
-                    margin = dip(BUTTON_MARGIN_MENU) }
+                    textView(BUTTON_TEXT_HELP) {
+                        textSize = TEXT_SIZE_NORMAL
+
+                    }.lparams { below(HELP); centerHorizontally() }
+                }
                 ////////////////////////////////////////
-                imageButton {
-                    imageResource = R.drawable.ic_logout_32dp
-                    background = ContextCompat.getDrawable(context, R.drawable.button_circle)
-                    onClick {
-                        val dialog = LogoutDialog()
-                        // Dialogの表示
-                        dialog.show(ui.owner.supportFragmentManager, "LOGOUT")
+                relativeLayout {
+                    imageButton {
+                        id = EXIT
+                        imageResource = R.drawable.ic_action_exit
+                        background = ContextCompat.getDrawable(context, R.drawable.button_menu)
+                        onClick {
+                            val dialog = LogoutDialog()
+                            // Dialogの表示
+                            dialog.show(ui.owner.supportFragmentManager, "LOGOUT")
+                        }
+                    }.lparams {
+                        width = dip(BUTTON_SIZE_MENU); height = dip(BUTTON_SIZE_MENU)
+                        horizontalMargin = dip(BUTTON_MARGIN_MENU)
                     }
-                }.lparams { width = dip(BUTTON_SIZE_MENU); height = dip(BUTTON_SIZE_MENU)
-                    margin = dip(BUTTON_MARGIN_MENU) }
+                    textView(BUTTON_TEXT_EXIT) {
+                        textSize = TEXT_SIZE_NORMAL
+
+                    }.lparams { below(EXIT); centerHorizontally() }
+                }
             }.lparams {
-                alignParentBottom(); centerHorizontally()
+                alignParentBottom(); centerHorizontally(); bottomMargin = dip(16)
             }
         }
     }

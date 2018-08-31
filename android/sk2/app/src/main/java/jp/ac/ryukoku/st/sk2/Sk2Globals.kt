@@ -58,12 +58,12 @@ class Sk2Globals: Application(), AnkoLogger {
         const val NAME_START_TESTUSER = "testuser"         // デバッグユーザー名の開始文字
 
         /*** View カラー ***/
-        var COLOR_BACKGROUND = Color.rgb((255*0.93).toInt(), (255*0.94).toInt(), (255*0.95).toInt())
-        var COLOR_BACKGROUND_TITLE = Color.rgb((255*0.9).toInt(), (255*0.9).toInt(), (255*0.9).toInt())
-        var COLOR_NORMAL = Color.rgb( (255*0.20).toInt(), (255*0.60).toInt(), (255*0.86).toInt()) //#3399db
-        //var COLOR_ACTIVE = Color.rgb( (255*0.10).toInt(), (255*0.74).toInt(), (255*0.61).toInt())
-        //var COLOR_ONDOWN = Color.rgb( (255*0.16).toInt(), (255*0.50).toInt(), (255*0.73).toInt())
-        //var COLOR_DISABLE = Color.rgb( (255*0.74).toInt(), (255*0.76).toInt(), (255*0.78).toInt())
+        var COLOR_BACKGROUND = Color.parseColor("#ecf0f1")
+        var COLOR_BACKGROUND_TITLE = Color.parseColor("#eeeeee")
+        var COLOR_NORMAL = Color.parseColor("#3498db")
+        //var COLOR_ACTIVE = Color.parseColor("#1abc9c")
+        //var COLOR_ONDOWN = Color.parseColor("#2980b9")
+        //var COLOR_DISABLE = Color.parseColor("#bdc3c7")
         /*** View テキストサイズ ***/
         const val TEXT_SIZE_TINY = 8f
         const val TEXT_SIZE_NORMAL = 10f
@@ -82,6 +82,10 @@ class Sk2Globals: Application(), AnkoLogger {
         const val BUTTON_TEXT_ATTEND_TRUE = "出席"
         const val BUTTON_TEXT_ATTEND_FALSE = "利用不可"
         const val BUTTON_SIZE_MENU = 60
+        const val BUTTON_TEXT_LOG = "LOG"
+        const val BUTTON_TEXT_HELP = "HELP"
+        const val BUTTON_TEXT_EXIT = "LOGOUT"
+
         const val BUTTON_MARGIN_MENU = 20
         const val SWITCH_TEXT_AUTO = "AUTO"
 
@@ -117,7 +121,7 @@ class Sk2Globals: Application(), AnkoLogger {
 
         /*** Timer ***/
         // BLE Scan する時間長
-        const val SCAN_PERIOD_IN_MILLISEC: Long = 3000
+        const val SCAN_PERIOD_IN_MILLISEC: Long = 5000
         // 自動記録のインターバル
         const val AUTO_SEND_INTERVAL_IN_MILLISEC: Long = 10*60*1000
         const val AUTO_SEND_INTERVAL_IN_MILLISEC_DEBUG: Long = 1*60*1000
