@@ -49,6 +49,7 @@ room_jsonfile = sk2_dir + "Seta_wifi_001.json"
 
 # for test
 TESTUSER = "testuser"
+DEMOUSER = "testuser-demo"
 
 
 class AsyncClient(asyncio.Protocol):
@@ -67,7 +68,10 @@ class AsyncClient(asyncio.Protocol):
             user = pieces[1]
             pwd = pieces[2]
             if (user.startswith(TESTUSER)):
-                auth = (user, "テストユーザ")
+                if (user == DEMOUSER):
+                    auth = ("Ryukoku ST", "龍谷 理子")
+                else:
+                    auth = (user, "テストユーザ")
             else:
                 auth = self.ldapAuth(user, pwd)
 
