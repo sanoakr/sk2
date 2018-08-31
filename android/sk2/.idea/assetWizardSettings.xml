@@ -71,7 +71,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="scalingPercent" value="73" />
+                                                <entry key="trimmed" value="true" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -83,7 +83,7 @@
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
                                       <entry key="backgroundColor" value="ffffff" />
-                                      <entry key="foregroundImage" value="$USER_HOME$/Downloads/android-circle-icons/Icon-xxxhdpi.png" />
+                                      <entry key="foregroundImage" value="$USER_HOME$/Downloads/android-icons (1)/Icon-xxxhdpi.png" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -110,7 +110,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="$USER_HOME$/Downloads/android-circle-icons/Icon-hdpi.png" />
+                                      <entry key="imageAsset" value="$USER_HOME$/Downloads/406_tr_f.png" />
                                       <entry key="outputName" value="ic_stat_sk2" />
                                     </map>
                                   </option>
