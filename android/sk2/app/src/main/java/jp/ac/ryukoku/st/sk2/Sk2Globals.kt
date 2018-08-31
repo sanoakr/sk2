@@ -56,6 +56,7 @@ class Sk2Globals: Application(), AnkoLogger {
         const val SERVER_REPLY_AUTH_FAIL = "authfail"
         const val SERVER_REPLY_FAIL = "fail"
         const val NAME_START_TESTUSER = "testuser"         // デバッグユーザー名の開始文字
+        const val NAME_DEMOUSER = "$NAME_START_TESTUSER-demo"
 
         /*** View カラー ***/
         var COLOR_BACKGROUND = Color.parseColor("#ecf0f1")

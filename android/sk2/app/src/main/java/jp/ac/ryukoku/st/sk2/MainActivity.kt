@@ -53,6 +53,7 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_BACKGROUND_TITLE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_NORMAL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_BLESCAN
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_TOAST
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NAME_DEMOUSER
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NAME_START_TESTUSER
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_DEBUG
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_UID
@@ -112,7 +113,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
         requestDozeIgnore()
 
         /** BLE のチェック **/
-        if (!sk2.checkBt()) {
+        if (!sk2.checkBt() && pref.getString(PREF_UID, "") != NAME_DEMOUSER) {
             // ダメならボタンをグレーアウト
             mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
             mainUi.attBt.text = BUTTON_TEXT_ATTEND_FALSE
@@ -198,11 +199,14 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
             false
         } else {
             // 画面上部のユーザ情報を設定
-            val utext = " $uid / $name"
-            ui.userInfo.text = utext
+            ui.userInfo.text = if (uid == NAME_DEMOUSER)
+                "Demo User / $name"
+            else
+                "$uid / $name"
 
             // 前方一致でテストユーザー(デバッグモード)とする
-            if (Regex("^$NAME_START_TESTUSER").containsMatchIn(uid)) {
+            if (Regex("^$NAME_START_TESTUSER").containsMatchIn(uid)
+                    && uid != NAME_DEMOUSER) {
                 pref.edit()
                         .putBoolean(PREF_DEBUG, true)
                         .apply()
@@ -244,7 +248,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
             }
         }
         if (scanArray.count() > 0) {
-            mainUi.scanInfo.text = scanArray.getBeaconsText(signal = true, ios = true, map = apNameMap)
+            mainUi.scanInfo.text = scanArray.getBeaconsText(signal = true, map = apNameMap)
             mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
             mainUi.attBt.text = BUTTON_TEXT_ATTEND_TRUE
         }
@@ -423,7 +427,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
                 id = USER
                 textColor = Color.BLACK
                 textSize = TEXT_SIZE_Large
-            }.lparams { below(TITLE); alignParentStart() }
+            }.lparams { below(TITLE); alignParentStart(); leftMargin = dip(5) }
             ////////////////////////////////////////
             autoSw = switch {
                 id = AUTO
@@ -441,7 +445,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
                 }
             }.lparams { below(TITLE);  alignParentEnd() ; baselineOf(USER)}
             /** ////////////////////////////////////////////////////////////////////////////// **/
-            scanInfo = textView("Scan Info") {
+            scanInfo = textView {
                 id = SCAN
                 textColor = Color.BLACK
                 textSize = TEXT_SIZE_TINY
@@ -450,7 +454,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
                 topMargin = dip(10); leftMargin = dip(10)
             }
             ////////////////////////////////////////
-            sendInfo = textView("Send Info") {
+            sendInfo = textView {
                 textColor = Color.BLACK
                 textSize = TEXT_SIZE_TINY
             }.lparams {
