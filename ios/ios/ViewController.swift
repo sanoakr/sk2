@@ -160,7 +160,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		logViewBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
 		logViewBtn.setTitleColor(appDelegate.ifNormalColor, for: .normal) // タイトルの色
 		logViewBtn.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: -90.0, right: 0.0)
-//		logViewBtn.backgroundColor = appDelegate.ifNormalColor  //色
 		logViewBtn.layer.cornerRadius = logViewBtn.frame.size.width * 0.5 //丸まり
 		logViewBtn.addTarget(self, action: #selector(ViewController.logView(_:)), for: .touchUpInside)
 		logViewBtn.layer.borderColor = appDelegate.ifNormalColor.cgColor
@@ -181,7 +180,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		helpViewBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
 		helpViewBtn.setTitleColor(appDelegate.ifNormalColor, for: .normal) // タイトルの色
 		helpViewBtn.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: -90.0, right: 0.0)
-//		helpViewBtn.backgroundColor = appDelegate.ifNormalColor  //色
 		helpViewBtn.layer.cornerRadius = helpViewBtn.frame.size.width * 0.5 //丸まり
 		helpViewBtn.addTarget(self, action: #selector(ViewController.helpView(_:)), for: .touchUpInside)
 		helpViewBtn.layer.borderColor = appDelegate.ifNormalColor.cgColor
@@ -204,7 +202,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		logoutBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
 		logoutBtn.setTitleColor(appDelegate.ifNormalColor, for: .normal) // タイトルの色
 		logoutBtn.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: -90.0, right: 0.0)
-//		logoutBtn.backgroundColor = appDelegate.ifNormalColor  //色
 		logoutBtn.layer.cornerRadius = logoutBtn.frame.size.width * 0.5 //丸まり
 		logoutBtn.addTarget(self, action: #selector(ViewController.onClickLogout(sender:)), for: .touchUpInside)
 		logoutBtn.layer.borderColor = appDelegate.ifNormalColor.cgColor
@@ -264,7 +261,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		if result == "success" {
 			
 			// ウィンドウを表示
-			showAlertAutoHidden(title : "出席を記録しました", message: "記録はログで確認することができます", time: 0.5)
+			showAlertAutoHidden(title : "出席を記録しました", message: "", time: 0.5)
 			
 			// バイブレーション
 			AudioServicesPlaySystemSound(1003);
@@ -520,7 +517,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// 配列をリセット
 		beaconUuids = NSMutableArray()
 		beaconDetails = Array<String>()
-		var debugBeaconDetails = Array<String>()
+		var val : [(majorID:Int, minorID:Int, rssi:Double, accuracy:Double, proximity:String)] = []
 		// 範囲内で検知されたビーコンはこのbeaconsにCLBeaconオブジェクトとして格納される
 		// rangingが開始されると１秒毎に呼ばれるため、beaconがある場合のみ処理をするようにすること
 		if(beacons.count > 0){
@@ -563,24 +560,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 					break
 				}
 				
-				//                //iBeaconを検出している状態でAttendボタンをタップすると発信
-				//                if(proximity != "Unknown") {
-				//                    beaconFlg = true
-				////                    print("--------------------------------------------- iBeacon検出しているよ！")
-				//                } else {
-				//                    beaconFlg = false
-				//                }
-				
 				// 変数に保存
 				beaconUuids.add(beaconUUID.uuidString)
-				beaconDetails.append("\(majorID),\(minorID),\(accuracy)")
-				debugBeaconDetails.append("\(majorID),\(minorID),\(proximity),\(rssi),\(accuracy)")
+				val.append((majorID: Int(truncating: majorID), minorID: Int(truncating: minorID), rssi: Double(rssi), accuracy: Double(accuracy), proximity: String(proximity)))
 			}
+			// accuracyでソート
+			val.sort(by: {$0.3 > $1.3})
 			
 			// デバッグ画面にiBeaconの値を表示
 			var beaconText:String = "now: \(appDelegate.currentTime())\n\nuuid: \(beaconUuids[0])\n"
-			for str in debugBeaconDetails {
-				beaconText += "-->\(String(describing: str))\n"
+			for str in val {
+				beaconDetails.append("\(Int(str.majorID)),\(Int(str.minorID)),\(Double(str.accuracy))")
+				beaconText += "-->\(str.majorID),\(str.minorID),\(str.rssi),\(str.accuracy),\(str.proximity)\n"
+//				beaconText += "-->\(String(describing: str))\n"
 			}
 			
 			debugText.text = String(describing: beaconText)
@@ -717,7 +709,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	func btnAuto(){
 		UIView.animate(withDuration: 0.5, animations: { () -> Void in
 			self.attendBtn.backgroundColor = self.appDelegate.ifNormalColor
-			self.attendBtn.setTitle("出席", for: .normal)  //タイトル
+			self.attendBtn.setTitle("出席\n（自動ON）", for: .normal)  //タイトル
 			self.attendBtn.isEnabled = true
 			self.attendBtn.layer.shadowOpacity = 0.3
 		})
