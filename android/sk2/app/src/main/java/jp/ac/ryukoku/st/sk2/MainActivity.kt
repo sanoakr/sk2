@@ -30,6 +30,7 @@ import no.nordicsemi.android.support.v18.scanner.*
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import android.content.*
+import android.graphics.DrawFilter
 import android.os.Vibrator
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.LocalBroadcastManager
@@ -53,6 +54,10 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_BACKGROUND_TITLE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_NORMAL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_BLESCAN
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_TOAST
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGOUT_DIALOG_CANCEL
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGOUT_DIALOG_MSG
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGOUT_DIALOG_OK
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGOUT_DIALOG_TITLE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NAME_DEMOUSER
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NAME_START_TESTUSER
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_DEBUG
@@ -525,9 +530,10 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
                         imageResource = R.drawable.ic_action_exit
                         background = ContextCompat.getDrawable(context, R.drawable.button_menu)
                         onClick {
-                            val dialog = LogoutDialog()
-                            // Dialogの表示
-                            dialog.show(ui.owner.supportFragmentManager, "LOGOUT")
+                            alert(LOGOUT_DIALOG_MSG, LOGOUT_DIALOG_TITLE) {
+                                positiveButton(LOGOUT_DIALOG_OK) { _ -> sk2.logout() }
+                                negativeButton(LOGOUT_DIALOG_CANCEL) { _ -> }
+                            }.show()
                         }
                     }.lparams {
                         width = dip(BUTTON_SIZE_MENU); height = dip(BUTTON_SIZE_MENU)

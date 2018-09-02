@@ -19,9 +19,14 @@ class SplashActivity : Activity() {
     private val handler = Handler()
     private val runnable = { startLogin() }
     private fun startLogin() {
+        (this.application as Sk2Globals).startMain()
+        /** Main に飛ばなければ Login へ**/
+        startActivity<LoginActivity>()
+        /**
         val intent = Intent(this, LoginActivity::class.java)
         intent.flags = (Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
+        **/
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,7 +36,7 @@ class SplashActivity : Activity() {
             window.statusBarColor = COLOR_NORMAL
         splashUi.setContentView(this)
 
-        handler.postDelayed(runnable, 1000)
+        handler.postDelayed(runnable, 2000)
     }
 }
 /** ////////////////////////////////////////////////////////////////////////////// **/

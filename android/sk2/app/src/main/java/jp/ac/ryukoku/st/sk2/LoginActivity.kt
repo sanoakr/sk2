@@ -1,7 +1,7 @@
 package jp.ac.ryukoku.st.sk2
 
 import android.app.Activity
-import android.content.Intent
+import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Build
@@ -16,14 +16,16 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_BACKGROUND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_NORMAL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.HINT_PASSWD
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.HINT_UID
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGIN_EXPIRY_PERIOD_DAYS
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGIN_TIME_DAY_UNIT_MILLSEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NAME_START_TESTUSER
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_KEY
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_LOGIN_TIME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_ROOM_JSON
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_UID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_USER_NAME
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PRIVACY_POLICY_NO_TEXT
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PRIVACY_POLICY_TEXT
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PRIVACY_POLICY_TITLE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PRIVACY_POLICY_YES_TEXT
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_COMMAND_AUTH
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_HOSTNAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_PORT
@@ -32,6 +34,7 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_REPLY_FAIL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SERVER_TIMEOUT_MILLISEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_LARGE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_Large
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_NORMAL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_CANT_CONNECT_SERVER
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOGIN_ATTEMPT_ATMARK
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOGIN_ATTEMPT_PASSWD
@@ -70,14 +73,7 @@ class LoginActivity : Activity() {
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onResume() {
         super.onResume()
-        /** ユーザIDが空でなければ && 教室AP情報を持っていれば **/
-        if (pref.getString(PREF_UID, "").isNotBlank() && pref.getString(PREF_ROOM_JSON, "").isNotBlank()) {
-            /** 期限を確認して **/
-            val today: Long = System.currentTimeMillis() / LOGIN_TIME_DAY_UNIT_MILLSEC
-            if ( today - pref.getLong(PREF_LOGIN_TIME, 0L)/ LOGIN_TIME_DAY_UNIT_MILLSEC < LOGIN_EXPIRY_PERIOD_DAYS)
-            /** そのままメインアクティビティへ **/
-                startMain()
-        }
+        sk2.startMain()
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /** サーバでログイン認証 **/
@@ -150,21 +146,11 @@ class LoginActivity : Activity() {
                     .apply()
             toast(TOAST_LOGIN_SUCCESS)
             /** メイン画面へ **/
-            startMain()
+            sk2.startMain()
         } else {
             // in fail
             toast(TOAST_LOGIN_FAIL)
         }
-    }
-    /** ////////////////////////////////////////////////////////////////////////////// **/
-    /** メイン画面へ **/
-    private fun startMain() {
-        /** AP Map を作成 **/
-        sk2.readApMap()
-
-        val intent = Intent(this, MainActivity::class.java)
-        intent.flags = (Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(intent)
     }
 }
 //@Suppress("EXPERIMENTAL_FEATURE_WARNING")
@@ -222,8 +208,30 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
                 padding = dip(0)
                 backgroundColor = COLOR_NORMAL
                 onClick {
-                    /** remove user's leading and trailing blanks **/
-                    ui.owner.attemptLogin(user.text.toString().trim(), passwd.text.toString())
+                    alert {
+                        positiveButton(PRIVACY_POLICY_YES_TEXT) { _ ->
+                            ui.owner.attemptLogin(user.text.toString().trim(), passwd.text.toString())
+                        }
+                        negativeButton(PRIVACY_POLICY_NO_TEXT) { _ -> }
+                        customView {
+                            verticalLayout {
+                                textView(PRIVACY_POLICY_TITLE) {
+                                    textSize = TEXT_SIZE_LARGE
+                                    textColor = Color.WHITE
+                                    backgroundColor = COLOR_NORMAL
+                                    padding = dip(4)
+                                }.lparams {
+                                    width = matchParent
+                                }
+                                scrollView {
+                                    textView(PRIVACY_POLICY_TEXT) {
+                                        textSize = TEXT_SIZE_NORMAL
+                                    }
+                                }
+                            }
+                        }
+                    }.show()
+                    //ui.owner.attemptLogin(user.text.toString().trim(), passwd.text.toString())
                 }
             }.lparams {
                 below(PASS); centerHorizontally(); width = matchParent

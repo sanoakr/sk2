@@ -182,6 +182,41 @@ class Sk2Globals: Application(), AnkoLogger {
         const val APMAP_KEY_BEACON_MINOR = "minor"
         const val APMAP_KEY_NAME = "name"
 
+        /** プライバシーポリシー **/
+        const val PRIVACY_POLICY_TITLE = "プライバシーポリシー"
+        var PRIVACY_POLICY_TEXT = """
+            |プライバシー ポリシーと安全な転送
+            |
+            |ユーザーの個人情報や機密情報（個人識別情報、財務情報、支払い情報、認証情報、電話帳や連絡先のデータ、マイクやカメラのセンサーデータ、端末の機密情報など）を扱うアプリは、以下の要件を満たす必要があります。
+            |・プライバシー ポリシーを Play Console の所定の欄から送信し、また Play で配信するアプリ本体にも掲載すること。
+            |・最新の暗号手法を使用して（HTTPS 経由などで）転送するなど、ユーザーデータを安全に扱うこと。
+            |
+            |プライバシー ポリシーでは、アプリ内での開示情報と併せて、アプリが収集、使用、共有するユーザーデータの使用方法、共有相手について包括的に開示する必要があります。
+            |
+            |目立つ方法での開示の要件
+            |Google Play でのアプリの掲載情報や、アプリのインターフェースで目立つように記載した機能とは無関係に、ユーザーの個人情報や機密情報をアプリが収集、転送する場合は、収集や転送の前に、その情報の使用方法を目立つ方法で表示し、そのような使用についてユーザーの同意を得る必要があります。
+            |
+            |アプリ内での開示:
+            |・アプリ内で開示しなければなりません。Play の掲載情報やウェブサイトでの開示だけでは不十分です。
+            |・アプリの通常使用時に表示しなければなりません。表示するためにメニューや設定に移動する必要のある開示では不十分です。
+            |・収集するデータの種類について説明する必要があります。
+            |・データをどのように使用するかについて説明する必要があります。
+            |・プライバシー ポリシーや利用規約に記載するだけでは不十分です。
+            |・個人情報や機密情報の収集に関係のない他の開示に含めることはできません。
+            |・アプリについて同意を求めるダイアログ:
+            |・同意を求めるダイアログを明確に表示する必要があります。
+            |・ユーザーが同意する手続きとして、肯定的な操作を求める必要があります（例: タップで同意する、チェックボックスをオンにする、言葉で指示する）。
+            |・肯定的な同意を得る前に、個人情報や機密情報の収集を開始することはできません。
+            |・開示から他へ移動する操作を同意と見なすことはできません（例: タップで移動する、戻るボタンやホームボタンを押す）。
+            |・自動で非表示になるメッセージや閲覧期限付きメッセージを使用することはできません。
+            |
+            |違反の例:
+            |・ユーザーのインストール済みアプリの一覧をユーザーの個人情報や機密情報として扱わず、プライバシー ポリシー、安全な転送、目立つ方法での開示の要件を満たしていないアプリ。
+            |・ユーザーの電話帳や連絡先のデータをユーザーの個人情報や機密情報として扱わず、プライバシー ポリシー、安全な転送、目立つ方法での開示の要件を満たしていないアプリ。
+        """.trimMargin()
+        const val PRIVACY_POLICY_YES_TEXT = "同意します"
+        const val PRIVACY_POLICY_NO_TEXT = "同意しません"
+
         /**  SharedPreferences **/
         lateinit var pref: SharedPreferences
         /**  出席情報のローカル記録用キュー **/
@@ -199,6 +234,23 @@ class Sk2Globals: Application(), AnkoLogger {
         pref = getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
         // ローカルキューをリストア
         restoreQueue()
+    }
+    /** ////////////////////////////////////////////////////////////////////////////// **/
+    /** メイン画面へ **/
+    fun startMain() {
+        /** ユーザIDが空でなければ && 教室AP情報を持っていれば **/
+        if (pref.getString(PREF_UID, "").isNotBlank() && pref.getString(PREF_ROOM_JSON, "").isNotBlank()) {
+            /** 期限を確認して **/
+            val today: Long = System.currentTimeMillis() / LOGIN_TIME_DAY_UNIT_MILLSEC
+            if (today - pref.getLong(PREF_LOGIN_TIME, 0L) / LOGIN_TIME_DAY_UNIT_MILLSEC < LOGIN_EXPIRY_PERIOD_DAYS) {
+                /** AP Map を作成 **/
+                readApMap()
+                /** そのままメインアクティビティへ **/
+                val intent = Intent(this, MainActivity::class.java)
+                intent.flags = (Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+            }
+        }
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** サーバからの AP JSON ファイルを List<Map> にして、さらに (Major, Minor) => Name の Map をつくる **/
