@@ -13,6 +13,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	var window: UIWindow?
 	var navigationController: UINavigationController?
+	var ActivityIndicator: UIActivityIndicatorView?
 	
 	// アプリ設定
 	var appTitle = "龍大理工学部出欠システム sk2"
@@ -28,12 +29,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var maxLocalLog = 10
 	
 	// VC共通カラー
-	var backgroundColor = UIColor(red: 0.93, green: 0.94, blue: 0.95, alpha: 1)
-	var ifNormalColor = UIColor(red: 0.20, green: 0.60, blue: 0.86, alpha: 1)
-	var ifActiveColor = UIColor(red: 0.10, green: 0.74, blue: 0.61, alpha: 1)
-	var ifOnDownColor = UIColor(red: 0.16, green: 0.50, blue: 0.73, alpha: 1)
-	var ifDisableColor = UIColor(red: 0.74, green: 0.76, blue: 0.78, alpha: 1)
+	var backgroundColor = UIColor(red: 0.93, green: 0.94, blue: 0.95, alpha: 1)	//#ecf0f1
+	var ifNormalColor = UIColor(red: 0.20, green: 0.60, blue: 0.86, alpha: 1)		//#3498db
+	var ifActiveColor = UIColor(red: 0.10, green: 0.74, blue: 0.61, alpha: 1)		//#1abc9c
+	var ifOnDownColor = UIColor(red: 0.16, green: 0.50, blue: 0.73, alpha: 1)		//#2980b9
+	var ifDisableColor = UIColor(red: 0.74, green: 0.76, blue: 0.78, alpha: 1)	//#bdc3c7
 	//UIColor(red: 0.09, green: 0.63, blue: 0.52, alpha: 1)
+//	// 夜間モード
+//	var backgroundColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1)
+
 	// 変数
 	var iconSize = 60
 	var postInterval:Int = 60 //sec

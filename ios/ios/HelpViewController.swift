@@ -62,6 +62,16 @@ class HelpViewController: UIViewController,UIWebViewDelegate {
 		backButton.addTarget(self, action: #selector(LogViewController.back(_:)), for: .touchUpInside)
 		view.addSubview(backButton)  // Viewに追加
 		
+		// --------------------------------------------------------------------------------------------------------------------------
+		// インジケーター
+		// スタイルは「.white」「.whiteLarge」「.gray」から選択可能
+		appDelegate.ActivityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+		// ストップした時に非表示する
+		appDelegate.ActivityIndicator?.hidesWhenStopped = true
+		// ビューの中央に配置
+		appDelegate.ActivityIndicator?.center = view.center
+		// ビューに追加する
+		view.addSubview((appDelegate.ActivityIndicator)!)
 		
 	}
 	
@@ -72,11 +82,13 @@ class HelpViewController: UIViewController,UIWebViewDelegate {
 	
 	// Pageが全て読み終わったら呼ばれる.
 	func webViewDidFinishLoad(_ webView: UIWebView) {
+		appDelegate.ActivityIndicator?.stopAnimating()
 		print("webViewDidFinishLoad")
 	}
 	
 	// PageがLoadされ始めた時、呼ばれる.
 	func webViewDidStartLoad(_ webView: UIWebView) {
+		appDelegate.ActivityIndicator?.startAnimating()
 		print("webViewDidStartLoad")
 	}
 	
