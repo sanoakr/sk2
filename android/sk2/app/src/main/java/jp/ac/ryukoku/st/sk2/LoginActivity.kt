@@ -166,9 +166,9 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
     companion object {
         const val TITLE = 1
         const val LABEL = 2
-        const val USER = 3
-        const val PASS = 4
-        const val LOGIN = 5
+        //const val USER = 3
+        //const val PASS = 4
+        //const val LOGIN = 5
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun createView(ui: AnkoContext<LoginActivity>) = with(ui) {
@@ -194,21 +194,24 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
             }
             /** ////////////////////////////////////////////////////////////////////////////// **/
             val user = editText {
-                id = USER
+                id = R.id.username
+                //id = USER
                 textSize = TEXT_SIZE_LARGE
                 hint = HINT_UID
                 inputType = TYPE_TEXT_VARIATION_EMAIL_ADDRESS
             }.lparams { below(LABEL); width = matchParent }
             /** ////////////////////////////////////////////////////////////////////////////// **/
             val passwd = editText {
-                id = PASS
+                id = R.id.password
+                //id = PASS
                 textSize = TEXT_SIZE_LARGE
                 hint = HINT_PASSWD
                 inputType = TYPE_CLASS_TEXT or TYPE_TEXT_VARIATION_PASSWORD
-            }.lparams { below(USER); width = matchParent }
+            }.lparams { below(R.id.username); width = matchParent }
             /** ////////////////////////////////////////////////////////////////////////////// **/
             button(BUTTON_TEXT_LOGIN) {
-                id = LOGIN
+                id = R.id.login
+                //id = LOGIN
                 textColor = Color.WHITE
                 textSize = TEXT_SIZE_LARGE
                 padding = dip(0)
@@ -240,7 +243,7 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
                     //ui.owner.attemptLogin(user.text.toString().trim(), passwd.text.toString())
                 }
             }.lparams {
-                below(PASS); centerHorizontally(); width = matchParent
+                below(R.id.password); centerHorizontally(); width = matchParent
                 topMargin = dip(50)
             }
         }
