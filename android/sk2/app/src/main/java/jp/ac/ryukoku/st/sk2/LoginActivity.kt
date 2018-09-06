@@ -76,6 +76,9 @@ class LoginActivity : Activity() {
         sk2.startMain()
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
+    /** Disable Back Key **/
+    override fun onBackPressed() {}
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     /** サーバでログイン認証 **/
     fun attemptLogin(user: String, passwd: String) {
         when {

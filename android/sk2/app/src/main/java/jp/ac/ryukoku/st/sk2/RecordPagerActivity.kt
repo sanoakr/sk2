@@ -37,8 +37,8 @@ class RecordPagerActivity: FragmentActivity() {
         recordPagerUi.showPages(supportFragmentManager)
         /** Tab Title **/
         recordPagerUi.setTabText(listOf(
-                TITLE_RECORD_TAB_SERVER,
-                TITLE_RECORD_TAB_LOCAL
+                TITLE_RECORD_TAB_LOCAL,
+                TITLE_RECORD_TAB_SERVER
         ))
 
     }
@@ -72,10 +72,10 @@ class RecordPagerUi : AnkoComponent<RecordPagerActivity> {
                 tabGravity = TabLayout.GRAVITY_FILL
                 //setSelectedTabIndicatorColor(getColor(ctx, R.color.colorPrimary))
             }.lparams(width = matchParent, height = wrapContent)
-
+            ////////////////////////////////////////
             viewPager = viewPager {
                 id = VIEWPAGER
-                offscreenPageLimit = 2
+                offscreenPageLimit = 1
             }.lparams(width = matchParent, height = matchParent)
 
             tabLayout.setupWithViewPager(viewPager)
@@ -96,8 +96,8 @@ class RecordPagerUi : AnkoComponent<RecordPagerActivity> {
 class RecordPageAdapter(fm: FragmentManager): FragmentPagerAdapter(fm) {
     override fun getItem(position: Int): Fragment? {
         return when (position) {
-            0 -> RecordFragment()
-            1 -> RecordLocalFragment()
+            0 -> RecordLocalFragment()
+            1 -> RecordFragment()
             else -> null
         }
     }

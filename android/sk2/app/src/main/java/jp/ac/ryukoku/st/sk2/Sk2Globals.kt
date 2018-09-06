@@ -99,7 +99,10 @@ class Sk2Globals: Application(), AnkoLogger {
         const val EXTRA_BLESCAN = "$APP_NAME.scan"
         const val EXTRA_TOAST = "$APP_NAME.toast"
         /*** Broadcast メッセージ ***/
-        const val BROADCAST_ATTEND_SEND = "出席"
+        const val BROADCAST_ATTEND_SCAN = "スキャンを開始します"
+        const val BROADCAST_ATTEND_TRY = "ビーコン情報を送信します"
+        const val BROADCAST_ATTEND_SUCCESS = "送信完了！"
+        const val BROADCAST_ATTEND_FAIL = "送信に失敗しました"
         const val BROADCAST_ATTEND_NO_BEACON = "ビーコンが見つかりません"
         const val BROADCAST_ATTEND_NO_VALITTIME = "現在の時刻には送信できません"
         /** Debug Info Message **/
@@ -122,7 +125,7 @@ class Sk2Globals: Application(), AnkoLogger {
 
         /*** Timer ***/
         // BLE Scan する時間長
-        const val SCAN_PERIOD_IN_MILLISEC: Long = 5000
+        const val SCAN_PERIOD_IN_MILLISEC: Long = 3000
         // 自動記録のインターバル
         const val AUTO_SEND_INTERVAL_IN_MILLISEC: Long = 10*60*1000
         const val AUTO_SEND_INTERVAL_IN_MILLISEC_DEBUG: Long = 1*60*1000

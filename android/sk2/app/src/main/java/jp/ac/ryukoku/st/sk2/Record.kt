@@ -1,11 +1,11 @@
 package jp.ac.ryukoku.st.sk2
 
-import org.jetbrains.anko.AnkoLogger
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.MAX_SEND_BEACON_NUM
 import java.util.ArrayList
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /** サーバからの個別の出席記録を保持するデータクラス ***/
-class Record(): AnkoLogger {
+class Record() {
     var uid: String? = null
     var type: String? = null
     var datetime: String? = null // without the day of week
@@ -13,7 +13,7 @@ class Record(): AnkoLogger {
 
     /** Primary initializer **/
     init { // initialize data array of array  (4 x MAX_SEND_BEACON_NUM) used as Triple
-        for (i in 1..Sk2Globals.MAX_SEND_BEACON_NUM) {
+        for (i in 1..MAX_SEND_BEACON_NUM) {
             val quad: Pair<ArrayList<Double?>, String?> = Pair(arrayListOf<Double?>(null, null, null), null)
             data.add(quad)
         }
@@ -48,23 +48,22 @@ class Record(): AnkoLogger {
         if (str.isNotBlank()) {
             // ',' で分割
             val dataList = str.split(',')
-            // いくつの要素に分割された？
             val dataSize = dataList.count()
 
             if (dataSize >= 3) {
                 uid = dataList[0].trim()      // ユーザID
                 type = dataList[1].trim()     // データタイプ A/M
                 datetime = dataList[2].trim() // 記録日時
-                //warn("uid="+uid)
-                //warn("type="+type)
-                //warn("date="+datetime)
+
                 // 以降のデータは(Major, Minor, Distance)の3組とする
-                ////// 半端なところで終わった場合の処理ができていません
-                for (i in 3..(dataSize - 1)) {
+                val maxLen = 3 + 3*MAX_SEND_BEACON_NUM
+                val to = if (dataSize < maxLen) dataSize-1 else maxLen-1
+
+                for (i in 3..to) {
                     val n = i / 3 - 1    // round
                     val m = i % 3
                     val doubleVal = dataList[i].toDoubleOrNull()
-                    //warn("$i $n $m $doubleVal")
+
                     if (doubleVal != null)
                         data[n].first[m] = doubleVal
                     else
@@ -72,6 +71,7 @@ class Record(): AnkoLogger {
                 }
             }
         }
+        data.sortBy { it.first[2] }
     }
 }
 

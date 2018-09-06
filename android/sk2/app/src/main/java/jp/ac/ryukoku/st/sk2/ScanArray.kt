@@ -87,6 +87,8 @@ class ScanArray() {
                 list.add(StatBeacon(uuid, major.toInt(), minor.toInt(), pAvg.toInt(), rAvg.toInt()))
             }
         }
+        /** sortby distance **/
+        list.sortedByDescending { it.rssi }
         return list
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/

@@ -13,6 +13,9 @@ import android.util.Log
 import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
 import com.neovisionaries.bluetooth.ble.advertising.IBeacon
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.ACTION_BROADCAST
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BROADCAST_ATTEND_FAIL
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BROADCAST_ATTEND_NO_BEACON
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BROADCAST_ATTEND_SUCCESS
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.CHANNEL_DESCRIPTION
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.CHANNEL_ID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_BLESCAN
@@ -115,10 +118,6 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
         /** Initialize Scan Result **/
         scanArray = ScanArray()
 
-
-
-        /** ////////////////////////////////////////////////////////////////////////////// **/
-
         /** ////////////////////////////////////////////////////////////////////////////// **/
         /** Start Scan **/
         doAsync {
@@ -137,6 +136,9 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
             scanFilters = arrayListOf(builder.build())
             /** // フィルターが空だとバックグラウンドで止まる?
             scanFilters = ArrayList() // ArrayList<ScanFilter>() // フィルタは空 == 全て受け取る **/
+
+            /** ブロードキャストメッセージを送信 **/
+            sendBroadcastMessage(Sk2Globals.BROADCAST_ATTEND_SCAN)
 
             /** BLE Scan **/
             sk2.setScanRunning(true)
@@ -242,6 +244,9 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
         /*** ビーコンがあれば送信する ***/
         if (scanArray.count() > 0) {
 
+            /** ブロードキャストメッセージを送信 **/
+            sendBroadcastMessage(Sk2Globals.BROADCAST_ATTEND_TRY)
+
             /** 日時、ユーザ、認証キー **/
             val dtString = scanArray.datetime.format("yyy-MM-dd HH:mm:ss")
             val uid = pref.getString(PREF_UID, "")
@@ -259,10 +264,9 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
                     Triple(scanArray.datetime.toString(), type, scanArray.getStatisticalList()))
             sk2.saveQueue()
 
-            /** ブロードキャストメッセージを送信 **/
+            /** スキャンデータをブロードキャストメッセージで送信 **/
             sendBroadcastScanResult(scanArray.getBeaconsText(
-                    statistic = true, signal = true, ios = true, map = apNameMap))
-            sendBroadcastMessage(Sk2Globals.BROADCAST_ATTEND_SEND)
+                    statistic = true, signal = true, map = apNameMap))
 
             /** Notification を送信 **/
             val notification = notificationBuilder
@@ -301,14 +305,19 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
                     else
                         Log.d(TAG, "sendInfoToServer; Success recording on sk2 server")
 
+                    /** 送信完了のブロードキャストメッセージ送信 **/
+                    sendBroadcastMessage(BROADCAST_ATTEND_SUCCESS)
+
                 } catch (e: Exception) {
+                    /** 送信失敗のブロードキャストメッセージ送信 **/
+                    sendBroadcastMessage(BROADCAST_ATTEND_FAIL)
 
                     Log.d(TAG, "sendInfoToServer; Couldn't connect to sk2 server")
                 }
             }
         } else {
-            /** サーバエラーのブロードキャストメッセージ送信 **/
-            sendBroadcastMessage(Sk2Globals.BROADCAST_ATTEND_NO_BEACON)
+            /** ビーコンが見つからないときのブロードキャストメッセージ送信 **/
+            sendBroadcastMessage(BROADCAST_ATTEND_NO_BEACON)
         }
         return
     }
