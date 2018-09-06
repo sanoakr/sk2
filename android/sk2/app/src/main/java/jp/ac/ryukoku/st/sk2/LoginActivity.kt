@@ -74,6 +74,9 @@ class LoginActivity : Activity() {
     override fun onResume() {
         super.onResume()
         sk2.startMain()
+
+        /** auto login for testing **/
+        //attemptLogin("testuser", "testuser")
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /** Disable Back Key **/
