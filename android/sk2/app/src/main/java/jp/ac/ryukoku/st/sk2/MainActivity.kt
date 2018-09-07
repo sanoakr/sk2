@@ -58,6 +58,7 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGOUT_DIALOG_CANCEL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGOUT_DIALOG_MSG
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGOUT_DIALOG_OK
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGOUT_DIALOG_TITLE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.MAX_COUNT_NOBEACON
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NAME_DEMOUSER
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NAME_START_TESTUSER
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_DEBUG
@@ -81,6 +82,8 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
     companion object {
         lateinit var sk2: Sk2Globals
         lateinit var pref: SharedPreferences
+
+        var countNoBeacon = 0
     }
 
     private var mainUi = MainActivityUi()
@@ -235,32 +238,25 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** BLE スキャン受診時のコールバック ***/
     private fun onReceivedBleScan(results: List<ScanResult>) {
-        val scanArray = ScanArray()
-        scanArray.datetime = Moment()
-
         // ビーコン情報をパースして ScanArray() に保存
-        results.forEach { r ->
-            val bytes = r.scanRecord?.bytes
-            val rssi = r.rssi
-            val structures = ADPayloadParser.getInstance().parse(bytes)
-            structures.forEach { s ->
-                if (s is IBeacon && (s.uuid.toString() in VALID_IBEACON_UUID)) {
-                    scanArray.add(Pair(s, rssi))
+        val scanArray = ScanArray(results)
 
-                    val dist = getBleDistance(s.power, rssi)
-                    info("${s.uuid}, ${s.major}, ${s.minor}, $dist")
-                }
-            }
-        }
+        // ビーコンチェックしてスキャン情報とカウンタを更新
         if (scanArray.count() > 0) {
             mainUi.scanInfo.text = scanArray.getBeaconsText(signal = true, map = apNameMap)
-            mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
-            mainUi.attBt.text = BUTTON_TEXT_ATTEND_TRUE
-        }
-        else {
+            countNoBeacon = 0
+        } else {
             mainUi.scanInfo.text = SCAN_INFO_NOT_FOUND
+            countNoBeacon++
+        }
+        // ビーコンなしが続いたらボタン表示をオフ
+        if (countNoBeacon > MAX_COUNT_NOBEACON) {
             mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
             mainUi.attBt.text = BUTTON_TEXT_ATTEND_FALSE
+        }
+        else {
+            mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
+            mainUi.attBt.text = BUTTON_TEXT_ATTEND_TRUE
         }
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/

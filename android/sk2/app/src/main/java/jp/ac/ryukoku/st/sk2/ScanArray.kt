@@ -1,8 +1,11 @@
 package jp.ac.ryukoku.st.sk2
 
+import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
 import com.neovisionaries.bluetooth.ble.advertising.ADStructure
 import com.neovisionaries.bluetooth.ble.advertising.IBeacon
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.VALID_IBEACON_UUID
 import me.mattak.moment.Moment
+import no.nordicsemi.android.support.v18.scanner.ScanResult
 import java.util.*
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -21,9 +24,19 @@ class ScanArray() {
     private var adArray = ArrayList<Pair<ADStructure, Int>>()
 
     /** Secondary initializer **/
-    constructor(moment: Moment, array: ArrayList<Pair<ADStructure, Int>>) : this() {
-        datetime = moment
-        adArray = array
+    constructor(results: List<ScanResult>) : this() {
+        datetime = Moment()
+
+        results.forEach { r ->
+            val bytes = r.scanRecord?.bytes
+            val rssi = r.rssi
+            val structures = ADPayloadParser.getInstance().parse(bytes)
+            structures.forEach { s ->
+                if (s is IBeacon && (s.uuid.toString() in VALID_IBEACON_UUID)) {
+                    adArray.add(Pair(s, rssi))
+                }
+            }
+        }
     }
 
     fun isEmpty(): Boolean = adArray.isEmpty()

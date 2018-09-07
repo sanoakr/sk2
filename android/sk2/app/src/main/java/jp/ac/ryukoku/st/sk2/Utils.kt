@@ -1,6 +1,10 @@
 package jp.ac.ryukoku.st.sk2
 
+import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
+import com.neovisionaries.bluetooth.ble.advertising.IBeacon
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.VALID_IBEACON_UUID
 import me.mattak.moment.Moment
+import no.nordicsemi.android.support.v18.scanner.ScanResult
 import java.lang.Math.pow
 import java.util.*
 
@@ -35,6 +39,19 @@ fun addWeekday(dt: String?): String {
 
     return dwt
 }
+/** ////////////////////////////////////////////////////////////////////////////// **/
+/** 有効なビーコン情報を含んでいるか **/
+/*
+fun hasValidBeacons(results: List<ScanResult>): Boolean {
+    results.forEach { r ->
+        val structures = ADPayloadParser.getInstance().parse(r.scanRecord?.bytes)
+        structures.forEach { s ->
+            if (s is IBeacon && (s.uuid.toString() in VALID_IBEACON_UUID))
+                return true
+        }
+    }
+    return false
+}*/
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /*** TxPower と RSSI からビーコンとの距離を計算 ***/
 fun getBleDistance(tx: Int, rssi: Int, n: Double = 2.0): Double {

@@ -20,6 +20,7 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.CHANNEL_DESCRIPTION
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.CHANNEL_ID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_BLESCAN
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_TOAST
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.MAX_COUNT_NOBEACON
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NOTIFICATION_ID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NOTIFICATION_TEXT_SEND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NOTIFICATION_TEXT_STARTFORGROUND
@@ -141,16 +142,23 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
             sendBroadcastMessage(Sk2Globals.BROADCAST_ATTEND_SCAN)
 
             /** BLE Scan **/
-            sk2.setScanRunning(true)
-            mScanner.startScan(scanFilters, scanSettings, mScanCallback)
-            Thread.sleep(SCAN_PERIOD_IN_MILLISEC)
-            mScanner.stopScan(mScanCallback)
-            sk2.setScanRunning(false)
+            var countScan = 0
+            do {
+                sk2.setScanRunning(true)
+                mScanner.startScan(scanFilters, scanSettings, mScanCallback)
+                Thread.sleep(SCAN_PERIOD_IN_MILLISEC)
+                mScanner.stopScan(mScanCallback)
+                sk2.setScanRunning(false)
+                countScan++
+            /** カラなら MAX_COUNT までリトライ **/
+            } while(scanArray.isEmpty() && countScan < MAX_COUNT_NOBEACON)
 
             /** ////////////////////////////////////////////////////////////////////////////// **/
             /** 空でなければサーバ送信 **/
             if (scanArray.isNotEmpty() && send == true) {
                 sendInfoToServer(type)
+            } else {
+                sendBroadcastMessage(Sk2Globals.BROADCAST_ATTEND_NO_BEACON)
             }
             /** ////////////////////////////////////////////////////////////////////////////// **/
             /** Stop Service **/
@@ -178,33 +186,13 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
     /** BLE スキャナのコールバック **/
     private val mScanCallback = object: ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
-            onReceivedBleScan(listOf(result))
+            scanArray = ScanArray(listOf(result))
         }
         override fun onBatchScanResults(results: List<ScanResult>) {
-            onReceivedBleScan(results)
+            scanArray = ScanArray(results)
         }
         override fun onScanFailed(errorCode: Int) {
             Log.w(TAG, "ScanFailed: $errorCode")
-        }
-    }
-    /** ////////////////////////////////////////////////////////////////////////////// **/
-    /*** BLE スキャン受診時のコールバック ***/
-    private fun onReceivedBleScan(results: List<ScanResult>) {
-        /** スキャン日時 **/
-        scanArray.datetime = Moment()
-        /** ビーコン情報をパースして ScanArray() に保存 **/
-        results.forEach { r ->
-            val bytes = r.scanRecord?.bytes
-            val rssi = r.rssi
-            val structures = ADPayloadParser.getInstance().parse(bytes)
-            structures.forEach { s ->
-                if (s is IBeacon && (s.uuid.toString() in VALID_IBEACON_UUID)) {
-                    scanArray.add(Pair(s, rssi))
-
-                    val dist = getBleDistance(s.power, rssi)
-                    Log.i(TAG,"${s.uuid}, ${s.major}, ${s.minor}, $dist")
-                }
-            }
         }
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
