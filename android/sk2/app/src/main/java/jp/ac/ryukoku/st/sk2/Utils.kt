@@ -19,7 +19,7 @@ fun getWeekDayString(moment: Moment): String {
     return moment.format("yyyy-MM-dd E HH:mm:ss ZZZZ")
 }
 /** ////////////////////////////////////////////////////////////////////////////// **/
-/*** 日時文字列に曜日を挿入 ***/
+/*** 日時文字列に曜日を挿入、JPタイムゾーンを削除 ***/
 fun addWeekday(dt: String?): String {
     var dwt = dt ?: ""
 
@@ -32,7 +32,7 @@ fun addWeekday(dt: String?): String {
             val d = match[3].toInt()
             calendar.set(y, m, d, 0, 0, 0)
             val wday = Moment(calendar.time, TimeZone.getDefault(), Locale.JAPAN).weekdayName
-            dwt = dwt.replace(" ", " $wday ")
+            dwt = dwt.replaceFirst(" ", " $wday ").removeSuffix(" GMT+09:00")
         }
     }
     catch(e: Exception) { }
