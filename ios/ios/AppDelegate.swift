@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -127,6 +128,55 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		// Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 	}
 	
+	
+	// ----------------------------------------------------------------------------------------------------------------
+	
+	// Core Data stack
+	
+	lazy var persistentContainer: NSPersistentContainer = {
+		/*
+		The persistent container for the application. This implementation
+		creates and returns a container, having loaded the store for the
+		application to it. This property is optional since there are legitimate
+		error conditions that could cause the creation of the store to fail.
+		*/
+		let container = NSPersistentContainer(name: "sk2") 
+		container.loadPersistentStores(completionHandler: { (storeDescription, error) in
+			if let error = error as NSError? {
+				// Replace this implementation with code to handle the error appropriately.
+				// fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+				
+				/*
+				Typical reasons for an error here include:
+				* The parent directory does not exist, cannot be created, or disallows writing.
+				* The persistent store is not accessible, due to permissions or data protection when the device is locked.
+				* The device is out of space.
+				* The store could not be migrated to the current model version.
+				Check the error message to determine what the actual problem was.
+				*/
+				fatalError("Unresolved error \(error), \(error.userInfo)")
+			}
+		})
+		return container
+	}()
+	
+	// Core Data Saving support
+	
+	func saveContext () {
+		let context = persistentContainer.viewContext
+		if context.hasChanges {
+			do {
+				try context.save()
+			} catch {
+				// Replace this implementation with code to handle the error appropriately.
+				// fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+				let nserror = error as NSError
+				fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+			}
+		}
+	}
+	
+	// ----------------------------------------------------------------------------------------------------------------
 	// 現在時刻取得
 	func currentTime() -> String {
 		
@@ -141,5 +191,87 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		return dateString
 	}
+	
+	// --------------------------------------------------------------------------------------------------------------------------
+	// iBeaconのmajor,minor値を元にローカルDBからAP名を取得
+	func getBeaconName( major:String, minor:String) -> String {
+		
+		// データベースからデータを抽出
+		let context = appDelegate.persistentContainer.viewContext
+		let request = NSFetchRequest<NSManagedObject>(entityName: "IBeacon")
+		//属性nameが検索文字列と一致するデータをフェッチ対象にする。
+		request.predicate = NSPredicate(format:"major = %@ and minor = %@", major, minor)
+		
+		let models = try! context.fetch(request)
+		var retval:String = ""
+		for model in models {
+			let name = model.value(forKey: "name")
+			//			let major = model.value(forKey: "major")
+			//			let minor = model.value(forKey: "minor")
+			retval = name as! String
+			//print("value: \(String(describing: name)) - \(String(describing: major)) - \(String(describing: minor))")
+		}
+		return retval
+	}
+	
+	// --------------------------------------------------------------------------------------------------------------------------
+	// ローカルDBのデータをすべて削除
+	func deleteDbAll() -> Bool {
+		
+		// データの削除
+		//let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+		let context = appDelegate.persistentContainer.viewContext
+		do {
+		let fetchRequest: NSFetchRequest<IBeacon> = IBeacon.fetchRequest()
+		let data = try context.fetch(fetchRequest)
+		
+		for task in data {
+			context.delete(task)
+		}
+		
+		(UIApplication.shared.delegate as! AppDelegate).saveContext()
+		} catch {
+			print("Fetching Failed.")
+			return false
+		}
+		
+		// 保存
+		try! context.save()
+		
+		return true
+	}
+	
+	// --------------------------------------------------------------------------------------------------------------------------
+	// ローカルDBのデータ追加
+	func putApData( name:String, major:Int, minor:Int) -> Bool {
+		let context = appDelegate.persistentContainer.viewContext
+		let IBeacon = NSEntityDescription.insertNewObject(forEntityName: "IBeacon", into: context)
+		IBeacon.setValue(name, forKey: "name")
+		IBeacon.setValue(major, forKey: "major")
+		IBeacon.setValue(minor, forKey: "minor")
+		
+		// 保存
+		try! context.save()
+		
+		return true
+	}
+	
+	// --------------------------------------------------------------------------------------------------------------------------
+	// ローカルDBのデータ追加
+	func getApData() -> Bool {
+		let context = appDelegate.persistentContainer.viewContext
+		let request = NSFetchRequest<NSManagedObject>(entityName: "IBeacon")
+		let models = try! context.fetch(request)
+		print("-- model count: \(models.count)")
+		for model in models {
+			let name = model.value(forKey: "name")
+			let major = model.value(forKey: "major")
+			let minor = model.value(forKey: "minor")
+			print("value: \(String(describing: name)) - \(String(describing: major)) - \(String(describing: minor))")
+		}
+		
+		return true
+	}
+	
 }
 

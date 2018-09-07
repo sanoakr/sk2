@@ -11,6 +11,8 @@ import NetworkExtension
 import SystemConfiguration.CaptiveNetwork
 import CoreLocation
 import AudioToolbox
+import Foundation
+import CoreData
 
 class ViewController: UIViewController, CLLocationManagerDelegate {
 	
@@ -49,7 +51,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		
+
 		// デバイスの固有ID取得
 //		print("DeviceID: \(String(describing: UIDevice.current.identifierForVendor))")
 		
@@ -66,6 +68,18 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		let jpnName = myUserDefault.string(forKey: "jpnName")
 		//        let key = myUserDefault.string(forKey: "key")
 		let userInfo = user! + " / " + jpnName!
+		
+		// major,minorでフィルタ
+//		let searchResult = ap.filter {
+//			$0.beaconIdParams?.major == 1 && $0.beaconIdParams?.minor == 1
+//		}
+//
+//		print("★result = \(searchResult[0].name)")
+		
+//		// 保存されているデータをすべて表示（デバッグ用）
+//		for (key, value) in UserDefaults.standard.dictionaryRepresentation().sorted(by: { $0.0 < $1.0 }) {
+//			print("- \(key) => \(value)")
+//		}
 		
 		// 検証用ユーザーの場合はdebugモードにする
 		if(user == appDelegate.debugUser) {
@@ -686,6 +700,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			// すべてのローカルデータを消去
 			let appDomain = Bundle.main.bundleIdentifier
 			UserDefaults.standard.removePersistentDomain(forName: appDomain!)
+			UserDefaults.standard.synchronize()
 			
 			// ログイン画面を表示
 			let vc = LoginViewController()

@@ -106,7 +106,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 			myItems += ["\(value)"]
 		}
 		
-		print("myItems:\n\(myItems)")  //デバッグ
+//		print("myItems:\n\(myItems)")  //デバッグ
 		
 		// Viewの高さと幅を取得する.
 		let displayWidth: CGFloat = self.view.frame.width
@@ -258,11 +258,29 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		
 		// 配列数をチェック
 		if( splitRead.count == 12 ) {
+			
+			// AP名を取得
+			var ap1 = "-"
+			if( !splitRead[3].isEmpty && !splitRead[4].isEmpty ) {
+				ap1 = appDelegate.getBeaconName( major: splitRead[3], minor: splitRead[4])
+			}
+			
+			var ap2 = "-"
+			if( !splitRead[6].isEmpty && !splitRead[7].isEmpty ) {
+				ap2 = appDelegate.getBeaconName( major: splitRead[6], minor: splitRead[7])
+			}
+
+			var ap3 = "-"
+			if( !splitRead[9].isEmpty && !splitRead[10].isEmpty ) {
+				ap3 = appDelegate.getBeaconName( major: splitRead[9], minor: splitRead[10])
+			}
+			
 			cell.labelDate.text = " \(splitRead[2])"
 			cell.labelMode.text = splitRead[1]
-			cell.labelVal1.text = "major:\(splitRead[3]) minor:\(splitRead[4]) rssi:\(splitRead[5]) "
-			cell.labelVal2.text = "major:\(splitRead[6]) minor:\(splitRead[7]) rssi:\(splitRead[8]) "
-			cell.labelVal3.text = "major:\(splitRead[9]) minor:\(splitRead[10]) rssi:\(splitRead[11]) "
+			cell.labelVal1.text = "ap:\(String(describing: ap1)) major:\(splitRead[3]) minor:\(splitRead[4])"
+			cell.labelVal2.text = "ap:\(String(describing: ap2)) major:\(splitRead[6]) minor:\(splitRead[7])"
+			cell.labelVal3.text = "ap:\(String(describing: ap3)) major:\(splitRead[9]) minor:\(splitRead[10])"
+			
 		} else {
 			if myItems.count == 1 {
 				cell.labelDate.text = " 値がありません"

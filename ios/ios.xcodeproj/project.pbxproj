@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D6096AF021415A9A003069E9 /* sk2.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D6096AEE21415A9A003069E9 /* sk2.xcdatamodeld */; };
 		D66428D0212C154C0089C04E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66428CF212C154C0089C04E /* AppDelegate.swift */; };
 		D66428D2212C154C0089C04E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66428D1212C154C0089C04E /* ViewController.swift */; };
 		D66428D5212C154C0089C04E /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D66428D3212C154C0089C04E /* Main.storyboard */; };
@@ -42,6 +43,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D6096AEF21415A9A003069E9 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		D66428CC212C154C0089C04E /* ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D66428CF212C154C0089C04E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D66428D1212C154C0089C04E /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -125,6 +127,7 @@
 				D66428DB212C154C0089C04E /* Info.plist */,
 				D664291A21320D880089C04E /* Images.xcassets */,
 				D664291E21325DB70089C04E /* SplashViewController.swift */,
+				D6096AEE21415A9A003069E9 /* sk2.xcdatamodeld */,
 			);
 			path = ios;
 			sourceTree = "<group>";
@@ -295,6 +298,7 @@
 				D66428FE212C16280089C04E /* LoginViewController.swift in Sources */,
 				D6642902212C162F0089C04E /* LogViewController.swift in Sources */,
 				D66428D2212C154C0089C04E /* ViewController.swift in Sources */,
+				D6096AF021415A9A003069E9 /* sk2.xcdatamodeld in Sources */,
 				D664291F21325DB70089C04E /* SplashViewController.swift in Sources */,
 				D66428D0212C154C0089C04E /* AppDelegate.swift in Sources */,
 				D6642901212C162F0089C04E /* HelpViewController.swift in Sources */,
@@ -624,6 +628,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		D6096AEE21415A9A003069E9 /* sk2.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				D6096AEF21415A9A003069E9 /* Model.xcdatamodel */,
+			);
+			currentVersion = D6096AEF21415A9A003069E9 /* Model.xcdatamodel */;
+			path = sk2.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = D66428C4212C154C0089C04E /* Project object */;
 }
