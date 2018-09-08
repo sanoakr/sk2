@@ -23,6 +23,7 @@
 		D664292321327CC70089C04E /* logout.png in Resources */ = {isa = PBXBuildFile; fileRef = D664292021327CC70089C04E /* logout.png */; };
 		D664292A21327D150089C04E /* log.png in Resources */ = {isa = PBXBuildFile; fileRef = D664292721327D140089C04E /* log.png */; };
 		D66429312132890C0089C04E /* help.png in Resources */ = {isa = PBXBuildFile; fileRef = D66429302132890C0089C04E /* help.png */; };
+		D669E2CF214278A500AAA9B1 /* ConsentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D669E2CE214278A500AAA9B1 /* ConsentViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +66,7 @@
 		D664292021327CC70089C04E /* logout.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logout.png; sourceTree = "<group>"; };
 		D664292721327D140089C04E /* log.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = log.png; sourceTree = "<group>"; };
 		D66429302132890C0089C04E /* help.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = help.png; sourceTree = "<group>"; };
+		D669E2CE214278A500AAA9B1 /* ConsentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +120,7 @@
 				D664290721312C820089C04E /* img */,
 				D66428CF212C154C0089C04E /* AppDelegate.swift */,
 				D66428FF212C162E0089C04E /* HelpViewController.swift */,
+				D669E2CE214278A500AAA9B1 /* ConsentViewController.swift */,
 				D6642900212C162F0089C04E /* LogViewController.swift */,
 				D66428FD212C16280089C04E /* LoginViewController.swift */,
 				D66428D1212C154C0089C04E /* ViewController.swift */,
@@ -302,6 +305,7 @@
 				D664291F21325DB70089C04E /* SplashViewController.swift in Sources */,
 				D66428D0212C154C0089C04E /* AppDelegate.swift in Sources */,
 				D6642901212C162F0089C04E /* HelpViewController.swift in Sources */,
+				D669E2CF214278A500AAA9B1 /* ConsentViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

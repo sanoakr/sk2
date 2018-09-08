@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import NetworkExtension
+//import NetworkExtension
 import SystemConfiguration.CaptiveNetwork
 import CoreLocation
 import AudioToolbox
@@ -68,13 +68,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		let jpnName = myUserDefault.string(forKey: "jpnName")
 		//        let key = myUserDefault.string(forKey: "key")
 		let userInfo = user! + " / " + jpnName!
+		let consent:Bool = UserDefaults.standard.bool(forKey: "consent")
 		
-		// major,minorでフィルタ
-//		let searchResult = ap.filter {
-//			$0.beaconIdParams?.major == 1 && $0.beaconIdParams?.minor == 1
-//		}
-//
-//		print("★result = \(searchResult[0].name)")
+		print("consent:\(consent)")
+		
+		// 同意済みかチェックし、同意していない場合は同意画面に遷移
+		if(consent == false) {
+			// 同意画面を表示
+			let vc = ConsentViewController()
+			self.navigationController?.pushViewController(vc, animated: false)
+		}
 		
 //		// 保存されているデータをすべて表示（デバッグ用）
 //		for (key, value) in UserDefaults.standard.dictionaryRepresentation().sorted(by: { $0.0 < $1.0 }) {
@@ -94,7 +97,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		labelUser.backgroundColor = #colorLiteral(red: 0.9019607843, green: 0.9137254902, blue: 0.9176470588, alpha: 1)
 		labelUser.textAlignment = NSTextAlignment.left    // 左寄せ
 		labelUser.text = " \(userInfo)"
-		//        labelUser.backgroundColor = UIColor.red
 		view.addSubview(labelUser)  // Viewに追加
 		
 		// --------------------------------------------------------------------------------------------------------------------------
@@ -139,7 +141,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		labelAuto.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
 		labelAuto.textAlignment = NSTextAlignment.right    // センター寄せ
 		labelAuto.text = "自動送信"
-		//        labelUser.backgroundColor = UIColor.red
 		view.addSubview(labelAuto)  // Viewに追加
 		
 		// --------------------------------------------------------------------------------------------------------------------------

@@ -28,6 +28,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var debugUser = "testuser-skmt"
 	var timeout = 5
 	var maxLocalLog = 10
+	var consentText = "プライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\n"
 	
 	// VC共通カラー
 	var backgroundColor = UIColor(red: 0.93, green: 0.94, blue: 0.95, alpha: 1)	//#ecf0f1
@@ -54,8 +55,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		// 登録されているUserDefaultから設定値を呼び出す.
 		let autoSender:Int = myUserDefault.integer(forKey: "autoSender")
 		let debug:Int = myUserDefault.integer(forKey: "debug")
-//		let user = myUserDefault.string(forKey: "user")
-//		let key = myUserDefault.string(forKey: "key")
+		let user = myUserDefault.string(forKey: "user")
+		let key = myUserDefault.string(forKey: "key")
 		
 		print(autoSender)
 		print(debug)
@@ -63,29 +64,40 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let splash: SplashViewController = SplashViewController()
 		navigationController = UINavigationController(rootViewController: splash)
 
-//		if(user == nil || key == nil) {
-//			print("============ delegeteユーザーがセットされていないよ！ ============")
-//			let login: LoginViewController = LoginViewController()
-//			navigationController = UINavigationController(rootViewController: login)
-//		} else {
-//			
-//			print("============ delegeteユーザーがセットされている！ ============")
-//			let main: ViewController = ViewController()
-//			navigationController = UINavigationController(rootViewController: main)
-//			
-//			// 認証した場合はタイムスタンプを確認
-//			let timestamp:Int = myUserDefault.integer(forKey: "timestamp")
-//			let term = Int(NSDate().timeIntervalSince1970) - timestamp
-//			
-//			print("term:\(term)")
-//			
-//			if(term > timeLimit) {
-//				print("時間切れ")
-//				let login: LoginViewController = LoginViewController()
-//				navigationController = UINavigationController(rootViewController: login)
-//				myUserDefault.set(nil, forKey: "timestamp")
-//			}
-//		}
+		if(user == nil || key == nil) {
+			print("============ delegeteユーザーがセットされていないよ！ ============")
+			let login: LoginViewController = LoginViewController()
+			navigationController = UINavigationController(rootViewController: login)
+		} else {
+			
+			print("============ delegeteユーザーがセットされている！ ============")
+			let main: ViewController = ViewController()
+			navigationController = UINavigationController(rootViewController: main)
+			
+			// 同意しているかチェック
+			let consent:Bool = UserDefaults.standard.bool(forKey: "consent")
+			
+			// 利用同意をしているかチェック
+			if(consent == true) {
+				// 認証した場合はタイムスタンプを確認
+				let timestamp:Int = myUserDefault.integer(forKey: "timestamp")
+				let term = Int(NSDate().timeIntervalSince1970) - timestamp
+				
+				print("term:\(term)")
+				
+				if(term > timeLimit) {
+					print("時間切れ")
+					let login: LoginViewController = LoginViewController()
+					navigationController = UINavigationController(rootViewController: login)
+					myUserDefault.set(nil, forKey: "timestamp")
+				}
+			// 同意していない場合は同意画面を表示
+			} else {
+				print("consent: \(consent)")
+				let consent: ConsentViewController = ConsentViewController()
+				navigationController = UINavigationController(rootViewController: consent)
+			}
+		}
 		
 		self.window = UIWindow(frame: UIScreen.main.bounds)
 		self.window?.rootViewController = navigationController
@@ -112,10 +124,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	func applicationDidEnterBackground(_ application: UIApplication) {
 		// Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
 		// If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+		
+		self.backgroundTaskID = application.beginBackgroundTask(){
+			[weak self] in
+			application.endBackgroundTask((self?.backgroundTaskID)!)
+			self?.backgroundTaskID = UIBackgroundTaskInvalid
+		}
 	}
 	
 	func applicationWillEnterForeground(_ application: UIApplication) {
 		// Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+		
+		self.backgroundTaskID = application.beginBackgroundTask(){
+			[weak self] in
+			application.endBackgroundTask((self?.backgroundTaskID)!)
+			self?.backgroundTaskID = UIBackgroundTaskInvalid
+		}
 	}
 	
 	func applicationDidBecomeActive(_ application: UIApplication) {
