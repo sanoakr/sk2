@@ -235,6 +235,7 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
                                 scrollView {
                                     textView(PRIVACY_POLICY_TEXT) {
                                         textSize = TEXT_SIZE_NORMAL
+                                        padding = dip(4)
                                     }
                                 }
                             }
