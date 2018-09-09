@@ -144,7 +144,7 @@ class AsyncClient(asyncio.Protocol):
             logger.info("LOG any fail {} ".format(user))
 
         self.transport.write(reply_msg.encode())  # data bytes
-        logger.info('Sent: {!r}'.format(reply_msg))
+        logger.info('Sent: {!r}'.format(reply_msg[0:20]))
 
         self.transport.close()
         logger.info('Close the client socket')
