@@ -109,7 +109,7 @@ class Sk2Globals: Application(), AnkoLogger {
         const val SCAN_INFO_NOT_FOUND = "Any Beacons not found."
 
         /** Logout Dialog **/
-        const val LOGOUT_DIALOG_TITLE = "ログアウト"
+        const val LOGOUT_DIALOG_TITLE = "確認"
         const val LOGOUT_DIALOG_MSG = "ログアウトしますか？"
         const val LOGOUT_DIALOG_OK = "ログアウト"
         const val LOGOUT_DIALOG_CANCEL = "キャンセル"
@@ -340,7 +340,7 @@ class Sk2Globals: Application(), AnkoLogger {
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** ログアウト時にユーザ情報を持つ全てのSharedPreferenceをクリア ***/
-    fun logout() {
+    fun readyTologout() {
         pref.edit()
                 .putString(PREF_UID, "")
                 .putString(PREF_KEY, "")
@@ -352,8 +352,6 @@ class Sk2Globals: Application(), AnkoLogger {
 
         // Clear Local Queue
         saveQueue(clear = true)
-        // back to the Login Activity
-        startActivity(intentFor<LoginActivity>().clearTop())
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** BLE Scan が実行中か？ ***/

@@ -490,6 +490,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
                         horizontalMargin = dip(BUTTON_MARGIN_MENU)
                     }
                     textView(BUTTON_TEXT_LOG) {
+                        labelFor = LOG
                         textSize = TEXT_SIZE_NORMAL
 
                     }.lparams { below(LOG); centerHorizontally() }
@@ -508,6 +509,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
                        horizontalMargin = dip(BUTTON_MARGIN_MENU)
                     }
                     textView(BUTTON_TEXT_HELP) {
+                        labelFor = HELP
                         textSize = TEXT_SIZE_NORMAL
 
                     }.lparams { below(HELP); centerHorizontally() }
@@ -520,7 +522,10 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
                         background = ContextCompat.getDrawable(context, R.drawable.button_menu)
                         onClick {
                             alert(LOGOUT_DIALOG_MSG, LOGOUT_DIALOG_TITLE) {
-                                positiveButton(LOGOUT_DIALOG_OK) { _ -> sk2.logout() }
+                                positiveButton(LOGOUT_DIALOG_OK) { _ -> sk2.readyTologout()
+                                    // back to the Login Activity
+                                    ui.owner.startActivity(intentFor<LoginActivity>().clearTop())
+                                }
                                 negativeButton(LOGOUT_DIALOG_CANCEL) { _ -> }
                             }.show()
                         }
@@ -529,8 +534,8 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
                         horizontalMargin = dip(BUTTON_MARGIN_MENU)
                     }
                     textView(BUTTON_TEXT_EXIT) {
+                        labelFor = EXIT
                         textSize = TEXT_SIZE_NORMAL
-
                     }.lparams { below(EXIT); centerHorizontally() }
                 }
             }.lparams {
