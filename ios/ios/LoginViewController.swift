@@ -7,23 +7,36 @@
 //
 
 import UIKit
+import CoreData
 
 class LoginViewController: UIViewController {
 	
 	// AppDelegateのインスタンスを取得
 	let appDelegate: AppDelegate = UIApplication.shared.delegate as! AppDelegate
 	
-	var Connection1 = Connection()
+	var ServerAuth_ = ServerAuth()
 	
-	// ボタンを宣言
+	// UIを宣言
 	var leftBarButton: UIBarButtonItem!
 	
+
 	@IBOutlet weak var useridField: UITextField!
 	@IBOutlet weak var passwordField: UITextField!
-	
+
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
+//		// データベースからデータをロード
+//		print("load begin")
+//		container = NSPersistentContainer(name: "sk2")
+//		container.loadPersistentStores { (desc, error) in
+//			if let error = error {
+//				print("load error: \(error)")
+//			} else {
+//				print("load ok: \(desc)")
+//			}
+//		}
+//
 		self.view.backgroundColor = appDelegate.backgroundColor  // 背景色をセット
 		self.navigationItem.hidesBackButton = true	//　バックボタンを消す
 		
@@ -87,31 +100,33 @@ class LoginViewController: UIViewController {
 		loginBtn.backgroundColor = appDelegate.ifNormalColor
 		loginBtn.addTarget(self, action: #selector(LoginViewController.login(_:)), for: .touchUpInside)
 		view.addSubview(loginBtn)  // Viewに追加
+		
 	}
+	
+	var container: NSPersistentContainer!	//データベース読み込みのコンテナ
 	
 	// --------------------------------------------------------------------------------------------------------------------------
 	// ログインボタンの動作
 	@IBAction func login(_ sender: UIButton) {
 		
-		// ここでサーバーにuseridとpasswordを問い合わせて認証する
-		
-		Connection1.connect()
+		// 認証サーバーに問い合わせ
+		ServerAuth_.connect()
 		
 		let sendtext = "AUTH,\(String(describing: useridField.text!)),\(String(describing: passwordField.text!))"
 		
-		_ = Connection1.sendCommand(command: sendtext)
-		let retval = Connection1.sendCommand(command: "end")
+		_ = ServerAuth_.sendCommand(command: sendtext)
+		let retval = ServerAuth_.sendCommand(command: "end")
 		
-		print(retval)
+//		print(retval)
 		
 		let result:String = retval["auth"] as! String;
 		
 		// 認証が通った場合の処理
 		if result == "true" {
-			let engName:String = retval["engName"] as! String;
-			let jpnName:String = retval["jpnName"] as! String;
-			let key:String = retval["key"] as! String;
-			
+			let engName:String = retval["engName"] as! String
+			let jpnName:String = retval["jpnName"] as! String
+			let key:String = retval["key"] as! String
+
 			// UserDefaultを生成しuseridを保存
 			let myUserDefault:UserDefaults = UserDefaults()
 			let valUserid: String? = useridField.text!
@@ -119,8 +134,7 @@ class LoginViewController: UIViewController {
 			let valEngName: String? = engName
 			let valKey: String? = key
 			let timestamp:Int = Int(NSDate().timeIntervalSince1970) //unix timestampで認証日時を記録
-			
-			print("\(timestamp): Auth Success.")
+//			print("\(timestamp): Auth Success.")
 			
 			myUserDefault.set(valUserid, forKey: "user")
 			myUserDefault.set(valJpnName, forKey: "jpnName")
@@ -173,7 +187,7 @@ class LoginViewController: UIViewController {
 	}
 }
 
-class Connection: NSObject, StreamDelegate {
+class ServerAuth: NSObject, StreamDelegate {
 	
 	let ServerAddress: CFString = appDelegate.serverIp as CFString //IPアドレスを指定
 	let serverPort: UInt32 = UInt32(appDelegate.serverPort) //開放するポートを指定
@@ -181,8 +195,24 @@ class Connection: NSObject, StreamDelegate {
 	private var inputStream : InputStream!
 	private var outputStream: OutputStream!
 	
+	func matches(for regex: String, in text: String) -> [String] {
+
+		do {
+			let regex = try NSRegularExpression(pattern: regex)
+			let results = regex.matches(in: text,
+										range: NSRange(text.startIndex..., in: text))
+			return results.map {
+				String(text[Range($0.range, in: text)!])
+			}
+		} catch let error {
+			print("invalid regex: \(error.localizedDescription)")
+			return []
+		}
+	}
+	
 	// サーバーとの接続を確立する
 	func connect(){
+		
 		print("connecting.....")
 		
 		var readStream : Unmanaged<CFReadStream>?
@@ -223,32 +253,86 @@ class Connection: NSObject, StreamDelegate {
 		print(stream)
 	}
 	
+//	// サーバーにコマンド文字列を送信する関数
+//	func sendCommand(command: String) -> Dictionary<String, Any> {
+//
+//		var retval = Dictionary<String, String>()
+//
+//		var ccommand = command.data(using: String.Encoding.utf8, allowLossyConversion: false)!
+//		let text : String = ccommand.withUnsafeMutableBytes{ bytes in return String(bytesNoCopy: bytes, length: ccommand.count, encoding: String.Encoding.utf8, freeWhenDone: false)!}
+//
+//		// エラー処理
+//		var timeout = 5 * 100000 // タイムアウト値は5秒
+//
+//		while !self.outputStream.hasSpaceAvailable {
+//
+//			usleep(1000) // wait until the socket is ready
+//			timeout -= 100
+//
+//			if (timeout < 0 || self.outputStream.streamError != nil) {
+//				print("time out")
+//				retval["auth"] = "timeout"
+//
+//				self.inputStream.close()
+//				self.inputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+//				self.outputStream.close()
+//				self.outputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+//				return retval // disconnectStream will be called.
+//			}
+//		}
+//
+//		// "end"を受信したら接続切断
+//		if (String(describing: command) == "end") {
+//
+//			self.outputStream.close()
+//			self.outputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+//
+//			while(!inputStream.hasBytesAvailable){}
+//
+//			let bufferSize = 1024*10	// default:1024
+//			var buffer = Array<UInt8>(repeating: 0, count: bufferSize)
+//			let bytesRead = inputStream.read(&buffer, maxLength: bufferSize)
+//			print("bytesRead: \(bytesRead)")
+//			if (bytesRead >= 0) {
+//				let read = NSString(bytes: &buffer, length: bytesRead, encoding: String.Encoding.utf8.rawValue)!
+//				// デバッグ
+//				print("Receive: \(read)")
+//
+//				// 認証失敗
+//				if read.contains("authfail") {
+//					retval["auth"] = "false"
+//
+//					// 認証成功
+//				} else {
+//					let splitRead = read.components(separatedBy: ",")
+//					retval["auth"] = "true"
+//					retval["key"] = splitRead[0]
+//					retval["engName"] = splitRead[1]
+//					retval["jpnName"] = splitRead[2]
+//					retval["ap"] = splitRead[3]
+////					let matched = matches(for: "\\[.+\\]", in: read as String)
+////					print(matched)
+//
+//				}
+//			}
+//			self.inputStream.close()
+//			self.inputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+//		} else {
+//			self.outputStream.write( command, maxLength: text.utf8.count)
+//			print("Send: \(text)")
+//		}
+//
+//		return retval
+//
+//	}
+	
 	// サーバーにコマンド文字列を送信する関数
 	func sendCommand(command: String) -> Dictionary<String, Any> {
 		
-		var retval = Dictionary<String, String>()
+		var retval = Dictionary<String, Any>()
 		
 		var ccommand = command.data(using: String.Encoding.utf8, allowLossyConversion: false)!
 		let text : String = ccommand.withUnsafeMutableBytes{ bytes in return String(bytesNoCopy: bytes, length: ccommand.count, encoding: String.Encoding.utf8, freeWhenDone: false)!}
-		
-		// エラー処理
-		var timeout = 5 * 100000 // タイムアウト値は5秒
-		
-		while !self.outputStream.hasSpaceAvailable {
-			usleep(1000) // wait until the socket is ready
-			timeout -= 100
-			
-			if (timeout < 0 || self.outputStream.streamError != nil) {
-				print("time out")
-				retval["auth"] = "timeout"
-				
-				self.inputStream.close()
-				self.inputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
-				self.outputStream.close()
-				self.outputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
-				return retval // disconnectStream will be called.
-			}
-		}
 		
 		// "end"を受信したら接続切断
 		if (String(describing: command) == "end") {
@@ -256,39 +340,91 @@ class Connection: NSObject, StreamDelegate {
 			self.outputStream.close()
 			self.outputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
 			
-			//            while(!inputStream.hasBytesAvailable){}   //不要かどうか確認中（2018/08/19）
-			let bufferSize = 1024
+	//		while(!inputStream.hasBytesAvailable){}
+			let bufferSize = 10240
 			var buffer = Array<UInt8>(repeating: 0, count: bufferSize)
 			let bytesRead = inputStream.read(&buffer, maxLength: bufferSize)
-			if (bytesRead >= 0) {
-				//                let read = String(bytes: buffer, encoding: String.Encoding.utf8)!
-				let read = NSString(bytes: &buffer, length: bytesRead, encoding: String.Encoding.utf8.rawValue)!
-				// デバッグ
-				print("Receive: \(read)")
+			var read:String = NSString(bytes: UnsafePointer(buffer), length: bytesRead, encoding:String.Encoding.utf8.rawValue)! as String
+			
+			while (inputStream!.hasBytesAvailable){
 				
-				// 認証失敗
-				if read.contains("authfail") {
-					retval["auth"] = "false"
-					
-					// 認証成功
+				let bytesRead:Int=inputStream!.read(&buffer, maxLength: buffer.count)
+//				print("bytesRead: \(bytesRead)")
+				
+				// データ処理を一時的に待つ（これがないとうまくいかない場合がる）
+				sleep(UInt32(1))
+				
+				if (bytesRead > 0) { // had here (bytesRead >= 0) too
+//					read = String(bytes: buffer, encoding: String.Encoding.utf8)!
+					read += NSString(bytes: UnsafePointer(buffer), length: bytesRead, encoding:String.Encoding.utf8.rawValue)! as String
+					print("---------------------> \(buffer.count)")
 				} else {
+					print("# error")
+				}
+			}
+//			print("---------------------> \(read)")
+			// 認証失敗
+			if read.contains("authfail") {
+				retval["auth"] = "false"
+
+			// 認証成功
+			} else {
+				// 値を最後までリードできているかチェック
+				// 最後の文字が"]"の場合は、データを正しく受信できていると判断
+				if read.hasSuffix("]") {
+					
 					let splitRead = read.components(separatedBy: ",")
 					retval["auth"] = "true"
 					retval["key"] = splitRead[0]
 					retval["engName"] = splitRead[1]
 					retval["jpnName"] = splitRead[2]
+					
+					let splitRead2 = read.components(separatedBy: ",[")
+					let varAps = "[" + String(splitRead2[1])
+					
+					//
+					struct aps: Codable {
+						let name: String
+						struct iBeacon: Codable {
+	//						let uuid: String?
+							let major: Int?
+							let minor: Int?
+						}
+						let beaconIdParams: iBeacon?
+					}
+					
+					// サーバーから取得した無線APの値をjsonデコード
+					let apJson = try! JSONDecoder().decode([aps].self, from: varAps.data(using: .utf8)!)
+					
+					// データの削除
+					let _ = appDelegate.deleteDbAll()
+
+					for json in apJson {
+						
+						if((json.beaconIdParams) != nil) {
+							// データ追加
+							let _ = appDelegate.putApData(name: json.name, major: (json.beaconIdParams?.major)!, minor: (json.beaconIdParams?.minor)!)
+						}
+					}
+					
+//					// データベースからデータを抽出（デバッグ用）
+//					let _ = appDelegate.getApData()
+					
+				} else {
+					// サーバーからのデータ取得が出来ていない場合は認証失敗を返す（臨時対応）
+					retval["auth"] = "false"
 				}
 			}
+			
 			self.inputStream.close()
 			self.inputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+		
 		} else {
 			// UnsafePointerを使うとうまくいかない場合がある（最初にダミーコマンドを送る必要があった）
 			// self.outputStream.write(UnsafePointer(command), maxLength: text.utf8.count)
 			self.outputStream.write( command, maxLength: text.utf8.count)
 			print("Send: \(text)")
 		}
-		
 		return retval
-		
 	}
 }

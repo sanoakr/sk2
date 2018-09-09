@@ -7,10 +7,12 @@
 //
 
 import UIKit
-import NetworkExtension
+//import NetworkExtension
 import SystemConfiguration.CaptiveNetwork
 import CoreLocation
 import AudioToolbox
+import Foundation
+import CoreData
 
 class ViewController: UIViewController, CLLocationManagerDelegate {
 	
@@ -49,7 +51,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		
+
 		// デバイスの固有ID取得
 //		print("DeviceID: \(String(describing: UIDevice.current.identifierForVendor))")
 		
@@ -66,6 +68,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		let jpnName = myUserDefault.string(forKey: "jpnName")
 		//        let key = myUserDefault.string(forKey: "key")
 		let userInfo = user! + " / " + jpnName!
+		let consent:Bool = UserDefaults.standard.bool(forKey: "consent")
+		
+		print("consent:\(consent)")
+		
+		// 同意済みかチェックし、同意していない場合は同意画面に遷移
+		if(consent == false) {
+			// 同意画面を表示
+			let vc = ConsentViewController()
+			self.navigationController?.pushViewController(vc, animated: false)
+		}
+		
+//		// 保存されているデータをすべて表示（デバッグ用）
+//		for (key, value) in UserDefaults.standard.dictionaryRepresentation().sorted(by: { $0.0 < $1.0 }) {
+//			print("- \(key) => \(value)")
+//		}
 		
 		// 検証用ユーザーの場合はdebugモードにする
 		if(user == appDelegate.debugUser) {
@@ -80,7 +97,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		labelUser.backgroundColor = #colorLiteral(red: 0.9019607843, green: 0.9137254902, blue: 0.9176470588, alpha: 1)
 		labelUser.textAlignment = NSTextAlignment.left    // 左寄せ
 		labelUser.text = " \(userInfo)"
-		//        labelUser.backgroundColor = UIColor.red
 		view.addSubview(labelUser)  // Viewに追加
 		
 		// --------------------------------------------------------------------------------------------------------------------------
@@ -125,7 +141,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		labelAuto.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
 		labelAuto.textAlignment = NSTextAlignment.right    // センター寄せ
 		labelAuto.text = "自動送信"
-		//        labelUser.backgroundColor = UIColor.red
 		view.addSubview(labelAuto)  // Viewに追加
 		
 		// --------------------------------------------------------------------------------------------------------------------------
@@ -686,6 +701,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			// すべてのローカルデータを消去
 			let appDomain = Bundle.main.bundleIdentifier
 			UserDefaults.standard.removePersistentDomain(forName: appDomain!)
+			UserDefaults.standard.synchronize()
 			
 			// ログイン画面を表示
 			let vc = LoginViewController()
