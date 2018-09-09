@@ -168,6 +168,7 @@ class AsyncClient(asyncio.Protocol):
             gecos = c.response[0]['raw_attributes']['gecos'][0].decode("utf-8")
             name = c.response[0]['raw_attributes']['displayName'][0].decode(
                 "utf-8")
+            logger.info("ldap search reply {}, {}".format(gecos, name))
             return (gecos, name)
         except:
             return False
