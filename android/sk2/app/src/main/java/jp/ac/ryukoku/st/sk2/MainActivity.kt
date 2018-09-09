@@ -14,8 +14,6 @@ import android.support.v4.content.ContextCompat
 import android.widget.Button
 import android.widget.Switch
 import android.widget.TextView
-import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
-import com.neovisionaries.bluetooth.ble.advertising.IBeacon
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOCATION_PERMISSION_DENIED_MESSAGE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOCATION_PERMISSION_REQUEST_MESSAGE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_AUTO
@@ -24,17 +22,13 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_OK
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SETTINGS
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_ATTEND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_LARGE
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.VALID_IBEACON_UUID
-import me.mattak.moment.Moment
 import no.nordicsemi.android.support.v18.scanner.*
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 import android.content.*
-import android.graphics.DrawFilter
 import android.os.Vibrator
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.LocalBroadcastManager
-import android.support.v7.appcompat.R.attr.colorControlActivated
 import android.view.Gravity
 import android.view.View
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.ACTION_BROADCAST
@@ -51,7 +45,6 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_TEXT_HELP
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_TEXT_LOG
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_BACKGROUND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_BACKGROUND_TITLE
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_NORMAL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_BLESCAN
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.EXTRA_TOAST
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.LOGOUT_DIALOG_CANCEL
@@ -123,7 +116,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
         /** BLE のチェック **/
         if (!sk2.checkBt() && pref.getString(PREF_UID, "") != NAME_DEMOUSER) {
             // ダメならボタンをグレーアウト
-            mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
+            mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_disabled)
             mainUi.attBt.text = BUTTON_TEXT_ATTEND_FALSE
             toast(Sk2Globals.TOAST_CHECK_BLE_OFF)
         } else {
@@ -251,7 +244,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
         }
         // ビーコンなしが続いたらボタン表示をオフ
         if (countNoBeacon > MAX_COUNT_NOBEACON) {
-            mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_disabled)
+            mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_disabled)
             mainUi.attBt.text = BUTTON_TEXT_ATTEND_FALSE
         }
         else {

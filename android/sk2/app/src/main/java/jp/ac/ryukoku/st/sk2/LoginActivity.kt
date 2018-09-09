@@ -199,7 +199,7 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
                 textSize = TEXT_SIZE_LARGE
                 hint = HINT_UID
                 inputType = TYPE_TEXT_VARIATION_EMAIL_ADDRESS
-            }.lparams { below(LABEL); width = matchParent }
+            }.lparams { below(LABEL); width = matchParent; height = dip(50) }
             /** ////////////////////////////////////////////////////////////////////////////// **/
             val passwd = editText {
                 id = R.id.password
@@ -207,7 +207,7 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
                 textSize = TEXT_SIZE_LARGE
                 hint = HINT_PASSWD
                 inputType = TYPE_CLASS_TEXT or TYPE_TEXT_VARIATION_PASSWORD
-            }.lparams { below(R.id.username); width = matchParent }
+            }.lparams { below(R.id.username); width = matchParent; height = dip(50) }
             /** ////////////////////////////////////////////////////////////////////////////// **/
             button(BUTTON_TEXT_LOGIN) {
                 id = R.id.login
