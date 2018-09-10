@@ -51,7 +51,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-
+		
 		// デバイスの固有ID取得
 //		print("DeviceID: \(String(describing: UIDevice.current.identifierForVendor))")
 		
@@ -484,6 +484,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	// 現在リージョン内にiBeaconが存在するかどうかの通知を受け取る
 	func locationManager(_ manager: CLLocationManager, didDetermineState state: CLRegionState,  for region: CLRegion) {
 		
+		let dateFormatter = DateFormatter()
+		dateFormatter.locale = Locale(identifier: "ja_JP")
+		dateFormatter.dateFormat = "HH"
+		
+		let date = Date()
+		let dateString = dateFormatter.string(from: date)
+		
+//		print("dateString:\(Int(dateString)!)")
+		
 		if let region = region as? CLBeaconRegion { //これがあると安定する？
 			
 			// 登録されているUserDefaultから設定値を呼び出す
@@ -494,20 +503,28 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			switch (state) {
 				
 			case .inside: // リージョン内にiBeaconが存在いる
-				print("iBeaconが存在!");
-				beaconFlg = true
 				
-				// iBeacon受信時の動き
-				if( autoSender == 1 ) {
-					btnAuto()   //自動送信ボタンの表示
+				// 検知対象時間かどうかを判定
+				if(Int(dateString)! > appDelegate.startHour && Int(dateString)! < appDelegate.stopHour ) {
+				print("iBeacon存在：検知対象時間内");
+					beaconFlg = true
+					
+					// iBeacon受信時の動き
+					if( autoSender == 1 ) {
+						btnAuto()   //自動送信ボタンの表示
+					} else {
+						btnNormal() //通常送信ボタンの表示
+					}
+					
+					// すでに入っている場合は、そのままiBeaconのRangingをスタートさせる
+					// Delegateで呼び出される
+					// iBeaconがなくなったら、Rangingを停止する
+					manager.startRangingBeacons(in: region )
 				} else {
-					btnNormal() //通常送信ボタンの表示
+					print("iBeacon存在：検知対象時間外")
+					beaconFlg = false
+					btnDisable()
 				}
-				
-				// すでに入っている場合は、そのままiBeaconのRangingをスタートさせる
-				// Delegateで呼び出される
-				// iBeaconがなくなったら、Rangingを停止する
-				manager.startRangingBeacons(in: region )
 				break;
 				
 			case .outside:
