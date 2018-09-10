@@ -547,12 +547,38 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	// iBeaconを検出していなくても1秒ごとに呼ばれる
 	func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion)  {
 		
-		// 配列をリセット
+		// 配列の初期化
 		beaconUuids = NSMutableArray()
 		beaconDetails = Array<String>()
-		var val : [(majorID:Int, minorID:Int, rssi:Double, accuracy:Double, proximity:String)] = []
+		var items: [Item] = []
+		
 		// 範囲内で検知されたビーコンはこのbeaconsにCLBeaconオブジェクトとして格納される
 		// rangingが開始されると１秒毎に呼ばれるため、beaconがある場合のみ処理をするようにすること
+		
+		// ソート条件を指定するためのデータを用意
+		typealias SortDescriptor<Value> = (Value, Value) -> Bool
+		
+		// 複数のソート条件を結合するメソッドを用意
+		func combine<Value>(sortDescriptors: [SortDescriptor<Value>]) -> SortDescriptor<Value> {
+			
+			return { lhs, rhs in
+				for isOrderedBefore in sortDescriptors {
+					if isOrderedBefore(lhs,rhs) { return true }
+					if isOrderedBefore(rhs,lhs) { return false }
+				}
+				return false
+			}
+		}
+		
+		// iBeaconの値を管理するクラスを定義
+		struct Item {
+			var majorID: Int
+			var minorID: Int
+			var rssi: Double
+			var accuracy: Double
+			var proximity: String = ""
+		}
+	
 		if(beacons.count > 0){
 			
 			// 発見したBeaconの数だけLoopをまわす
@@ -574,35 +600,45 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 					
 				case CLProximity.unknown :
 //					print("Proximity: Unknown");
-					proximity = "Unknown"
+					proximity = "3.Unknown"
 					break
 					
 				case CLProximity.far:
 //					print("Proximity: Far");
-					proximity = "Far"
+					proximity = "2.Far"
 					break
 					
 				case CLProximity.near:
 //					print("Proximity: Near");
-					proximity = "Near"
+					proximity = "1.Near"
 					break
 					
 				case CLProximity.immediate:
 //					print("Proximity: Immediate");
-					proximity = "Immediate"
+					proximity = "0.Immediate"
 					break
 				}
 				
 				// 変数に保存
 				beaconUuids.add(beaconUUID.uuidString)
-				val.append((majorID: Int(truncating: majorID), minorID: Int(truncating: minorID), rssi: Double(rssi), accuracy: Double(accuracy), proximity: String(proximity)))
+				
+				// 配列に追加
+				items.append(Item(majorID: Int(truncating: majorID), minorID: Int(truncating: minorID),  rssi: Double(rssi), accuracy: Double(accuracy), proximity: String(proximity)))
 			}
-			// accuracyでソート
-			val.sort(by: {$0.3 > $1.3})
+			
+			// ソート条件を指定
+			let sortedByProximity: SortDescriptor<Item> = { $0.proximity < $1.proximity }
+			let sortedByRssi: SortDescriptor<Item> = { $0.rssi > $1.rssi }
+			
+			let combined: SortDescriptor<Item> = combine(
+				sortDescriptors: [sortedByProximity,sortedByRssi]
+			)
+			
+			let result = items.sorted(by: combined)
 			
 			// デバッグ画面にiBeaconの値を表示
 			var beaconText:String = "now: \(appDelegate.currentTime())\n\nuuid: \(beaconUuids[0])\n"
-			for str in val {
+			for str in result {
 				beaconDetails.append("\(Int(str.majorID)),\(Int(str.minorID)),\(Double(str.accuracy))")
 				beaconText += "-->\(str.majorID),\(str.minorID),\(str.rssi),\(str.accuracy),\(str.proximity)\n"
 //				beaconText += "-->\(String(describing: str))\n"
