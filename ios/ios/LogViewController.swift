@@ -15,6 +15,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 	
 	// Status Barの高さを取得する.
 	let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height
+	let safeAreaInsets = UIApplication.shared.keyWindow?.rootViewController?.view.safeAreaInsets.bottom
 	
 	var Connection = Connection2()
 	
@@ -66,7 +67,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 
 		// --------------------------------------------------------------------------------------------------------------------------
 		// 戻るボタン
-		let backButton = UIButton(frame: CGRect(x:0,y: Int(self.view.frame.height - 40),width: Int(self.view.frame.width),height:40))
+		let backButton = UIButton(frame: CGRect(x:0,y: Int(self.view.frame.height - safeAreaInsets! - 40),width: Int(self.view.frame.width),height:40))
 		backButton.setTitle("閉じる", for: .normal)  //タイトル
 		backButton.backgroundColor = appDelegate.ifNormalColor
 		backButton.addTarget(self, action: #selector(LogViewController.back(_:)), for: .touchUpInside)
@@ -111,9 +112,11 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		// Viewの高さと幅を取得する.
 		let displayWidth: CGFloat = self.view.frame.width
 		let displayHeight: CGFloat = self.view.frame.height
+		let safeAreaInsets = UIApplication.shared.keyWindow?.rootViewController?.view.safeAreaInsets.bottom
 		
 		// TableViewの生成(Status barの高さをずらして表示).
-		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 95, width: displayWidth, height: displayHeight - 155))
+		let tableHeight = displayHeight - safeAreaInsets! - barHeight - 135
+		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 95, width: displayWidth, height: tableHeight))
 		
 		// セルの高さ
 		myTableView.rowHeight = 120
@@ -179,8 +182,9 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		let displayHeight: CGFloat = self.view.frame.height
 		
 		// TableViewの生成(Status barの高さをずらして表示).
-		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 95, width: displayWidth, height: displayHeight - 155))
-		
+		let tableHeight = displayHeight - safeAreaInsets! - barHeight - 135
+		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 95, width: displayWidth, height: tableHeight))
+
 		// セルの高さ
 		myTableView.rowHeight = 120
 		
