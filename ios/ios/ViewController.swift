@@ -60,6 +60,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		self.navigationItem.hidesBackButton = true	//　バックボタンを消す
 		// ナビゲーションバーの高さを取得する
 		let navigationBarHeight = self.navigationController?.navigationBar.frame.size.height
+		let statusVar = UIApplication.shared.statusBarFrame.height
 		
 		// 登録されているUserDefaultから設定値を呼び出す
 		let autoSender:Int = myUserDefault.integer(forKey: "autoSender")
@@ -92,7 +93,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		
 		// --------------------------------------------------------------------------------------------------------------------------
 		// userを生成
-		labelUser = UILabel(frame: CGRect(x:0, y:navigationBarHeight! + 20, width:self.view.frame.width, height:50))
+		labelUser = UILabel(frame: CGRect(x:0, y:navigationBarHeight! + statusVar, width:self.view.frame.width, height:50))
 		labelUser.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
 		labelUser.backgroundColor = #colorLiteral(red: 0.9019607843, green: 0.9137254902, blue: 0.9176470588, alpha: 1)
 		labelUser.textAlignment = NSTextAlignment.left    // 左寄せ
@@ -123,7 +124,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// --------------------------------------------------------------------------------------------------------------------------
 		// 自動送信トグルスイッチを生成
 		let SWautoSender: UISwitch = UISwitch()
-		SWautoSender.layer.position = CGPoint(x: self.view.bounds.width - 30, y: navigationBarHeight! + 45)
+		SWautoSender.layer.position = CGPoint(x: self.view.bounds.width - 30, y: navigationBarHeight! + statusVar + 25)
 		if(autoSender == 0) {
 			SWautoSender.isOn = false    // SwitchをOffに設定
 		} else if( autoSender == 1 ) {
@@ -137,7 +138,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		self.view.addSubview(SWautoSender)  // SwitchをViewに追加
 		
 		// 説明ラベル
-		labelAuto = UILabel(frame: CGRect(x:0, y: navigationBarHeight! + 20, width:self.view.frame.width - 60, height:50))
+		labelAuto = UILabel(frame: CGRect(x:0, y: navigationBarHeight! + statusVar, width:self.view.frame.width - 60, height:50))
 		labelAuto.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
 		labelAuto.textAlignment = NSTextAlignment.right    // センター寄せ
 		labelAuto.text = "自動送信"
