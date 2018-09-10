@@ -68,6 +68,7 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_TINY
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_MAIN_AUTO_OFF
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_MAIN_AUTO_ON
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.apNameMap
+import me.mattak.moment.Moment
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /** Sk2 Main Activity **/
@@ -234,6 +235,13 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
         // ビーコン情報をパースして ScanArray() に保存
         val scanArray = ScanArray(results)
 
+        /*** 送信可能時刻をチェック ***/
+        val curDatetime = Moment() // 現在時刻
+        // debug モードでなく、’..TIME_FROM'時から’..TIME_TO'時の間でない
+        val invalidTime = ( (! pref.getBoolean(PREF_DEBUG, false))
+                && (curDatetime.hour < Sk2Globals.PERMISSION_SENDING_TIME_FROM
+                        || curDatetime.hour > Sk2Globals.PERMISSION_SENDING_TIME_TO))
+
         // ビーコンチェックしてスキャン情報とカウンタを更新
         if (scanArray.count() > 0) {
             mainUi.scanInfo.text = scanArray.getBeaconsText(signal = true, map = apNameMap)
@@ -243,7 +251,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
             countNoBeacon++
         }
         // ビーコンなしが続いたらボタン表示をオフ
-        if (countNoBeacon > MAX_COUNT_NOBEACON) {
+        if (invalidTime || countNoBeacon > MAX_COUNT_NOBEACON) {
             mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_disabled)
             mainUi.attBt.text = BUTTON_TEXT_ATTEND_FALSE
         }
