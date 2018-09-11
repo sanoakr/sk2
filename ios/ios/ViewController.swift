@@ -51,7 +51,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-
+		
 		// デバイスの固有ID取得
 //		print("DeviceID: \(String(describing: UIDevice.current.identifierForVendor))")
 		
@@ -60,6 +60,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		self.navigationItem.hidesBackButton = true	//　バックボタンを消す
 		// ナビゲーションバーの高さを取得する
 		let navigationBarHeight = self.navigationController?.navigationBar.frame.size.height
+		let statusVar = UIApplication.shared.statusBarFrame.height
 		
 		// 登録されているUserDefaultから設定値を呼び出す
 		let autoSender:Int = myUserDefault.integer(forKey: "autoSender")
@@ -92,7 +93,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		
 		// --------------------------------------------------------------------------------------------------------------------------
 		// userを生成
-		labelUser = UILabel(frame: CGRect(x:0, y:navigationBarHeight! + 20, width:self.view.frame.width, height:50))
+		labelUser = UILabel(frame: CGRect(x:0, y:navigationBarHeight! + statusVar, width:self.view.frame.width, height:50))
 		labelUser.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
 		labelUser.backgroundColor = #colorLiteral(red: 0.9019607843, green: 0.9137254902, blue: 0.9176470588, alpha: 1)
 		labelUser.textAlignment = NSTextAlignment.left    // 左寄せ
@@ -123,7 +124,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// --------------------------------------------------------------------------------------------------------------------------
 		// 自動送信トグルスイッチを生成
 		let SWautoSender: UISwitch = UISwitch()
-		SWautoSender.layer.position = CGPoint(x: self.view.bounds.width - 30, y: navigationBarHeight! + 45)
+		SWautoSender.layer.position = CGPoint(x: self.view.bounds.width - 30, y: navigationBarHeight! + statusVar + 25)
 		if(autoSender == 0) {
 			SWautoSender.isOn = false    // SwitchをOffに設定
 		} else if( autoSender == 1 ) {
@@ -137,7 +138,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		self.view.addSubview(SWautoSender)  // SwitchをViewに追加
 		
 		// 説明ラベル
-		labelAuto = UILabel(frame: CGRect(x:0, y: navigationBarHeight! + 20, width:self.view.frame.width - 60, height:50))
+		labelAuto = UILabel(frame: CGRect(x:0, y: navigationBarHeight! + statusVar, width:self.view.frame.width - 60, height:50))
 		labelAuto.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
 		labelAuto.textAlignment = NSTextAlignment.right    // センター寄せ
 		labelAuto.text = "自動送信"
@@ -483,6 +484,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	// 現在リージョン内にiBeaconが存在するかどうかの通知を受け取る
 	func locationManager(_ manager: CLLocationManager, didDetermineState state: CLRegionState,  for region: CLRegion) {
 		
+		let dateFormatter = DateFormatter()
+		dateFormatter.locale = Locale(identifier: "ja_JP")
+		dateFormatter.dateFormat = "HH"
+		
+		let date = Date()
+		let dateString = dateFormatter.string(from: date)
+		
+//		print("dateString:\(Int(dateString)!)")
+		
 		if let region = region as? CLBeaconRegion { //これがあると安定する？
 			
 			// 登録されているUserDefaultから設定値を呼び出す
@@ -493,20 +503,28 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			switch (state) {
 				
 			case .inside: // リージョン内にiBeaconが存在いる
-				print("iBeaconが存在!");
-				beaconFlg = true
 				
-				// iBeacon受信時の動き
-				if( autoSender == 1 ) {
-					btnAuto()   //自動送信ボタンの表示
+				// 検知対象時間かどうかを判定
+				if(Int(dateString)! > appDelegate.startHour && Int(dateString)! < appDelegate.stopHour ) {
+				print("iBeacon存在：検知対象時間内");
+					beaconFlg = true
+					
+					// iBeacon受信時の動き
+					if( autoSender == 1 ) {
+						btnAuto()   //自動送信ボタンの表示
+					} else {
+						btnNormal() //通常送信ボタンの表示
+					}
+					
+					// すでに入っている場合は、そのままiBeaconのRangingをスタートさせる
+					// Delegateで呼び出される
+					// iBeaconがなくなったら、Rangingを停止する
+					manager.startRangingBeacons(in: region )
 				} else {
-					btnNormal() //通常送信ボタンの表示
+					print("iBeacon存在：検知対象時間外")
+					beaconFlg = false
+					btnDisable()
 				}
-				
-				// すでに入っている場合は、そのままiBeaconのRangingをスタートさせる
-				// Delegateで呼び出される
-				// iBeaconがなくなったら、Rangingを停止する
-				manager.startRangingBeacons(in: region )
 				break;
 				
 			case .outside:
@@ -529,12 +547,38 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	// iBeaconを検出していなくても1秒ごとに呼ばれる
 	func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion)  {
 		
-		// 配列をリセット
+		// 配列の初期化
 		beaconUuids = NSMutableArray()
 		beaconDetails = Array<String>()
-		var val : [(majorID:Int, minorID:Int, rssi:Double, accuracy:Double, proximity:String)] = []
+		var items: [Item] = []
+		
 		// 範囲内で検知されたビーコンはこのbeaconsにCLBeaconオブジェクトとして格納される
 		// rangingが開始されると１秒毎に呼ばれるため、beaconがある場合のみ処理をするようにすること
+		
+		// ソート条件を指定するためのデータを用意
+		typealias SortDescriptor<Value> = (Value, Value) -> Bool
+		
+		// 複数のソート条件を結合するメソッドを用意
+		func combine<Value>(sortDescriptors: [SortDescriptor<Value>]) -> SortDescriptor<Value> {
+			
+			return { lhs, rhs in
+				for isOrderedBefore in sortDescriptors {
+					if isOrderedBefore(lhs,rhs) { return true }
+					if isOrderedBefore(rhs,lhs) { return false }
+				}
+				return false
+			}
+		}
+		
+		// iBeaconの値を管理するクラスを定義
+		struct Item {
+			var majorID: Int
+			var minorID: Int
+			var rssi: Double
+			var accuracy: Double
+			var proximity: String = ""
+		}
+	
 		if(beacons.count > 0){
 			
 			// 発見したBeaconの数だけLoopをまわす
@@ -556,35 +600,45 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 					
 				case CLProximity.unknown :
 //					print("Proximity: Unknown");
-					proximity = "Unknown"
+					proximity = "3.Unknown"
 					break
 					
 				case CLProximity.far:
 //					print("Proximity: Far");
-					proximity = "Far"
+					proximity = "2.Far"
 					break
 					
 				case CLProximity.near:
 //					print("Proximity: Near");
-					proximity = "Near"
+					proximity = "1.Near"
 					break
 					
 				case CLProximity.immediate:
 //					print("Proximity: Immediate");
-					proximity = "Immediate"
+					proximity = "0.Immediate"
 					break
 				}
 				
 				// 変数に保存
 				beaconUuids.add(beaconUUID.uuidString)
-				val.append((majorID: Int(truncating: majorID), minorID: Int(truncating: minorID), rssi: Double(rssi), accuracy: Double(accuracy), proximity: String(proximity)))
+				
+				// 配列に追加
+				items.append(Item(majorID: Int(truncating: majorID), minorID: Int(truncating: minorID),  rssi: Double(rssi), accuracy: Double(accuracy), proximity: String(proximity)))
 			}
-			// accuracyでソート
-			val.sort(by: {$0.3 > $1.3})
+			
+			// ソート条件を指定
+			let sortedByProximity: SortDescriptor<Item> = { $0.proximity < $1.proximity }
+			let sortedByRssi: SortDescriptor<Item> = { $0.rssi > $1.rssi }
+			
+			let combined: SortDescriptor<Item> = combine(
+				sortDescriptors: [sortedByProximity,sortedByRssi]
+			)
+			
+			let result = items.sorted(by: combined)
 			
 			// デバッグ画面にiBeaconの値を表示
 			var beaconText:String = "now: \(appDelegate.currentTime())\n\nuuid: \(beaconUuids[0])\n"
-			for str in val {
+			for str in result {
 				beaconDetails.append("\(Int(str.majorID)),\(Int(str.minorID)),\(Double(str.accuracy))")
 				beaconText += "-->\(str.majorID),\(str.minorID),\(str.rssi),\(str.accuracy),\(str.proximity)\n"
 //				beaconText += "-->\(String(describing: str))\n"

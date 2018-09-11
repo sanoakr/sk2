@@ -21,12 +21,13 @@ class HelpViewController: UIViewController,UIWebViewDelegate {
 		
 		// Status Barの高さを取得する.
 		let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height
+		let safeAreaInsets = UIApplication.shared.keyWindow?.rootViewController?.view.safeAreaInsets.bottom
 		
 		// Viewの高さと幅を取得する.
 		let displayWidth: CGFloat = self.view.frame.width
 		let displayHeight: CGFloat = self.view.frame.height
 		// WebViewの生成.
-		myWebView = UIWebView(frame: CGRect(x: 0, y: barHeight + 40, width: displayWidth, height: displayHeight - barHeight - 80))
+		myWebView = UIWebView(frame: CGRect(x: 0, y: barHeight + 40, width: displayWidth, height: displayHeight - barHeight - safeAreaInsets!  - 80))
 		
 		// Deletegateを自身に設定.
 		myWebView.delegate = self
@@ -55,7 +56,7 @@ class HelpViewController: UIViewController,UIWebViewDelegate {
 		// --------------------------------------------------------------------------------------------------------------------------
 		// 戻るボタン
 		
-		let backButton = UIButton(frame: CGRect(x:0,y: Int(self.view.frame.height - 40),width: Int(self.view.frame.width),height:40))
+		let backButton = UIButton(frame: CGRect(x:0,y: Int(self.view.frame.height - safeAreaInsets! - 40),width: Int(self.view.frame.width),height:40))
 		
 		backButton.setTitle("閉じる", for: .normal)  //タイトル
 		backButton.backgroundColor = appDelegate.ifNormalColor
