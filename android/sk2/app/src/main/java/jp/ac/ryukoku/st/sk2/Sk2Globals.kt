@@ -175,10 +175,8 @@ class Sk2Globals: Application(), AnkoLogger {
         const val PERMISSION_SENDING_TIME_TO: Int = 20
 
         /*** 受信する iBeacon のUUID、BLE ***/
-        val VALID_IBEACON_UUID: List<String> = listOf(
-                "ebf59ccc-21f2-4558-9488-00f2b388e5e6", // ru-wifi
-                "00000000-87b3-1001-b000-001c4d975326"  // sekimoto's
-        )
+        val VALID_IBEACON_UUID: List<String> = listOf("ebf59ccc-21f2-4558-9488-00f2b388e5e6") // ru-wifi
+
         /*** AP Map の Key ***/
         const val APMAP_KEY_BEACON = "beaconIdParams"
         const val APMAP_KEY_BEACON_UUID = "uuid"
