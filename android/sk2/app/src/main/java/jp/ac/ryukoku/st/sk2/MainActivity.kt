@@ -206,13 +206,20 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
             else
                 "$uid / $name"
 
+            /**
             // 前方一致でテストユーザー(デバッグモード)とする
             if (Regex("^$NAME_START_TESTUSER").containsMatchIn(uid)
                     && uid != NAME_DEMOUSER) {
-                pref.edit()
-                        .putBoolean(PREF_DEBUG, true)
-                        .apply()
+            pref.edit()
+            .putBoolean(PREF_DEBUG, true)
+            .apply()
             }
+            **/
+            /** for Beta **/
+            pref.edit()
+                    .putBoolean(PREF_DEBUG, true)
+                    .apply()
+
             true // O.K.
         }
     }
