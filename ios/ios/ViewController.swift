@@ -56,7 +56,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 //		print("DeviceID: \(String(describing: UIDevice.current.identifierForVendor))")
 		
 		// UI定義
-		let btnWidth = Int(self.view.frame.width / 3)
+		let btnWidth = Int(self.view.frame.width / 4)
+		let mainBtnWidth = Int(self.view.frame.width / 5) * 3
 		self.navigationItem.hidesBackButton = true	//　バックボタンを消す
 		// ナビゲーションバーの高さを取得する
 		let navigationBarHeight = self.navigationController?.navigationBar.frame.size.height
@@ -148,7 +149,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		
 		// --------------------------------------------------------------------------------------------------------------------------
 		// 出席ボタンを設置
-		attendBtn = UIButton(frame: CGRect(x: (self.view.frame.width/2 - 120),y: (self.view.frame.height / 2 - 120 + navigationBarHeight!),width: 240,height:240))
+		attendBtn = UIButton(
+			frame: CGRect(
+				x: (Int(self.view.frame.width / 2) - Int(mainBtnWidth / 2)),
+				y: (Int(self.view.frame.height / 2) - Int(mainBtnWidth / 2) + Int(navigationBarHeight!)),
+				width: mainBtnWidth,
+				height: mainBtnWidth
+			)
+		)
 		attendBtn.addTarget(self, action: #selector(ViewController.sendAttend(sender:)), for: .touchUpInside)
 		attendBtn.titleLabel?.lineBreakMode = .byWordWrapping
 		attendBtn.titleLabel?.numberOfLines = 0
@@ -168,7 +176,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// ログボタンを設置
 		let logViewBtn = UIButton(
 			frame: CGRect(
-				x: Int(btnWidth - 80),
+//				x: Int(btnWidth - 80),
+				x: Int(btnWidth) - Int(appDelegate.iconSize / 2) - Int(appDelegate.iconSize / 4),
 				y: Int(self.view.frame.height - 120),
 				width: appDelegate.iconSize,
 				height: appDelegate.iconSize
@@ -208,7 +217,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// ログアウトボタンを設置
 		let logoutBtn = UIButton(
 			frame: CGRect(
-				x: Int(self.view.frame.width) - Int(appDelegate.iconSize + 50),
+//				x: Int(self.view.frame.width) - Int(appDelegate.iconSize + 50),
+				x: Int(btnWidth * 3) - Int(appDelegate.iconSize / 2) + Int(appDelegate.iconSize / 4),
 				y: Int(self.view.frame.height - 120),
 				width: appDelegate.iconSize,
 //				width: btnWidth,
@@ -460,6 +470,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			break
 		case .denied:
 			print("許可しない")
+			
+			//
+			// 警告を表示し設定するように最速する
+			//
 			// UIAlertControllerを作成する.
 			let myAlert: UIAlertController = UIAlertController(title: "エラー", message: "位置情報サービスのが許可されていません", preferredStyle: .alert)
 			
