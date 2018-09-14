@@ -1,4 +1,4 @@
-//
+
 //  AppDelegate.swift
 //  attend
 //
@@ -18,17 +18,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	// アプリ設定
 	var appTitle = "龍大理工学部出欠システム sk2"
-	var timeLimit = 10368000 //sec 120days
+	var timeLimit = 10368000 // 認証後の有効期限（秒/120日）
 	var serverIp = "133.83.30.65"
 	var serverPort = 4440
 	var serverPort2 = 4441
 	var helpUrl = "https://sk2.st.ryukoku.ac.jp/"
-	//    var uuidList = ["00000000-87B3-1001-B000-001C4D975326"] //検知対象は1つのUUID。(OS等のバージョンで検出可能な上限数は20個程度が目安)
-	var uuidList = ["ebf59ccc-21f2-4558-9488-00f2b388e5e6"] //本番meraki
+	var uuidList = ["ebf59ccc-21f2-4558-9488-00f2b388e5e6"] //検知対象は1つのUUID。(OS等のバージョンで検出可能な上限数は20個程度が目安)
 	var debugUser = "testuser-skmt"
-	var timeout = 5
-	var maxLocalLog = 10
-	var consentText = "プライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\nプライバシーポリシーです\n\n"
+	var iconSize = 60
+	var timeout = 5		// 処理のタイムアウト（秒）
+	var startHour = 7	// 出席取得　開始時間（時）
+	var stopHour = 23	// 出席取得　終了時間（時）
+	var maxLocalLog = 10	// ローカルログの保持回数
+	var postInterval:Int = 600 // 自動送信の間隔（秒）
+	var consentText = "龍谷大学（以下「本学」）理工学部（以下「当学部」）は、当学部が提供するスマートフォン用アプリケーション「理工出席」（以下「本アプリ」）および本アプリによって提供するサービス（以下「本サービス」）を通じて利用者の位置情報をご提供いただきます。当学部は、本サービスの円滑な提供を実施させていただくために、本学が定めた龍谷大学プライバシーポリシーに基づき、本プライバシーポリシーを定め、利用者の情報の保護に努めます。\n\nなお、利用者が本アプリによる情報提供を希望されない場合は、利用者自身の判断により、位置情報の提供を拒否することができます。この場合、本アプリおよび本サービスを利用になれない場合があります。\n\n1. 本アプリにより本学部が取得する情報と利用目的\n\n当学部は、本アプリおよび本サービスの提供等にあたり、次の利用目的の達成に必要な範囲で下記に記載する情報をアプリケーション経由で自動的に取得および利用者の操作によって取得し、取扱います。\n\n　1. 本アプリの認証時に当学部サーバに通知される全学統合認証ID\n　　・利用目的\n　　　本サービス提供の際に利用者を識別するため\n　　・取得方法\n　　　利用者によるログイン操作または、本アプリによる自動取得\n　2. 利用端末のBluetooth機能を利用した、本学キャンパスおよび関連施設に限定した位置情報及び、その取得時刻\n　　・利用目的\n　　　本サービス提供の際、位置情報を確認し、利用者の講義等への出欠情報を取得するため\n　　　利用者の位置情報を利用者個人が特定されないかたちで、本学の運営・教育・研究に利用するため\n　　・取得方法\n　　　利用者による取得送信操作及び本アプリによる定期的な自動取得\n　　　※ 位置情報は本アプリの起動後、利用者が出席情報の送信ボタンを押下したタイミングまたは、本アプリの自動送信機能をオンにした場合およそ10分間に1回、本学キャンパスおよびその関連施設内で、授業実施時間に限り取得します。\n\n2. 本学部が取得する情報の加工および第三者提供\n\n　・当学部は、前条において取得した情報を、本サービスの提供に係る当学部のシステムへ取得・蓄積・転送し、前条の利用目的に利用します。\n　・当学部は、前項の規定に関わらず、本アプリが取得する情報を次の各号のいずれかに該当すると認める場合は、本人の権利利益に最大限の配慮を払いつつ、個人情報を第三者に提供する場合があります。\n\n　　1. 本人から同意を得た場合。\n　　2. 法令に基づく場合。\n　　3. 人の生命、身体又は財産の保護のために必要がある場合であって、本人の同意を得ることが困難である場合。\n　　4. 公衆衛生の向上又は児童の健全な育成の推進のために特に必要がある場合であって、本人の同意を得ることが困難である場合。\n　　5. 国の機関若しくは地方公共団体又はその委託を受けた者が、法令の定める事務を遂行することに協力する必要がある場合であって、本人の同意を得ることによりその遂行に支障を及ぼすおそれがある場合。\n　　6. 取得した位置情報等を、本学部が利用者本人を特定できる情報を含まない、総体的かつ統計的なデータに加工した場合。\n\n3. 本学部が取得する情報の取得・蓄積・利用に関する同意\n\n利用者は本アプリをインストールする際に本プライバシーポリシーを確認頂き、本アプリおよび本サービスに関する内容を理解した上でご利用ください。\n\n4. 本学部が取得する情報の取得停止等\n\n　　1. 本サービスでは、第1条に定める規定に基づき、取得した利用者情報の内容に関し、本学部の教学上の利用者本人に資する必要性がなくなった後に、照会・訂正・削除等を申請することができます。\n　　2. 本アプリおよび本サービスは、利用者が、本アプリが利用端末から削除（アンインストール）された場合、利用者情報は全て端末より直ちに削除されます。\n\n5. 本学部が取得する情報の取り扱いに関する問い合わせ窓口\n\n本アプリおよび本サービスにおける本学部が取得する情報の取扱いに関して、ご意見・ご要望がございましたら、下記窓口までご連絡ください。\n\n　・窓口名称：龍谷大学理工学部教務課\n　・お問い合わせ方法：\n　　　・電話：077-543-7730\n　　　・電子メール： rikou@ad.ryukoku.ac.jp\n　・受付時間：平日午前9時～午後5時\n\n6. 本プライバシーポリシーの変更\n\n　　1. 本学部は、法令の変更等に伴い、本プライバシーポリシーを変更することがあります。\n　　2. 本学部は、本アプリのバージョンアップに伴って、本学部が取得する情報の取得項目の変更や追加、利用目的の変更、第三者提供等について変更がある場合には、本アプリ内で通知し、重要なものについてはインストール前もしくはインストール時にあらためて同意を取得させていただきます。"
 	
 	// VC共通カラー
 	var backgroundColor = UIColor(red: 0.93, green: 0.94, blue: 0.95, alpha: 1)	//#ecf0f1
@@ -36,14 +39,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var ifActiveColor = UIColor(red: 0.10, green: 0.74, blue: 0.61, alpha: 1)		//#1abc9c
 	var ifOnDownColor = UIColor(red: 0.16, green: 0.50, blue: 0.73, alpha: 1)		//#2980b9
 	var ifDisableColor = UIColor(red: 0.74, green: 0.76, blue: 0.78, alpha: 1)	//#bdc3c7
-	//UIColor(red: 0.09, green: 0.63, blue: 0.52, alpha: 1)
-//	// 夜間モード
-//	var backgroundColor = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1)
 
-	// 変数
-	var iconSize = 60
-	var postInterval:Int = 60 //sec
-	
 	// background処理
 	var backgroundTaskID : UIBackgroundTaskIdentifier = 0
 	
@@ -111,7 +107,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		// Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
 		// Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
 		
-		print("バックグラウンド実行")
+		print("applicationWillResignActive")
 		
 		self.backgroundTaskID = application.beginBackgroundTask(){
 			[weak self] in
@@ -125,6 +121,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		// Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
 		// If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
 		
+		print("applicationDidEnterBackground")
+		
 		self.backgroundTaskID = application.beginBackgroundTask(){
 			[weak self] in
 			application.endBackgroundTask((self?.backgroundTaskID)!)
@@ -134,6 +132,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	func applicationWillEnterForeground(_ application: UIApplication) {
 		// Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+		
+		print("applicationWillEnterForeground")
 		
 		self.backgroundTaskID = application.beginBackgroundTask(){
 			[weak self] in
@@ -146,10 +146,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		// Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
 		
 		print("アプリが起動したよ")
+		
+		application.endBackgroundTask(self.backgroundTaskID)
 	}
 	
 	func applicationWillTerminate(_ application: UIApplication) {
 		// Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+		
+		self.backgroundTaskID = application.beginBackgroundTask(){
+			[weak self] in
+			application.endBackgroundTask((self?.backgroundTaskID)!)
+			self?.backgroundTaskID = UIBackgroundTaskInvalid
+		}
 	}
 	
 	

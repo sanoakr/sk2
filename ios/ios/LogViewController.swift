@@ -228,7 +228,6 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 			
 		case 0:
 			print("サーバーログ")
-			// サーバーログを表示
 			showServerLog()
 
 		case 1:
@@ -281,9 +280,9 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 			
 			cell.labelDate.text = " \(splitRead[2])"
 			cell.labelMode.text = splitRead[1]
-			cell.labelVal1.text = "ap:\(String(describing: ap1)) major:\(splitRead[3]) minor:\(splitRead[4])"
-			cell.labelVal2.text = "ap:\(String(describing: ap2)) major:\(splitRead[6]) minor:\(splitRead[7])"
-			cell.labelVal3.text = "ap:\(String(describing: ap3)) major:\(splitRead[9]) minor:\(splitRead[10])"
+			cell.labelVal1.text = "ap:\(String(describing: ap1)) major:\(splitRead[3]) minor:\(splitRead[4]) RSSI:\(splitRead[5])"
+			cell.labelVal2.text = "ap:\(String(describing: ap2)) major:\(splitRead[6]) minor:\(splitRead[7]) RSSI:\(splitRead[8])"
+			cell.labelVal3.text = "ap:\(String(describing: ap3)) major:\(splitRead[9]) minor:\(splitRead[10]) RSSI:\(splitRead[11])"
 			
 		} else {
 			if myItems.count == 1 {
@@ -328,12 +327,15 @@ class MyCell: UITableViewCell {
 		contentView.addSubview(labelDate)
 		
 		labelVal1 = UILabel()
+		labelVal1.font = UIFont.systemFont(ofSize: 11)
 		contentView.addSubview(labelVal1)
 		
 		labelVal2 = UILabel()
+		labelVal2.font = UIFont.systemFont(ofSize: 11)
 		contentView.addSubview(labelVal2)
 		
 		labelVal3 = UILabel()
+		labelVal3.font = UIFont.systemFont(ofSize: 11)
 		contentView.addSubview(labelVal3)
 	}
 	

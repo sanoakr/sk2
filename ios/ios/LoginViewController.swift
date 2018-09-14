@@ -22,7 +22,7 @@ class LoginViewController: UIViewController {
 
 	@IBOutlet weak var useridField: UITextField!
 	@IBOutlet weak var passwordField: UITextField!
-
+	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
@@ -114,10 +114,13 @@ class LoginViewController: UIViewController {
 		
 		let sendtext = "AUTH,\(String(describing: useridField.text!)),\(String(describing: passwordField.text!))"
 		
+		// ローディング開始
+//		startIndicator()
+		
 		_ = ServerAuth_.sendCommand(command: sendtext)
 		let retval = ServerAuth_.sendCommand(command: "end")
 		
-//		print(retval)
+//		self.dismissIndicator()
 		
 		let result:String = retval["auth"] as! String;
 		
@@ -351,7 +354,7 @@ class ServerAuth: NSObject, StreamDelegate {
 				let bytesRead:Int=inputStream!.read(&buffer, maxLength: buffer.count)
 //				print("bytesRead: \(bytesRead)")
 				
-				// データ処理を一時的に待つ（これがないとうまくいかない場合がる）
+				// データ処理を一時的に待つ（これがないとうまくいかない場合がおおい）
 				sleep(UInt32(1))
 				
 				if (bytesRead > 0) { // had here (bytesRead >= 0) too
@@ -362,6 +365,7 @@ class ServerAuth: NSObject, StreamDelegate {
 					print("# error")
 				}
 			}
+			
 //			print("---------------------> \(read)")
 			// 認証失敗
 			if read.contains("authfail") {
@@ -425,6 +429,7 @@ class ServerAuth: NSObject, StreamDelegate {
 			self.outputStream.write( command, maxLength: text.utf8.count)
 			print("Send: \(text)")
 		}
+		
 		return retval
 	}
 }
