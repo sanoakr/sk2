@@ -86,9 +86,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 //		}
 		
 		// 検証用ユーザーの場合はdebugモードにする
-		if(user == appDelegate.debugUser) {
-			debugMode = 1
-		}
+		// リリースまでは全員debugモードにする
+		debugMode = 1
+//		if(user == appDelegate.debugUser) {
+//			debugMode = 1
+//		}
 		self.view.backgroundColor = appDelegate.backgroundColor // 背景色をセット
 		
 		// --------------------------------------------------------------------------------------------------------------------------
@@ -415,7 +417,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	private func startMyMonitoring() {
 		
 		let UUIDList = appDelegate.uuidList
-		
 		// UUIDListのUUIDを設定して、反応するようにする
 		for i in 0 ..< UUIDList.count {
 			
@@ -439,6 +440,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			
 			// iBeaconのモニタリング開始
 			myLocationManager.startMonitoring(for: myBeaconRegion)
+			
+			print("myBeaconRegion:\(myBeaconRegion)")
 		}
 	}
 	
@@ -457,6 +460,20 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			break
 		case .denied:
 			print("許可しない")
+			// UIAlertControllerを作成する.
+			let myAlert: UIAlertController = UIAlertController(title: "エラー", message: "位置情報サービスのが許可されていません", preferredStyle: .alert)
+			
+			// OKのアクションを作成する.
+			let myOkAction = UIAlertAction(title: "設定を開く", style: .default) { action in
+				UIApplication.shared.open(URL(string: "app-settings:")!, options: [:], completionHandler: nil)
+			}
+			
+			// Actionを追加する.
+			myAlert.addAction(myOkAction)
+			
+			// UIAlertを発動する.
+			present(myAlert, animated: true, completion: nil)
+			
 			break
 		case .authorizedAlways:
 			print("常に許可")
