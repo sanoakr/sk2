@@ -66,7 +66,7 @@ class HelpViewController: UIViewController,UIWebViewDelegate {
 		// --------------------------------------------------------------------------------------------------------------------------
 		// インジケーター
 		// スタイルは「.white」「.whiteLarge」「.gray」から選択可能
-		appDelegate.ActivityIndicator = UIActivityIndicatorView(activityIndicatorStyle: .gray)
+		appDelegate.ActivityIndicator = UIActivityIndicatorView(style: .gray)
 		// ストップした時に非表示する
 		appDelegate.ActivityIndicator?.hidesWhenStopped = true
 		// ビューの中央に配置

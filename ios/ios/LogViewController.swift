@@ -54,7 +54,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		segment.tintColor = appDelegate.ifNormalColor
 		
 		// ボタンを押した時の処理を設定
-		segment.addTarget(self, action: #selector(LogViewController.change(segment:)), for: UIControlEvents.valueChanged)
+		segment.addTarget(self, action: #selector(LogViewController.change(segment:)), for: UIControl.Event.valueChanged)
 		
 		// ViewにsegmentをsubViewとして追加
 		self.view.addSubview(segment)
@@ -314,7 +314,7 @@ class MyCell: UITableViewCell {
 	var labelVal2: UILabel!
 	var labelVal3: UILabel!
 	
-	override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
 		super.init(style: style, reuseIdentifier: reuseIdentifier)
 		
 		labelMode = UILabel()
@@ -396,8 +396,8 @@ class Connection2: NSObject, StreamDelegate {
 		self.inputStream.delegate  = self
 		self.outputStream.delegate = self
 		
-		self.inputStream.schedule(in: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
-		self.outputStream.schedule(in: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+		self.inputStream.schedule(in: RunLoop.current, forMode: RunLoop.Mode.default)
+		self.outputStream.schedule(in: RunLoop.current, forMode: RunLoop.Mode.default)
 		
 		self.inputStream.open()
 		self.outputStream.open()
@@ -417,9 +417,9 @@ class Connection2: NSObject, StreamDelegate {
 		// 返り値を定義
 		var retval = Dictionary<Int, String>()
 		var countCommand = command.data(using: String.Encoding.utf8, allowLossyConversion: false)!
-		
+		let commandLength = countCommand.count
 		let bytes : String = countCommand.withUnsafeMutableBytes{
-			bytes in return String(bytesNoCopy: bytes, length: countCommand.count, encoding: String.Encoding.utf8, freeWhenDone: false)!
+			bytes in return String(bytesNoCopy: bytes, length: commandLength, encoding: String.Encoding.utf8, freeWhenDone: false)!
 		}
 		
 		// エラー処理
@@ -431,17 +431,17 @@ class Connection2: NSObject, StreamDelegate {
 				print("time out")
 				retval[0] = "Error: time out."
 				self.inputStream.close()
-				self.inputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+				self.inputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
 				self.outputStream.close()
-				self.outputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+				self.outputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
 				return retval // disconnectStream will be called.
 			} else if self.outputStream.streamError != nil {
 				print("disconnect Stream")
 				retval[0] = "Error: disconnect Stream."
 				self.inputStream.close()
-				self.inputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+				self.inputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
 				self.outputStream.close()
-				self.outputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+				self.outputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
 				return retval
 			}
 		}
@@ -454,7 +454,7 @@ class Connection2: NSObject, StreamDelegate {
 		print("Send: \(command)")
 		
 		self.outputStream.close()
-		self.outputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+		self.outputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
 		
 		//        while(!inputStream.hasBytesAvailable){}   //不要かどうか確認中（2018/08/19）
 		let bufferSize = 2048
@@ -480,7 +480,7 @@ class Connection2: NSObject, StreamDelegate {
 			}
 		}
 		self.inputStream.close()
-		self.inputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+		self.inputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
 		
 		return retval
 	}

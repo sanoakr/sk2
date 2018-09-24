@@ -388,11 +388,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		let alert = UIAlertController(
 			title: title,
 			message: message,
-			preferredStyle: UIAlertControllerStyle.alert
+			preferredStyle: UIAlertController.Style.alert
 		)
 		let ok = UIAlertAction(
 			title: "OK",
-			style: UIAlertActionStyle.default,
+			style: UIAlertAction.Style.default,
 			handler: nil
 		)
 		alert.addAction(ok)
@@ -874,8 +874,8 @@ class Connection3: NSObject, StreamDelegate {
 		self.inputStream.delegate  = self
 		self.outputStream.delegate = self
 		
-		self.inputStream.schedule(in: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
-		self.outputStream.schedule(in: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+		self.inputStream.schedule(in: RunLoop.current, forMode: RunLoop.Mode.default)
+		self.outputStream.schedule(in: RunLoop.current, forMode: RunLoop.Mode.default)
 		
 		self.inputStream.open()
 		self.outputStream.open()
@@ -912,9 +912,9 @@ class Connection3: NSObject, StreamDelegate {
 				retval["response"] = "fail"
 				
 				self.inputStream.close()
-				self.inputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+				self.inputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
 				self.outputStream.close()
-				self.outputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+				self.outputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
 				return retval // disconnectStream will be called.
 			}
 		}
@@ -925,7 +925,7 @@ class Connection3: NSObject, StreamDelegate {
 		print("Send: \(command)")
 		
 		self.outputStream.close()
-		self.outputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+		self.outputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
 		
 		//        while(!inputStream.hasBytesAvailable){}   //不要かどうか確認中（2018/08/19）
 		let bufferSize = 1024
@@ -940,8 +940,13 @@ class Connection3: NSObject, StreamDelegate {
 		}
 		
 		self.inputStream.close()
-		self.inputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+		self.inputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
 		
 		return retval
 	}
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any]) -> [UIApplication.OpenExternalURLOptionsKey: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
 }

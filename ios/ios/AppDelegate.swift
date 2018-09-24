@@ -41,9 +41,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var ifDisableColor = UIColor(red: 0.74, green: 0.76, blue: 0.78, alpha: 1)	//#bdc3c7
 
 	// background処理
-	var backgroundTaskID : UIBackgroundTaskIdentifier = 0
+	var backgroundTaskID : UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0)
 	
-	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 		// Override point for customization after application launch.
 		
 		// UserDefaultの生成.
@@ -112,7 +112,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		self.backgroundTaskID = application.beginBackgroundTask(){
 			[weak self] in
 			application.endBackgroundTask((self?.backgroundTaskID)!)
-			self?.backgroundTaskID = UIBackgroundTaskInvalid
+			self?.backgroundTaskID = UIBackgroundTaskIdentifier.invalid
 		}
 		
 	}
@@ -126,7 +126,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		self.backgroundTaskID = application.beginBackgroundTask(){
 			[weak self] in
 			application.endBackgroundTask((self?.backgroundTaskID)!)
-			self?.backgroundTaskID = UIBackgroundTaskInvalid
+			self?.backgroundTaskID = UIBackgroundTaskIdentifier.invalid
 		}
 	}
 	
@@ -138,7 +138,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		self.backgroundTaskID = application.beginBackgroundTask(){
 			[weak self] in
 			application.endBackgroundTask((self?.backgroundTaskID)!)
-			self?.backgroundTaskID = UIBackgroundTaskInvalid
+			self?.backgroundTaskID = UIBackgroundTaskIdentifier.invalid
 		}
 	}
 	
@@ -147,7 +147,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		print("アプリが起動したよ")
 		
-		application.endBackgroundTask(self.backgroundTaskID)
+		application.endBackgroundTask(convertToUIBackgroundTaskIdentifier(self.backgroundTaskID.rawValue))
 	}
 	
 	func applicationWillTerminate(_ application: UIApplication) {
@@ -156,7 +156,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		self.backgroundTaskID = application.beginBackgroundTask(){
 			[weak self] in
 			application.endBackgroundTask((self?.backgroundTaskID)!)
-			self?.backgroundTaskID = UIBackgroundTaskInvalid
+			self?.backgroundTaskID = UIBackgroundTaskIdentifier.invalid
 		}
 	}
 	
@@ -305,5 +305,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		return true
 	}
 	
+	
 }
 
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToUIBackgroundTaskIdentifier(_ input: Int) -> UIBackgroundTaskIdentifier {
+	return UIBackgroundTaskIdentifier(rawValue: input)
+}

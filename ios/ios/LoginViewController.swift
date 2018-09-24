@@ -20,8 +20,8 @@ class LoginViewController: UIViewController {
 	var leftBarButton: UIBarButtonItem!
 	
 
-	@IBOutlet weak var useridField: UITextField!
-	@IBOutlet weak var passwordField: UITextField!
+	@IBOutlet var useridField: UITextField!
+	@IBOutlet var passwordField: UITextField!
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -80,7 +80,7 @@ class LoginViewController: UIViewController {
 		// --------------------------------------------------------------------------------------------------------------------------
 		// passwordFieldを生成
 		passwordField = UITextField(frame: CGRect(x:20, y:265, width:self.view.frame.width - 40, height:30))
-		passwordField.leftViewMode = UITextFieldViewMode.always
+		passwordField.leftViewMode = UITextField.ViewMode.always
 		passwordField.placeholder = "パスワード"
 		passwordField.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)    // 背景色
 		passwordField.borderStyle = .none
@@ -241,8 +241,8 @@ class ServerAuth: NSObject, StreamDelegate {
 		self.inputStream.delegate  = self
 		self.outputStream.delegate = self
 		
-		self.inputStream.schedule(in: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
-		self.outputStream.schedule(in: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+		self.inputStream.schedule(in: RunLoop.current, forMode: RunLoop.Mode.default)
+		self.outputStream.schedule(in: RunLoop.current, forMode: RunLoop.Mode.default)
 		
 		self.inputStream.open()
 		self.outputStream.open()
@@ -335,13 +335,14 @@ class ServerAuth: NSObject, StreamDelegate {
 		var retval = Dictionary<String, Any>()
 		
 		var ccommand = command.data(using: String.Encoding.utf8, allowLossyConversion: false)!
-		let text : String = ccommand.withUnsafeMutableBytes{ bytes in return String(bytesNoCopy: bytes, length: ccommand.count, encoding: String.Encoding.utf8, freeWhenDone: false)!}
+		let commandLength = ccommand.count
+		let text : String = ccommand.withUnsafeMutableBytes{ bytes in return String(bytesNoCopy: bytes, length: commandLength, encoding: String.Encoding.utf8, freeWhenDone: false)!}
 		
 		// "end"を受信したら接続切断
 		if (String(describing: command) == "end") {
 			
 			self.outputStream.close()
-			self.outputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+			self.outputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
 			
 	//		while(!inputStream.hasBytesAvailable){}
 			let bufferSize = 10240
@@ -421,7 +422,7 @@ class ServerAuth: NSObject, StreamDelegate {
 			}
 			
 			self.inputStream.close()
-			self.inputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
+			self.inputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
 		
 		} else {
 			// UnsafePointerを使うとうまくいかない場合がある（最初にダミーコマンドを送る必要があった）
