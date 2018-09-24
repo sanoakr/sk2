@@ -129,7 +129,7 @@ class Sk2Globals: Application(), AnkoLogger {
         const val MAX_COUNT_NOBEACON = 10
         // 自動記録のインターバル
         const val AUTO_SEND_INTERVAL_IN_MILLISEC: Long = 10*60*1000
-        const val AUTO_SEND_INTERVAL_IN_MILLISEC_DEBUG: Long = 1*60*1000
+        const val AUTO_SEND_INTERVAL_IN_MILLISEC_DEBUG: Long = 10*60*1000
         /** Auto Interval Alarm **/
         // リクエストコード
         const val ALARM_REQUEST_CODE_AUTO = 0
