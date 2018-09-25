@@ -154,6 +154,8 @@ class AsyncClient(asyncio.Protocol):
         try:
             s = ldap3.Server(eds, use_ssl=True)
             c = ldap3.Connection(s, auto_bind=True)
+
+            logger.info("start connection to {} by {}".format(eds, id))
             c.search(search_base=eds_sbase,
                      search_filter="(uid={})".format(id))
             dn = c.response[0]['dn']
@@ -163,11 +165,14 @@ class AsyncClient(asyncio.Protocol):
 
         try:
             c = ldap3.Connection(s, auto_bind=True, user=dn, password=ps)
+
+            logger.info("start auth connection to {} by {}".format(eds, id))
             c.search(search_base=eds_sbase, search_filter="(uid={})".format(
                 id), attributes=['gecos', 'displayName'])
             gecos = c.response[0]['raw_attributes']['gecos'][0].decode("utf-8")
             name = c.response[0]['raw_attributes']['displayName'][0].decode(
                 "utf-8")
+
             logger.info("ldap search reply {}, {}".format(gecos, name))
             return (gecos, name)
         except:

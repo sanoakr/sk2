@@ -91,7 +91,8 @@ $dbname = "sk2";
 $dbchar = "UTF-8";
 $dbtbl = "st";
 
-$farr = array('id', 'type');
+$fid = 'id';
+$farr = array('type');
 $fdt = 'datetime';
 $date_from = 'from';
 $date_to = 'to';
@@ -121,6 +122,8 @@ if ($result = $link->query($sql)) {
 echo "<h2></h2><br>\n";
 //////////////////////////////
 if ($_SERVER["REQUEST_METHOD"] == 'POST') {
+    $$fid = $_POST[$fid];
+
     foreach ($farr as $key) {
         $$key = $_POST[$key];
         //echo " $key=" . $$key;
@@ -138,6 +141,9 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
 }
 //////////////////////////////
 echo "<div name='form'><form action='search.php' method ='post'>\n";
+
+echo $fid . ': <input type="text" name="' . $fid . '" value="' . $$fid . '">' . " (wildcard=%)\n";
+
 foreach ($farr as $key) {
     echo "&emsp;&emsp;$key:";
     makeSelector($link, $dbtbl, $key, $$key);
@@ -162,6 +168,8 @@ echo "<br><p><input type='submit' value='search'></p></form></div>\n";
 if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     echo "<h2>Search Result</h2>\n";
     $sql = "SELECT * FROM $dbtbl WHERE ";
+    //////////////////////////////
+    $sql .= "$fid LIKE '" . $$fid . "' AND ";
     //////////////////////////////
     foreach ($farr as $key) {
         if ($$key != '*') {
