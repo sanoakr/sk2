@@ -69,6 +69,7 @@
 		D66429302132890C0089C04E /* help.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = help.png; sourceTree = "<group>"; };
 		D669E2CE214278A500AAA9B1 /* ConsentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsentViewController.swift; sourceTree = "<group>"; };
 		D669E2D0214417E500AAA9B1 /* UIViewController+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extension.swift"; sourceTree = "<group>"; };
+		D68AE17B2158C96B00955F53 /* ios.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ios.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +104,7 @@
 				D66428E3212C154D0089C04E /* iosTests */,
 				D66428EE212C154D0089C04E /* iosUITests */,
 				D66428CD212C154C0089C04E /* Products */,
+				D68AE17C2158C97E00955F53 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -119,6 +121,7 @@
 		D66428CE212C154C0089C04E /* ios */ = {
 			isa = PBXGroup;
 			children = (
+				D68AE17B2158C96B00955F53 /* ios.entitlements */,
 				D664290721312C820089C04E /* img */,
 				D66428CF212C154C0089C04E /* AppDelegate.swift */,
 				D66428FF212C162E0089C04E /* HelpViewController.swift */,
@@ -164,6 +167,13 @@
 				D664292021327CC70089C04E /* logout.png */,
 			);
 			path = img;
+			sourceTree = "<group>";
+		};
+		D68AE17C2158C97E00955F53 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -235,6 +245,20 @@
 					D66428CB212C154C0089C04E = {
 						CreatedOnToolsVersion = 9.4.1;
 						LastSwiftMigration = 1000;
+						SystemCapabilities = {
+							com.apple.AccessWiFi = {
+								enabled = 0;
+							};
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.Push = {
+								enabled = 0;
+							};
+							com.apple.WAC = {
+								enabled = 0;
+							};
+						};
 					};
 					D66428DF212C154D0089C04E = {
 						CreatedOnToolsVersion = 9.4.1;
@@ -487,6 +511,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 2NL9698ZUX;
 				INFOPLIST_FILE = ios/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -494,7 +519,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = jp.ac.ryukoku.sk2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -505,6 +530,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 2NL9698ZUX;
 				INFOPLIST_FILE = ios/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -512,7 +538,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = jp.ac.ryukoku.sk2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

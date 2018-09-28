@@ -8,6 +8,10 @@
 
 import UIKit
 
+@available(iOS 11.0, *)
+@available(iOS 11.0, *)
+@available(iOS 11.0, *)
+@available(iOS 11.0, *)
 class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 	
 	// AppDelegateのインスタンスを取得

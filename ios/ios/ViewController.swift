@@ -21,7 +21,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	
 	var Connection = Connection3()
 	var timerPostInterval = Timer()
-	var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = 0
+	var timerScanInterval = Timer()
+	var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0)
 	
 	// UI
 	var logViewBtn: UIBarButtonItem!
@@ -29,6 +30,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	var rightBarButton: UIBarButtonItem!
 	var attendBtn: UIButton!
 	var debugText : UITextView!
+	var debugText2 : UITextView!
 	var labelUser : UILabel!
 	var labelAuto : UILabel!
 	var labelBeacon : UILabel!
@@ -105,8 +107,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		
 		// --------------------------------------------------------------------------------------------------------------------------
 		// debugTextを生成
-		debugText = UITextView(frame: CGRect(x:10, y:navigationBarHeight! + 70, width:self.view.frame.width - 20, height:160))
-		debugText.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
+		debugText = UITextView(frame: CGRect(x:10, y:navigationBarHeight! + 70, width: (self.view.frame.width - 20 ) / 2, height:160))
+		debugText.font = UIFont.systemFont(ofSize: 7.0)    //フォントサイズ
 		debugText.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0)    // 背景色
 		debugText.isEditable = false    // 編集不可
 		debugText.textAlignment = NSTextAlignment.left    // 左寄せ
@@ -116,6 +118,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			view.addSubview(debugText)
 		} else {
 			debugText.removeFromSuperview()
+		}
+	
+		// --------------------------------------------------------------------------------------------------------------------------
+		// debugText2を生成
+		debugText2 = UITextView(frame: CGRect(x:10 +  (self.view.frame.width - 20 ) / 2, y:navigationBarHeight! + 70, width: (self.view.frame.width - 20 ) / 2, height:160))
+		debugText2.font = UIFont.systemFont(ofSize: 7.0)    //フォントサイズ
+		debugText2.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)    // 背景色
+		debugText2.isEditable = false    // 編集不可
+		debugText2.textAlignment = NSTextAlignment.left    // 左寄せ
+		
+		// デバッグモードの場合
+		if(debugMode == 1) {
+			view.addSubview(debugText2)
+		} else {
+			debugText2.removeFromSuperview()
 		}
 		
 		// 自動送信機能をN分ごとに実行
@@ -137,7 +154,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		SWautoSender.onTintColor = appDelegate.ifNormalColor
 		
 		// SwitchのOn/Off切り替わりの際に、呼ばれるイベントを設定する.
-		SWautoSender.addTarget(self, action: #selector(ViewController.onClickSWautoSender(sender:)), for: UIControlEvents.valueChanged)
+		SWautoSender.addTarget(self, action: #selector(ViewController.onClickSWautoSender(sender:)), for: UIControl.Event.valueChanged)
 		self.view.addSubview(SWautoSender)  // SwitchをViewに追加
 		
 		// 説明ラベル
@@ -276,14 +293,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		attendBtn.backgroundColor = appDelegate.ifOnDownColor //色
 		attendBtn.layer.shadowOpacity = 0
 		
-		print("beaconDetails: \(beaconDetails)")
+		print("beaconDetails: \(String(describing: beaconDetails))")
 		
 		// 登録されているUserDefaultから設定値を呼び出す
 		let user:String = myUserDefault.string(forKey: "user")!
 		let key:String = myUserDefault.string(forKey: "key")!
 		
 		// データ送信
-		let result = sendAttend(user: user, key: key, type: "M", beaconDetails: beaconDetails)
+		let result = sendAttend(user: user, key: key, type: "M")
 		
 		// データが正常に記録された場合の処理
 		if result == "success" {
@@ -371,8 +388,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			print("自動送信機能のチェック：\(appDelegate.postInterval)ごと")   //デバッグ
 			
 			// データ送信
-			let result = sendAttend(user: user, key: key, type: "A", beaconDetails: beaconDetails)
-			
+			let result = sendAttend(user: user, key: key, type: "A")
 			// データが正常に記録された場合の処理
 			if result == "success" {
 				// バイブレーション
@@ -404,7 +420,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		let alert = UIAlertController(
 			title: title,
 			message: message,
-			preferredStyle: UIAlertControllerStyle.alert
+			preferredStyle: UIAlertController.Style.alert
 		)
 		// アラート表示
 		present(alert, animated: true, completion: {
@@ -451,7 +467,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			// iBeaconのモニタリング開始
 			myLocationManager.startMonitoring(for: myBeaconRegion)
 			
-			print("myBeaconRegion:\(myBeaconRegion)")
+			print("myBeaconRegion:\(String(describing: myBeaconRegion))")
 		}
 	}
 	
@@ -479,7 +495,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			
 			// OKのアクションを作成する.
 			let myOkAction = UIAlertAction(title: "設定を開く", style: .default) { action in
-				UIApplication.shared.open(URL(string: "app-settings:")!, options: [:], completionHandler: nil)
+				UIApplication.shared.open(URL(string: "app-settings:")!, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
 			}
 			
 			// Actionを追加する.
@@ -537,7 +553,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 				
 				// 検知対象時間かどうかを判定
 				if(Int(dateString)! > appDelegate.startHour && Int(dateString)! < appDelegate.stopHour ) {
-				print("iBeacon存在：検知対象時間内");
+					print("iBeacon存在：検知対象時間内");
+					debugText2.text += String(describing: "iBeacon存在：検知対象時間内\n")
 					beaconFlg = true
 					
 					// iBeacon受信時の動き
@@ -553,19 +570,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 					manager.startRangingBeacons(in: region )
 				} else {
 					print("iBeacon存在：検知対象時間外")
+					debugText2.text += String(describing: "iBeacon存在：検知対象時間外\n")
 					beaconFlg = false
 					btnDisable()
 				}
 				break;
 				
 			case .outside:
-				print("iBeaconが圏外!")
+				print("iBeaconが圏外")
+				debugText2.text += String(describing: "iBeaconが圏外\n")
 				beaconFlg = false
 				btnDisable()
 				break;
 				
 			case .unknown:
-				print("iBeaconが圏外もしくは不明な状態!")
+				print("iBeaconが圏外もしくは不明な状態")
+				debugText2.text += String(describing: "iBeaconが圏外もしくは不明な状態\n")
 				beaconFlg = false
 				btnDisable()
 				break;
@@ -581,6 +601,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// 配列の初期化
 		beaconUuids = NSMutableArray()
 		beaconDetails = Array<String>()
+		
 		var items: [Item] = []
 		
 		// 範囲内で検知されたビーコンはこのbeaconsにCLBeaconオブジェクトとして格納される
@@ -682,6 +703,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	// iBeaconを検出した際に呼ばれる
 	func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
 		print("didEnterRegion: iBeaconが圏内に発見されました。");
+		debugText2.text += String(describing: "didEnterRegion: iBeaconが圏内に発見されました。\n")
 		
 		// Rangingを始める (Rangingは1秒ごとに呼ばれるので、検出中のiBeaconがなくなったら止める)
 		manager.startRangingBeacons(in: region as! CLBeaconRegion)
@@ -690,13 +712,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	// iBeaconを喪失した際に呼ばれる. 喪失後 30秒ぐらいあとに呼び出される
 	func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
 		print("didExitRegion: iBeaconが圏外に喪失されました。");
+		debugText2.text += String(describing: "didExitRegion: iBeaconが圏外に喪失されました。\n")
 		
 		// 検出中のiBeaconが存在しないのなら、iBeaconのモニタリングを終了する
 		manager.stopRangingBeacons(in: region as! CLBeaconRegion)
 	}
 	
 	
-	func sendAttend(user: String, key: String, type: String, beaconDetails: Array<String>) -> String{
+	func sendAttend(user: String, key: String, type: String) -> String{
 		
 		let resultVal:String
 		let now = appDelegate.currentTime()
@@ -704,18 +727,36 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		
 		print("--------------------- sendAttend begin ---------------------")
 		
-		//iBeaconの検出数が3以上ある場合
+//		// iBeacon値の正確性を高めるためscanを10回分蓄積する
+//		// キューを生成してサブスレッドで実行
+//		DispatchQueue(label: "jp.classmethod.app.queue").async {
+//			var testData:Array = self.beaconDetails
+//			print("data1:\(testData)")
+//			
+//			for i in 0..<5 {
+//				sleep(1)
+//				testData = testData + self.beaconDetails
+//				print("data\(i):\(testData)")
+//			}
+//			
+//			// メインスレッドで実行
+//			DispatchQueue.main.async {
+//				print("finish")
+//			}
+//		}
+//		
+		// iBeaconの検出数が3以上ある場合
 		if(beaconDetails.count > 2) {
 			for i in stride(from: 0, to: 3, by: 1) {
 				sendtext += ",\(beaconDetails[i])"
 				print("\(i)回目のループの値は\(beaconDetails[i])")
 			}
 		} else {
-			//検出したiBeaconの値を入れる
+			// 検出したiBeaconの値を入れる
 			for value in beaconDetails {
 				sendtext += ",\(value)"
 			}
-			//不足分をカラの値に入れる
+			// 不足分をカラの値に入れる
 			for _ in stride(from: 0, to: (3 - beaconDetails.count), by: 1) {
 				sendtext += ",,,"
 			}
@@ -896,9 +937,9 @@ class Connection3: NSObject, StreamDelegate {
 		// 返り値を定義
 		var retval = Dictionary<String, String>()
 		var countCommand = command.data(using: String.Encoding.utf8, allowLossyConversion: false)!
-		
+		let commandLength = countCommand.count
 		let bytes : String = countCommand.withUnsafeMutableBytes{
-			bytes in return String(bytesNoCopy: bytes, length: countCommand.count, encoding: String.Encoding.utf8, freeWhenDone: false)!
+			bytes in return String(bytesNoCopy: bytes, length: commandLength, encoding: String.Encoding.utf8, freeWhenDone: false)!
 		}
 		
 		// エラー処理
