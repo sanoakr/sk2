@@ -130,28 +130,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			self?.backgroundTaskID = UIBackgroundTaskIdentifier.invalid
 		}
 		
-		//
-		// 通知テスト（使うかどうかはわからない）
-		//
-		//　通知設定に必要なクラスをインスタンス化
-		let trigger: UNNotificationTrigger
-		let content = UNMutableNotificationContent()
-		var notificationTime = DateComponents()
-		
-		// トリガー設定
-		notificationTime.hour = 12
-		notificationTime.minute = 14
-		trigger = UNCalendarNotificationTrigger(dateMatching: notificationTime, repeats: false)
-		
-		// 通知内容の設定
-		content.title = ""
-		content.body = "【通知テスト】\(String(describing: notificationTime.hour)):\(String(describing: notificationTime.minute))時になりました"
-		content.sound = UNNotificationSound.default
-		
-		// 通知スタイルを指定
-		let request = UNNotificationRequest(identifier: "uuid", content: content, trigger: trigger)
-		// 通知をセット
-		UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
+//        //
+//        // 通知テスト（使うかどうかはわからない）
+//        //
+//        //　通知設定に必要なクラスをインスタンス化
+//        let trigger: UNNotificationTrigger
+//        let content = UNMutableNotificationContent()
+//        var notificationTime = DateComponents()
+//        
+//        // トリガー設定
+//        notificationTime.hour = 12
+//        notificationTime.minute = 14
+//        trigger = UNCalendarNotificationTrigger(dateMatching: notificationTime, repeats: false)
+//        
+//        // 通知内容の設定
+//        content.title = ""
+//        content.body = "【通知テスト】\(String(describing: notificationTime.hour)):\(String(describing: notificationTime.minute))時になりました"
+//        content.sound = UNNotificationSound.default
+//        
+//        // 通知スタイルを指定
+//        let request = UNNotificationRequest(identifier: "uuid", content: content, trigger: trigger)
+//        // 通知をセット
+//        UNUserNotificationCenter.current().add(request, withCompletionHandler: nil)
 	}
 	
 	func applicationWillEnterForeground(_ application: UIApplication) {
