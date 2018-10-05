@@ -86,6 +86,11 @@ class ConsentViewController: UIViewController,UIWebViewDelegate {
 //		print("ok")
 		// useDefaultsに同意フラグ
 		UserDefaults.standard.set(true, forKey: "consent")
+        
+        // ローカルにバージョンとビルドを保存
+        UserDefaults.standard.set(appDelegate.currentVersion, forKey: "currentVersion")
+        UserDefaults.standard.set(appDelegate.currentBuild, forKey: "currentBuild")
+        
 		// メイン画面を表示
 		let vc = ViewController()
 		self.navigationController?.pushViewController(vc, animated: false)

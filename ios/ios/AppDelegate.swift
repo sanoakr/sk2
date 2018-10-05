@@ -44,6 +44,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	// background処理
 	var backgroundTaskID : UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0)
 	
+    // バージョン情報
+    let currentVersion: String! = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+    let currentBuild: String! = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
+    
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 		// Override point for customization after application launch.
 		
@@ -57,12 +61,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		print(autoSender)
 		print(debug)
-		
+        
+        print("============ userDefaults begin ============")
+        print(UserDefaults.standard.dictionaryRepresentation())
+        print("============ userDefaults  end  ============")
+        
+        
 		let splash: SplashViewController = SplashViewController()
 		navigationController = UINavigationController(rootViewController: splash)
 
 		if(user == nil || key == nil) {
 			print("============ delegeteユーザーがセットされていないよ！ ============")
+            
 			let login: LoginViewController = LoginViewController()
 			navigationController = UINavigationController(rootViewController: login)
 		} else {
@@ -79,15 +89,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 				// 認証した場合はタイムスタンプを確認
 				let timestamp:Int = myUserDefault.integer(forKey: "timestamp")
 				let term = Int(NSDate().timeIntervalSince1970) - timestamp
-				
+                let setVersion = UserDefaults().string(forKey: "currentVersion")
+                
+                print("timestamp:\(timestamp)")
 				print("term:\(term)")
 				
+                // 認証維持期間を過ぎている場合
 				if(term > timeLimit) {
 					print("時間切れ")
 					let login: LoginViewController = LoginViewController()
 					navigationController = UINavigationController(rootViewController: login)
 					myUserDefault.set(nil, forKey: "timestamp")
-				}
+                    
+                // 保存されているバージョンとアプリのバージョンが違う場合
+                } else if( setVersion != currentVersion) {
+                    print("バージョン違い")
+                    let login: LoginViewController = LoginViewController()
+                    navigationController = UINavigationController(rootViewController: login)
+                }
+                
 			// 同意していない場合は同意画面を表示
 			} else {
 				print("consent: \(consent)")
