@@ -100,11 +100,36 @@ class LoginViewController: UIViewController {
 		loginBtn.backgroundColor = appDelegate.ifNormalColor
 		loginBtn.addTarget(self, action: #selector(LoginViewController.login(_:)), for: .touchUpInside)
 		view.addSubview(loginBtn)  // Viewに追加
+        
+        let message = appDelegate.message
+
+        if( message == "versionMismatch" ) {
+            showAlertAutoHidden(title:"バージョン不一致", message: "新しいバージョンにアップグレードされたため、再度ログインが必要です。", showTime: 3)
+        } else if ( message == "timeOver" ) {
+            showAlertAutoHidden(title:"認証切れ", message: "認証の有効期限が切れたため、再度ログインが必要です。", showTime: 3)
+        }
 		
 	}
 	
 	var container: NSPersistentContainer!	//データベース読み込みのコンテナ
 	
+    //
+    // 時間制限付きアラート
+    //
+    func showAlertAutoHidden(title: Any, message: Any, showTime: Double) {
+        
+        // アラート作成
+        let alert = UIAlertController(title: title as? String, message: message as? String, preferredStyle: .alert)
+        
+        // アラート表示
+        self.present(alert, animated: true, completion: {
+            // アラートを閉じる
+            DispatchQueue.main.asyncAfter(deadline: .now() + showTime, execute: {
+                alert.dismiss(animated: true, completion: nil)
+            })
+        })
+    }
+    
 	// --------------------------------------------------------------------------------------------------------------------------
 	// ログインボタンの動作
 	@IBAction func login(_ sender: UIButton) {
@@ -138,7 +163,7 @@ class LoginViewController: UIViewController {
 			let valKey: String? = key
 			let timestamp:Int = Int(NSDate().timeIntervalSince1970) //unix timestampで認証日時を記録
 //			print("\(timestamp): Auth Success.")
-			
+            
 			myUserDefault.set(valUserid, forKey: "user")
 			myUserDefault.set(valJpnName, forKey: "jpnName")
 			myUserDefault.set(valEngName, forKey: "engName")

@@ -77,7 +77,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		print("consent:\(consent)")
 		
 		// 同意済みかチェックし、同意していない場合は同意画面に遷移
-		if(consent == false) {
+		if( consent == false || appDelegate.message == "versionMismatch" ) {
 			// 同意画面を表示
 			let vc = ConsentViewController()
 			self.navigationController?.pushViewController(vc, animated: false)

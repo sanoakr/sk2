@@ -44,6 +44,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	// background処理
 	var backgroundTaskID : UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0)
 	
+    var message : String!
+    
     // バージョン情報
     let currentVersion: String! = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
     let currentBuild: String! = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
@@ -68,6 +70,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         
 		let splash: SplashViewController = SplashViewController()
+        let setVersion = UserDefaults().string(forKey: "currentVersion")
+        
 		navigationController = UINavigationController(rootViewController: splash)
 
 		if(user == nil || key == nil) {
@@ -81,6 +85,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 			let main: ViewController = ViewController()
 			navigationController = UINavigationController(rootViewController: main)
 			
+            print("setVersion:\(String(describing: setVersion))")
+            print("currentVersion:\(String(describing: currentVersion))")
+            
 			// 同意しているかチェック
 			let consent:Bool = UserDefaults.standard.bool(forKey: "consent")
 			
@@ -89,7 +96,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 				// 認証した場合はタイムスタンプを確認
 				let timestamp:Int = myUserDefault.integer(forKey: "timestamp")
 				let term = Int(NSDate().timeIntervalSince1970) - timestamp
-                let setVersion = UserDefaults().string(forKey: "currentVersion")
                 
                 print("timestamp:\(timestamp)")
 				print("term:\(term)")
@@ -97,13 +103,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 // 認証維持期間を過ぎている場合
 				if(term > timeLimit) {
 					print("時間切れ")
+                    appDelegate.message = "timeOver"
 					let login: LoginViewController = LoginViewController()
 					navigationController = UINavigationController(rootViewController: login)
 					myUserDefault.set(nil, forKey: "timestamp")
                     
                 // 保存されているバージョンとアプリのバージョンが違う場合
-                } else if( setVersion != currentVersion) {
+                } else if( (setVersion != nil) && setVersion != currentVersion) {
                     print("バージョン違い")
+                    appDelegate.message = "versionMismatch"
                     let login: LoginViewController = LoginViewController()
                     navigationController = UINavigationController(rootViewController: login)
                 }

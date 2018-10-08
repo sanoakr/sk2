@@ -91,6 +91,9 @@ class ConsentViewController: UIViewController,UIWebViewDelegate {
         UserDefaults.standard.set(appDelegate.currentVersion, forKey: "currentVersion")
         UserDefaults.standard.set(appDelegate.currentBuild, forKey: "currentBuild")
         
+        //delegateMessage
+        appDelegate.message = ""
+        
 		// メイン画面を表示
 		let vc = ViewController()
 		self.navigationController?.pushViewController(vc, animated: false)
