@@ -90,10 +90,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		
 		// 検証用ユーザーの場合はdebugモードにする
 		// リリースまでは全員debugモードにする
-		debugMode = 1
-//		if(user == appDelegate.debugUser) {
-//			debugMode = 1
-//		}
+//        debugMode = 1
+        if(user == appDelegate.debugUser) {
+            debugMode = 1
+        }
 		self.view.backgroundColor = appDelegate.backgroundColor // 背景色をセット
 		
 		// --------------------------------------------------------------------------------------------------------------------------
