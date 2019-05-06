@@ -90,10 +90,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		
 		// 検証用ユーザーの場合はdebugモードにする
 		// リリースまでは全員debugモードにする
-		debugMode = 1
-//		if(user == appDelegate.debugUser) {
-//			debugMode = 1
-//		}
+//        debugMode = 1
+        if(user == appDelegate.debugUser) {
+            debugMode = 1
+        }
 		self.view.backgroundColor = appDelegate.backgroundColor // 背景色をセット
 		
 		// --------------------------------------------------------------------------------------------------------------------------
@@ -678,6 +678,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 				items.append(Item(majorID: Int(truncating: majorID), minorID: Int(truncating: minorID),  rssi: Double(rssi), accuracy: Double(accuracy), proximity: String(proximity)))
 			}
 			
+            
 			// ソート条件を指定
 			let sortedByProximity: SortDescriptor<Item> = { $0.proximity < $1.proximity }
 			let sortedByRssi: SortDescriptor<Item> = { $0.rssi > $1.rssi }
@@ -721,74 +722,88 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	
 	func sendAttend(user: String, key: String, type: String) -> String{
 		
-		let resultVal:String
+        let resultVal:String
 		let now = appDelegate.currentTime()
-		var sendtext = "\(key),\(type),\(now)"
+        var sendtext = "\(key),\(type),\(now)"
 		
 		print("--------------------- sendAttend begin ---------------------")
 		
-//		// iBeacon値の正確性を高めるためscanを10回分蓄積する
-//		// キューを生成してサブスレッドで実行
-//		DispatchQueue(label: "jp.classmethod.app.queue").async {
-//			var testData:Array = self.beaconDetails
-//			print("data1:\(testData)")
-//			
-//			for i in 0..<5 {
-//				sleep(1)
-//				testData = testData + self.beaconDetails
-//				print("data\(i):\(testData)")
-//			}
-//			
-//			// メインスレッドで実行
-//			DispatchQueue.main.async {
-//				print("finish")
-//			}
-//		}
-//		
-		// iBeaconの検出数が3以上ある場合
-		if(beaconDetails.count > 2) {
-			for i in stride(from: 0, to: 3, by: 1) {
-				sendtext += ",\(beaconDetails[i])"
-				print("\(i)回目のループの値は\(beaconDetails[i])")
-			}
-		} else {
-			// 検出したiBeaconの値を入れる
-			for value in beaconDetails {
-				sendtext += ",\(value)"
-			}
-			// 不足分をカラの値に入れる
-			for _ in stride(from: 0, to: (3 - beaconDetails.count), by: 1) {
-				sendtext += ",,,"
-			}
-		}
-		print("sendtext:\(sendtext)")
-		
-		// socket通信
-		Connection.connect()
-		
-		// ローカルログへ保存
-		saveLocalLog(sendtext: sendtext)
-		
-		sendtext = "\(user)," + sendtext
-		let retVal = Connection.sendCommand(command: sendtext)
-		
-		// 値がカラの場合はエラー
-		if(retVal.isEmpty) {
-			resultVal = "fail"
-		} else {
-			let result:String = retVal["response"] as! String;
-			
-			// 出席が正常に記録された場合の処理
-			if result == "success" {
-				resultVal = "success"
-			} else {
-				resultVal = "fail"
-			}
-		}
-		
-		print("--------------------- sendAttend end ---------------------")
-		
-		return resultVal
+//        var testData:Array = self.beaconDetails
+//        print("data1:\(testData)")
+//
+//        for i in 0..<5 {
+//            sleep(1)
+//            testData = testData + self.beaconDetails
+//            print("data\(i):\(testData)")
+//        }
+        
+//        // iBeacon値の正確性を高めるためscanを10回分蓄積する
+//        // キューを生成してサブスレッドで実行
+//        DispatchQueue(label: "jp.classmethod.app.queue").async {
+//            var testData:Array = self.beaconDetails
+//            print("data1:\(testData)")
+//
+//            for i in 0..<5 {
+//                sleep(1)
+//                testData = testData + self.beaconDetails
+//                print("data\(i):\(testData)")
+//            }
+//
+//            // メインスレッドで実行
+//            DispatchQueue.main.sync {
+//                print("finish")
+//
+//
+//
+//            }
+//        }
+//        print("--------------------- sendAttend end ---------------------")
+//        return "resultVal"
+        
+        // iBeaconの検出数が3以上ある場合
+        if(beaconDetails.count > 2) {
+            for i in stride(from: 0, to: 3, by: 1) {
+                sendtext += ",\(beaconDetails[i])"
+                print("\(i)回目のループの値は\(beaconDetails[i])")
+            }
+        } else {
+            // 検出したiBeaconの値を入れる
+            for value in beaconDetails {
+                sendtext += ",\(value)"
+            }
+            // 不足分をカラの値に入れる
+            for _ in stride(from: 0, to: (3 - beaconDetails.count), by: 1) {
+                sendtext += ",,,"
+            }
+        }
+        print("sendtext:\(sendtext)")
+
+        // socket通信
+        Connection.connect()
+
+        // ローカルログへ保存
+        saveLocalLog(sendtext: sendtext)
+
+        sendtext = "\(user)," + sendtext
+        let retVal = Connection.sendCommand(command: sendtext)
+
+        // 値がカラの場合はエラー
+        if(retVal.isEmpty) {
+            resultVal = "fail"
+        } else {
+            let result:String = retVal["response"] as! String;
+
+            // 出席が正常に記録された場合の処理
+            if result == "success" {
+                resultVal = "success"
+            } else {
+                resultVal = "fail"
+            }
+        }
+        
+        print("--------------------- sendAttend end ---------------------")
+
+        return resultVal
 	}
 	
 	// ローカルログの保存
