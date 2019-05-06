@@ -42,7 +42,8 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOGIN_ATTEMPT_UID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOGIN_FAIL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOGIN_SUCCESS
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
+import org.jetbrains.anko.sdk27.coroutines.onClick
+//import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.InputStreamReader

@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '28.0.2'
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "jp.ac.ryukoku.st.sk2"
         minSdkVersion 19
@@ -27,13 +27,13 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-        implementation "com.android.support:appcompat-v7:$support_version"
+    implementation "com.android.support:appcompat-v7:$support_version"
     implementation "com.android.support:support-v4:$support_version"
     implementation "com.android.support:animated-vector-drawable:$support_version"
     implementation "com.android.support:support-media-compat:$support_version"
     testImplementation 'junit:junit:4.12'
 
-    implementation 'com.google.android.gms:play-services-location:15.0.1'
+    implementation 'com.google.android.gms:play-services-location:16.0.0'
     implementation "com.android.support:design:$support_version"
 
     implementation "org.jetbrains.anko:anko:$anko_version"
@@ -47,9 +47,3 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.8.5'
 }
-kotlin {
-    experimental {
-        coroutines "enable"
-    }
-}
-

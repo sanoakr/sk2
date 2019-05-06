@@ -108,7 +108,7 @@ class ScanArray() {
     /** ビーコン情報をテキストで **/
     fun getBeaconsText(label: Boolean = true, time: Boolean = true, statistic: Boolean = false,
                        uuid: Boolean = true, signal: Boolean = false, ios: Boolean = false,
-                       map: MutableMap<Triple<String, Int, Int>, String> = mutableMapOf()): String {
+                       map: MutableMap<Triple<String, Int, Int>, Pair<String, String>> = mutableMapOf()): String {
         /** ラベル設定 **/
         val uuLabel = if (label) "UUID=" else ","
         val mjLabel = if (label) "\n\tMajor=" else ","
@@ -144,7 +144,7 @@ class ScanArray() {
                     if (label) {
                         /** ラベル付きのときのみ **/
                         if (map.isNotEmpty())
-                            beaconText.append("\tName=${map[Triple(mUuid, mMajor, mMinor)]}\n")
+                            beaconText.append("\tName=${map[Triple(mUuid, mMajor, mMinor)]?.first}\n")
                         if (signal)
                             beaconText.append("\tTxPower=$mTx, RSSI=$mRssi\n")
                         if (ios) {
@@ -173,7 +173,7 @@ class ScanArray() {
 
                         if (label) {/** ラベル付きのときのみ **/
                             if (map.isNotEmpty())
-                                beaconText.append("\tName=${map[Triple(b.uuid.toString(), b.major, b.minor)]}\n")
+                                beaconText.append("\tName=${map[Triple(b.uuid.toString(), b.major, b.minor)]?.first}\n")
                             if (signal)
                                 beaconText.append("\tTxPower=${b.power}, RSSI=$rssi\n")
                             if (ios) {

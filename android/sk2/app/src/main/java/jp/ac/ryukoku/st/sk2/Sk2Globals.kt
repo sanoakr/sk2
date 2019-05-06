@@ -10,6 +10,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
+import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.jetbrains.anko.*
@@ -178,11 +179,12 @@ class Sk2Globals: Application(), AnkoLogger {
         val VALID_IBEACON_UUID: List<String> = listOf("ebf59ccc-21f2-4558-9488-00f2b388e5e6") // ru-wifi
 
         /*** AP Map の Key ***/
-        const val APMAP_KEY_BEACON = "beaconIdParams"
-        const val APMAP_KEY_BEACON_UUID = "uuid"
-        const val APMAP_KEY_BEACON_MAJOR = "major"
-        const val APMAP_KEY_BEACON_MINOR = "minor"
-        const val APMAP_KEY_NAME = "name"
+        //const val APMAP_KEY_BEACON = "beaconIdParams"
+        const val APMAP_KEY_UUID = "Uuid"
+        const val APMAP_KEY_MAJOR = "Major"
+        const val APMAP_KEY_MINOR = "Minor"
+        const val APMAP_KEY_NAME = "Name"
+        const val APMAP_KEY_NOTES = "Notes"
 
         /** プライバシーポリシー **/
         const val PRIVACY_POLICY_TITLE = "プライバシーポリシー"
@@ -257,7 +259,7 @@ class Sk2Globals: Application(), AnkoLogger {
         lateinit var localQueue: Queue<Triple<String,Char,List<StatBeacon>>>
         /**  AP情報の Map **/
         lateinit var apInfos: List<Map<String, Any>>
-        lateinit var apNameMap: MutableMap<Triple<String, Int, Int>, String>
+        lateinit var apNameMap: MutableMap<Triple<String, Int, Int>, Pair<String, String>>
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
 
@@ -287,7 +289,7 @@ class Sk2Globals: Application(), AnkoLogger {
         }
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
-    /*** サーバからの AP JSON ファイルを List<Map> にして、さらに (Major, Minor) => Name の Map をつくる **/
+    /*** サーバからの AP JSON ファイルを List<Map> にして、さらに (Uuid, Major, Minor) => (Name, Notes) の Map をつくる **/
     fun readApMap() {
         /** JSON から List<Map> **/
         val gson = Gson()
@@ -296,15 +298,18 @@ class Sk2Globals: Application(), AnkoLogger {
             val type: Type = object : TypeToken<List<Map<String, Any>>>() {}.type
             apInfos = gson.fromJson(jsonString, type)
         }
-        /** List<Map> から (Major, Minor) => Name **/
+        /** List<Map> から (Uuid, Major, Minor) => (Name, Notes) **/
         apNameMap = mutableMapOf()
         apInfos.forEach { ap ->
-            if (ap.containsKey(APMAP_KEY_BEACON) && ap.containsKey(APMAP_KEY_NAME)) {
-                val beacon = ap[APMAP_KEY_BEACON] as Map<String, String>
-                val uuid = beacon[APMAP_KEY_BEACON_UUID] as String
-                val major = (beacon[APMAP_KEY_BEACON_MAJOR] as Double).toInt()
-                val minor = (beacon[APMAP_KEY_BEACON_MINOR] as Double).toInt()
-                apNameMap[Triple(uuid, major, minor)] = ap[APMAP_KEY_NAME] as String
+            if (ap.containsKey(APMAP_KEY_MAJOR) && ap.containsKey(APMAP_KEY_MINOR)
+                    && ap.containsKey(APMAP_KEY_NAME) && ap.containsKey(APMAP_KEY_NOTES)) {
+                val uuid = ap[APMAP_KEY_UUID] as String
+                val major = (ap[APMAP_KEY_MAJOR] as Double).toInt()
+                val minor = (ap[APMAP_KEY_MINOR] as Double).toInt()
+                val name = ap[APMAP_KEY_NAME] as String
+                val notes = ap[APMAP_KEY_NOTES] as String
+                Log.d(name, notes)
+                apNameMap[Triple(uuid, major, minor)] = Pair(name, notes)
             }
         }
     }
@@ -332,8 +337,7 @@ class Sk2Globals: Application(), AnkoLogger {
         /** remove recodes null data contained **/
         localQueue.clear()
         queue.items.forEach {r ->
-            if (r.toList().any { e -> e != null })
-                localQueue.push(r)
+            localQueue.push(r)
         }
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/

@@ -24,7 +24,7 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_ATTEND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_LARGE
 import no.nordicsemi.android.support.v18.scanner.*
 import org.jetbrains.anko.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
+//import org.jetbrains.anko.sdk25.coroutines.onClick
 import android.content.*
 import android.os.Vibrator
 import android.support.v4.app.FragmentActivity
@@ -69,6 +69,7 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_MAIN_AUTO_OFF
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_MAIN_AUTO_ON
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.apNameMap
 import me.mattak.moment.Moment
+import org.jetbrains.anko.sdk27.coroutines.onClick
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /** Sk2 Main Activity **/
@@ -117,11 +118,11 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
         /** BLE のチェック **/
         if (!sk2.checkBt() && pref.getString(PREF_UID, "") != NAME_DEMOUSER) {
             // ダメならボタンをグレーアウト
-            mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_disabled)
+            mainUi.attBt.background = ContextCompat.getDrawable(this, R.drawable.button_states_disabled)
             mainUi.attBt.text = BUTTON_TEXT_ATTEND_FALSE
             toast(Sk2Globals.TOAST_CHECK_BLE_OFF)
         } else {
-            mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
+            mainUi.attBt.background = ContextCompat.getDrawable(this, R.drawable.button_states_blue)
             mainUi.attBt.text = BUTTON_TEXT_ATTEND_TRUE
         }
 
@@ -252,11 +253,11 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
         }
         // ビーコンなしが続いたらボタン表示をオフ
         if (invalidTime || countNoBeacon > MAX_COUNT_NOBEACON) {
-            mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_disabled)
+            mainUi.attBt.background = ContextCompat.getDrawable(this, R.drawable.button_states_disabled)
             mainUi.attBt.text = BUTTON_TEXT_ATTEND_FALSE
         }
         else {
-            mainUi.attBt.background = ContextCompat.getDrawable(ctx, R.drawable.button_states_blue)
+            mainUi.attBt.background = ContextCompat.getDrawable(this, R.drawable.button_states_blue)
             mainUi.attBt.text = BUTTON_TEXT_ATTEND_TRUE
         }
     }
@@ -287,7 +288,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
 
             /** message は Toast 表示 **/
             if (! message.isNullOrEmpty())
-                toast(message!!)
+                toast(message)
             /** scanResult は SendInfo へ表示 **/
             if (pref.getBoolean(PREF_DEBUG, false) && ! scanResult.isNullOrEmpty())
                 mainUi.sendInfo.text = scanResult
