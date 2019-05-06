@@ -150,7 +150,7 @@ class RecordAdapter: BaseAdapter() {
                             ////////////////////////////////////////
                             textView("($major, $minor)") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
-                            }.lparams { horizontalGravity = left; width = dip(100) }
+                            }.lparams { horizontalGravity = left; width = dip(50) }
                             ////////////////////////////////////////
                             val dist = "%.2f".format(item.getDistance(ix))
                             textView("Dist.=$dist") {

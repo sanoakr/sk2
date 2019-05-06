@@ -109,7 +109,7 @@ class RecordLocalAdapter: BaseAdapter(), AnkoLogger {
                             ////////////////////////////////////////
                             textView("($major, $minor)") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
-                            }.lparams { horizontalGravity = left; width = dip(100) }
+                            }.lparams { horizontalGravity = left; width = dip(50) }
                             ////////////////////////////////////////
                             //Log.e("CAST to Double from", "${beacons[ix][3]} ${beacons[ix][4]}")
                             val tx: Int = beacons[ix].power
