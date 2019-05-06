@@ -103,23 +103,19 @@ class RecordLocalAdapter: BaseAdapter(), AnkoLogger {
                         linearLayout {
                             padding = dip(3)
                             ////////////////////////////////////////
-                            textView("Name=${apNameMap[Triple(uuid, major, minor)]}") {
+                            textView("${apNameMap[Triple(uuid, major, minor)]?.second}") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
-                            }.lparams { horizontalGravity = left; width = dip(150) }
+                            }.lparams { horizontalGravity = left; width = dip(200) }
                             ////////////////////////////////////////
-                            textView("Major=$major") {
+                            textView("($major, $minor)") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
-                            }.lparams { horizontalGravity = left; width = dip(50) }
-                            ////////////////////////////////////////
-                            textView("Minor=$minor") {
-                                textSize = Sk2Globals.TEXT_SIZE_NORMAL
-                            }.lparams { horizontalGravity = left; width = dip(50) }
+                            }.lparams { horizontalGravity = left; width = dip(100) }
                             ////////////////////////////////////////
                             //Log.e("CAST to Double from", "${beacons[ix][3]} ${beacons[ix][4]}")
                             val tx: Int = beacons[ix].power
                             val rssi: Int = beacons[ix].rssi
-                            val dist = "%.6f".format(getBleDistance(tx, rssi))
-                            textView("Distance=$dist") {
+                            val dist = "%.2f".format(getBleDistance(tx, rssi))
+                            textView("Dist.=$dist") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
                             }.lparams { horizontalGravity = right; weight = 2f; leftMargin = dip(4) }
                         }

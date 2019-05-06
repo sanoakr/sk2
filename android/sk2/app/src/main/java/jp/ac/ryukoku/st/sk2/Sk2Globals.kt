@@ -10,7 +10,6 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
-import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.jetbrains.anko.*
@@ -301,14 +300,16 @@ class Sk2Globals: Application(), AnkoLogger {
         /** List<Map> から (Uuid, Major, Minor) => (Name, Notes) **/
         apNameMap = mutableMapOf()
         apInfos.forEach { ap ->
-            if (ap.containsKey(APMAP_KEY_MAJOR) && ap.containsKey(APMAP_KEY_MINOR)
-                    && ap.containsKey(APMAP_KEY_NAME) && ap.containsKey(APMAP_KEY_NOTES)) {
+            if (ap.containsKey(APMAP_KEY_MAJOR) && ap[APMAP_KEY_MAJOR] != null
+                    && ap.containsKey(APMAP_KEY_MINOR) && ap[APMAP_KEY_MINOR] != null
+                    && ap.containsKey(APMAP_KEY_NAME)  && ap[APMAP_KEY_NAME] != null
+                    && ap.containsKey(APMAP_KEY_NOTES) && ap[APMAP_KEY_NOTES] != null) {
                 val uuid = ap[APMAP_KEY_UUID] as String
                 val major = (ap[APMAP_KEY_MAJOR] as Double).toInt()
                 val minor = (ap[APMAP_KEY_MINOR] as Double).toInt()
                 val name = ap[APMAP_KEY_NAME] as String
                 val notes = ap[APMAP_KEY_NOTES] as String
-                Log.d(name, notes)
+                //Log.d("sk2", "$uuid, $major, $minor, $name, $notes")
                 apNameMap[Triple(uuid, major, minor)] = Pair(name, notes)
             }
         }

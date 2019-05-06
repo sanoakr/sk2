@@ -144,19 +144,16 @@ class RecordAdapter: BaseAdapter() {
                         linearLayout {
                             padding = dip(3)
                             ////////////////////////////////////////
-                            textView("Name=${apNameMap[Triple(uuid, major, minor)]}") {
+                            textView("${apNameMap[Triple(uuid, major, minor)]?.second}") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
-                            }.lparams { horizontalGravity = left; width = dip(150) }
-                            textView("Major=$major") {
-                                textSize = Sk2Globals.TEXT_SIZE_NORMAL
-                            }.lparams { horizontalGravity = left; width = dip(50) }
+                            }.lparams { horizontalGravity = left; width = dip(200) }
                             ////////////////////////////////////////
-                            textView("Minor=$minor") {
+                            textView("($major, $minor)") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
-                            }.lparams { horizontalGravity = left; width = dip(50) }
+                            }.lparams { horizontalGravity = left; width = dip(100) }
                             ////////////////////////////////////////
-                            val dist = "%.6f".format(item.getDistance(ix))
-                            textView("Distance=$dist") {
+                            val dist = "%.2f".format(item.getDistance(ix))
+                            textView("Dist.=$dist") {
                                 textSize = Sk2Globals.TEXT_SIZE_NORMAL
                             }.lparams { horizontalGravity = right; weight = 2f; leftMargin = dip(4) }
                         }

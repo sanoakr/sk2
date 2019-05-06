@@ -144,7 +144,7 @@ class ScanArray() {
                     if (label) {
                         /** ラベル付きのときのみ **/
                         if (map.isNotEmpty())
-                            beaconText.append("\tName=${map[Triple(mUuid, mMajor, mMinor)]?.first}\n")
+                            beaconText.append("\tName=${map[Triple(mUuid, mMajor, mMinor)]}\n")
                         if (signal)
                             beaconText.append("\tTxPower=$mTx, RSSI=$mRssi\n")
                         if (ios) {
@@ -173,7 +173,7 @@ class ScanArray() {
 
                         if (label) {/** ラベル付きのときのみ **/
                             if (map.isNotEmpty())
-                                beaconText.append("\tName=${map[Triple(b.uuid.toString(), b.major, b.minor)]?.first}\n")
+                                beaconText.append("\t${map[Triple(b.uuid.toString(), b.major, b.minor)]}\n")
                             if (signal)
                                 beaconText.append("\tTxPower=${b.power}, RSSI=$rssi\n")
                             if (ios) {
