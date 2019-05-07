@@ -1,1370 +1,800 @@
 [
- {
-   "Name": "ST001-3F-AP-18",
-   "Model": "MR33",
-   "Notes": "1号館_3F_340実習室",
-   "Serial number": "Q2PD-LDPZ-8UGL",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.89",
-   "MAC address": "e0:cb:bc:48:7c:8f",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 48
- },
- {
-   "Name": "ST001-2F-AP-05",
-   "Model": "MR33",
-   "Notes": "1号館_2F_210A演習室",
-   "Serial number": "Q2PD-5ERT-VAU6",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.106",
-   "MAC address": "e0:cb:bc:49:13:68",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 21
- },
- {
-   "Name": "ST001-B1-AP-03",
-   "Model": "MR33",
-   "Notes": "1号館_B1F_B103実験室",
-   "Serial number": "Q2PD-6YY6-UY5Q",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.33",
-   "MAC address": "e0:cb:bc:49:18:2f",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 1
- },
- {
-   "Name": "ST001-5F-AP-05",
-   "Model": "MR33",
-   "Notes": "1号館_5F_507研究室前通路",
-   "Serial number": "Q2PD-TM5W-3NR5",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.15",
-   "MAC address": "e0:cb:bc:48:96:7f",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 73
- },
- {
-   "Name": "ST001-2F-AP-03",
-   "Model": "MR33",
-   "Notes": "1号館_2F_206A演習室",
-   "Serial number": "Q2PD-5SDT-TB7B",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.104",
-   "MAC address": "e0:cb:bc:49:14:a6",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 19
- },
- {
-   "Name": "ST001-6F-AP-04",
-   "Model": "MR33",
-   "Notes": "1号館_6F_604実験室",
-   "Serial number": "Q2PD-ZDB6-EV4F",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.38",
-   "MAC address": "e0:cb:bc:49:23:dd",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 92
- },
- {
-   "Name": "ST001-6F-AP-07",
-   "Model": "MR33",
-   "Notes": "1号館_6F_608情報実習室西",
-   "Serial number": "Q2PD-RXTR-WA5M",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.41",
-   "MAC address": "e0:cb:bc:48:8d:76",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 95
- },
- {
-   "Name": "ST001-4F-AP-18",
-   "Model": "MR33",
-   "Notes": "1号館_4F_441実習室",
-   "Serial number": "Q2PD-2DTH-XGKH",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.70",
-   "MAC address": "e0:cb:bc:34:e8:1a",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 67
- },
- {
-   "Name": "ST001-5F-AP-20",
-   "Model": "MR33",
-   "Notes": "1号館_5F_542情報実習室北",
-   "Serial number": "Q2PD-Z7SH-LDHA",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.110",
-   "MAC address": "e0:cb:bc:48:b8:24",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 88
- },
- {
-   "Name": "ST001-3F-AP-14",
-   "Model": "MR33",
-   "Notes": "1号館_3F_318研究室",
-   "Serial number": "Q2PD-V6FJ-P7E5",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.86",
-   "MAC address": "e0:cb:bc:48:3a:4c",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 44
- },
- {
-   "Name": "ST001-5F-AP-10",
-   "Model": "MR33",
-   "Notes": "1号館_5F_531実験室",
-   "Serial number": "Q2PD-ZKCL-WCHF",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.112",
-   "MAC address": "e0:cb:bc:48:91:a7",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 78
- },
- {
-   "Name": "ST001-5F-AP-04",
-   "Model": "MR33",
-   "Notes": "1号館_5F_507研究室",
-   "Serial number": "Q2PD-628N-HCBS",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.16",
-   "MAC address": "e0:cb:bc:49:15:66",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 72
- },
- {
-   "Name": "ST001-1F-AP-11",
-   "Model": "MR33",
-   "Notes": "1号館_1F_エントランスホール",
-   "Serial number": "Q2PD-77B7-8E94",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.37",
-   "MAC address": "e0:cb:bc:49:18:c1",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 11
- },
- {
-   "Name": "ST001-5F-AP-19",
-   "Model": "MR33",
-   "Notes": "1号館_5F_542情報実習室中央",
-   "Serial number": "Q2PD-5KRY-GJWZ",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.109",
-   "MAC address": "e0:cb:bc:49:13:f1",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 87
- },
- {
-   "Name": "ST001-2F-AP-12",
-   "Model": "MR33",
-   "Notes": "1号館_2F_239実験室",
-   "Serial number": "Q2PD-6YXH-ZKXK",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.96",
-   "MAC address": "e0:cb:bc:49:18:2e",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 28
- },
- {
-   "Name": "ST001-2F-AP-14",
-   "Model": "MR33",
-   "Notes": "1号館_2F_242実験室",
-   "Serial number": "Q2PD-9XHB-8Z8Z",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.98",
-   "MAC address": "e0:cb:bc:49:21:2b",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 30
- },
- {
-   "Name": "ST001-3F-AP-12",
-   "Model": "MR33",
-   "Notes": "1号館_3F_334実験室",
-   "Serial number": "Q2PD-5C44-7EAL",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.82",
-   "MAC address": "e0:cb:bc:49:13:28",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 42
- },
- {
-   "Name": "ST001-5F-AP-13",
-   "Model": "MR33",
-   "Notes": "1号館_5F_535数理情報学科事務室",
-   "Serial number": "Q2PD-5RQR-5YWN",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.9",
-   "MAC address": "e0:cb:bc:49:14:98",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 81
- },
- {
-   "Name": "ST001-5F-AP-09",
-   "Model": "MR33",
-   "Notes": "1号館_5F_530実験室",
-   "Serial number": "Q2PD-7L8S-W2NS",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.111",
-   "MAC address": "e0:cb:bc:49:19:e6",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 77
- },
- {
-   "Name": "ST001-1F-AP-02",
-   "Model": "MR33",
-   "Notes": "1号館_1F_キャリアセンターインターンシップ支援オフィス 東",
-   "Serial number": "Q2PD-4KVW-7X8K",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.25",
-   "MAC address": "e0:cb:bc:49:10:c4",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 8
- },
- {
-   "Name": "ST001-4F-AP-12",
-   "Model": "MR33",
-   "Notes": "1号館_4F_434電子情報学科事務室",
-   "Serial number": "Q2PD-8BR5-2M3L",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.64",
-   "MAC address": "e0:cb:bc:49:1c:03",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 61
- },
- {
-   "Name": "ST001-6F-AP-13",
-   "Model": "MR33",
-   "Notes": "1号館_6F_614実習室",
-   "Serial number": "Q2PD-VLU3-3YHM",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.47",
-   "MAC address": "e0:cb:bc:48:9c:9e",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 101
- },
- {
-   "Name": "ST001-2F-AP-04",
-   "Model": "MR33",
-   "Notes": "1号館_2F_208A演習室",
-   "Serial number": "Q2PD-5L7H-XA4G",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.105",
-   "MAC address": "e0:cb:bc:49:13:fc",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 20
- },
- {
-   "Name": "ST001-5F-AP-12",
-   "Model": "MR33",
-   "Notes": "1号館_5F_534演習室",
-   "Serial number": "Q2PD-8Y48-JFAA",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.10",
-   "MAC address": "e0:cb:bc:49:1e:22",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 80
- },
- {
-   "Name": "ST001-5F-AP-16",
-   "Model": "MR33",
-   "Notes": "1号館_5F_540実験室",
-   "Serial number": "Q2PD-5MH8-CMAC",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.6",
-   "MAC address": "e0:cb:bc:49:14:23",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 84
- },
- {
-   "Name": "ST001-6F-AP-14",
-   "Model": "MR33",
-   "Notes": "1号館_6F_615実験室",
-   "Serial number": "Q2PD-ZLS3-4YDK",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.48",
-   "MAC address": "e0:cb:bc:48:b9:69",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 102
- },
- {
-   "Name": "ST001-1F-AP-01",
-   "Model": "MR33",
-   "Notes": "1号館_1F_キャリアセンターインターンシップ支援オフィス 西",
-   "Serial number": "Q2PD-5BCW-QV2X",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.108",
-   "MAC address": "e0:cb:bc:49:13:15",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 118
- },
- {
-   "Name": "ST001-3F-AP-20",
-   "Model": "MR42E",
-   "Notes": null,
-   "Serial number": "Q2TD-G33F-EUVM",
-   "Firmware version": "MR 26.0",
-   "Public IP": "133.83.239.204",
-   "MAC address": "0c:8d:db:7a:05:85",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 120
- },
- {
-   "Name": "ST001-2F-AP-13",
-   "Model": "MR33",
-   "Notes": "1号館_2F_241物質化学科事務室",
-   "Serial number": "Q2PD-5D8P-GD7T",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.97",
-   "MAC address": "e0:cb:bc:49:13:45",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 29
- },
- {
-   "Name": "ST001-5F-AP-14",
-   "Model": "MR33",
-   "Notes": "1号館_5F_538演習室",
-   "Serial number": "Q2PD-236K-7RT6",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.8",
-   "MAC address": "e0:cb:bc:49:08:d1",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 82
- },
- {
-   "Name": "ST001-3F-AP-03",
-   "Model": "MR33",
-   "Notes": "1号館_3F_305A演習室",
-   "Serial number": "Q2PD-5DNA-AKZS",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.74",
-   "MAC address": "e0:cb:bc:49:13:4e",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 33
- },
- {
-   "Name": "ST001-3F-AP-11",
-   "Model": "MR33",
-   "Notes": "1号館_3F_333大学院合同研究室（物質化学科）",
-   "Serial number": "Q2PD-4CF8-B7RC",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.83",
-   "MAC address": "e0:cb:bc:48:ae:25",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 41
- },
- {
-   "Name": "ST001-4F-AP-17",
-   "Model": "MR33",
-   "Notes": "1号館_4F_440実習室",
-   "Serial number": "Q2PD-72Y8-5D4S",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.69",
-   "MAC address": "e0:cb:bc:49:18:62",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 66
- },
- {
-   "Name": "ST001-3F-AP-08",
-   "Model": "MR33",
-   "Notes": "1号館_3F_330実験室",
-   "Serial number": "Q2PD-5CKN-WD9H",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.79",
-   "MAC address": "e0:cb:bc:49:13:38",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 38
- },
- {
-   "Name": "ST001-4F-AP-14",
-   "Model": "MR33",
-   "Notes": "1号館_4F_436実験室",
-   "Serial number": "Q2PD-23C4-XP2X",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.66",
-   "MAC address": "e0:cb:bc:49:08:d9",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 63
- },
- {
-   "Name": "ST001-1F-AP-13",
-   "Model": "MR33",
-   "Notes": "1号館_1F_理工学部教務課中央",
-   "Serial number": "Q2PD-5DCY-DKTM",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.36",
-   "MAC address": "e0:cb:bc:49:13:47",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 15
- },
- {
-   "Name": "ST001-1F-AP-12",
-   "Model": "MR33",
-   "Notes": "1号館_1F_理事室",
-   "Serial number": "Q2PD-ZNPQ-LQWY",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.100",
-   "MAC address": "e0:cb:bc:49:24:d0",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 12
- },
- {
-   "Name": "ST001-3F-AP-09",
-   "Model": "MR33",
-   "Notes": "1号館_3F_331実験室",
-   "Serial number": "Q2PD-93UP-REKF",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.80",
-   "MAC address": "e0:cb:bc:34:fc:3b",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 39
- },
- {
-   "Name": "ST001-3F-AP-10",
-   "Model": "MR33",
-   "Notes": "1号館_3F_332実験室",
-   "Serial number": "Q2PD-ZD9D-ULWT",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.81",
-   "MAC address": "e0:cb:bc:49:23:dc",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 40
- },
- {
-   "Name": "ST001-3F-AP-04",
-   "Model": "MR33",
-   "Notes": "1号館_3F_308演習室",
-   "Serial number": "Q2PD-5DEH-7YP3",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.75",
-   "MAC address": "e0:cb:bc:49:13:48",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 34
- },
- {
-   "Name": "ST001-1F-AP-03",
-   "Model": "MR42",
-   "Notes": "1号館_1F_107講義室 南",
-   "Serial number": "Q2KD-BQE9-P5PG",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.101",
-   "MAC address": "e0:cb:bc:8b:90:f1",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 115
- },
- {
-   "Name": "ST001-1F-AP-06",
-   "Model": "MR42",
-   "Notes": "1号館_1F_107講義室 東",
-   "Serial number": "Q2KD-VXYR-PBBW",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.22",
-   "MAC address": "e0:cb:bc:8b:90:cb",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 114
- },
- {
-   "Name": "ST001-2F-AP-08",
-   "Model": "MR33",
-   "Notes": "1号館_2F_231実験室",
-   "Serial number": "Q2PD-5CU3-SG4Z",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.58",
-   "MAC address": "e0:cb:bc:49:13:3e",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 119
- },
- {
-   "Name": "ST001-4F-AP-08",
-   "Model": "MR33",
-   "Notes": "1号館_4F_411A演習室",
-   "Serial number": "Q2PD-F9R8-3G54",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.60",
-   "MAC address": "e0:cb:bc:48:0f:2b",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 57
- },
- {
-   "Name": "ST001-6F-AP-18",
-   "Model": "MR33",
-   "Notes": "1号館_6F_619会議室",
-   "Serial number": "Q2PD-8D5F-USKJ",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.52",
-   "MAC address": "e0:cb:bc:49:1c:28",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 106
- },
- {
-   "Name": "ST001-4F-AP-13",
-   "Model": "MR33",
-   "Notes": "1号館_4F_435実験室",
-   "Serial number": "Q2PD-78Y5-99XQ",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.65",
-   "MAC address": "e0:cb:bc:49:18:e6",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 62
- },
- {
-   "Name": "ST001-5F-AP-11",
-   "Model": "MR33",
-   "Notes": "1号館_5F_533会議室",
-   "Serial number": "Q2PD-3F2T-E8P9",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.11",
-   "MAC address": "e0:cb:bc:48:48:f0",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 79
- },
- {
-   "Name": "ST001-6F-AP-12",
-   "Model": "MR33",
-   "Notes": "1号館_6F_612実験室東",
-   "Serial number": "Q2PD-79S7-BFRD",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.46",
-   "MAC address": "e0:cb:bc:48:b7:3b",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 100
- },
- {
-   "Name": "ST001-3F-AP-17",
-   "Model": "MR33",
-   "Notes": "1号館_3F_338会議室",
-   "Serial number": "Q2PD-7P7C-ZLDJ",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.88",
-   "MAC address": "e0:cb:bc:49:1a:30",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 47
- },
- {
-   "Name": "ST001-5F-AP-15",
-   "Model": "MR33",
-   "Notes": "1号館_5F_539実験室",
-   "Serial number": "Q2PD-5KCK-YC2T",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.7",
-   "MAC address": "e0:cb:bc:49:13:e4",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 83
- },
- {
-   "Name": "ST001-1F-AP-14",
-   "Model": "MR33",
-   "Notes": "1号館_1F_理工学部教務課西",
-   "Serial number": "Q2PD-5AV2-6VL5",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.153",
-   "MAC address": "e0:cb:bc:49:13:08",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 16
- },
- {
-   "Name": "ST001-4F-AP-19",
-   "Model": "MR33",
-   "Notes": "1号館_4F_443実験室",
-   "Serial number": "Q2PD-4PXS-CSJH",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.71",
-   "MAC address": "e0:cb:bc:49:11:37",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 68
- },
- {
-   "Name": "ST001-3F-AP-16",
-   "Model": "MR33",
-   "Notes": "1号館_3F_336機械システム工学科事務室",
-   "Serial number": "Q2PD-5ZYR-AMZK",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.87",
-   "MAC address": "e0:cb:bc:49:15:60",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 46
- },
- {
-   "Name": "ST001-1F-AP-08",
-   "Model": "MR33",
-   "Notes": "1号館_1F_瀬田事務部",
-   "Serial number": "Q2PD-5L4E-MR2W",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.20",
-   "MAC address": "e0:cb:bc:49:13:f9",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 14
- },
- {
-   "Name": "ST001-1F-AP-05",
-   "Model": "MR42",
-   "Notes": "1号館_1F_107講義室 西",
-   "Serial number": "Q2KD-SU5B-FZUQ",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.23",
-   "MAC address": "e0:cb:bc:8b:92:a8",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 113
- },
- {
-   "Name": "ST001-B1-AP-08",
-   "Model": "MR33",
-   "Notes": "1号館_B1F_B106実験室B",
-   "Serial number": "Q2PD-5BR7-YVMS",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.27",
-   "MAC address": "e0:cb:bc:49:13:20",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 6
- },
- {
-   "Name": "ST001-4F-AP-16",
-   "Model": "MR33",
-   "Notes": "1号館_4F_439実習室",
-   "Serial number": "Q2PD-6VPF-UWWV",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.68",
-   "MAC address": "e0:cb:bc:49:17:e4",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 65
- },
- {
-   "Name": "ST001-3F-AP-06",
-   "Model": "MR33",
-   "Notes": "1号館_3F_313A演習室",
-   "Serial number": "Q2PD-5CKN-F6QA",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.77",
-   "MAC address": "e0:cb:bc:49:13:37",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 36
- },
- {
-   "Name": "ST001-6F-AP-10",
-   "Model": "MR33",
-   "Notes": "1号館_6F_609情報実習室南",
-   "Serial number": "Q2PD-4YDR-54BZ",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.43",
-   "MAC address": "e0:cb:bc:34:ef:ea",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 98
- },
- {
-   "Name": "ST001-3F-AP-19",
-   "Model": "MR33",
-   "Notes": "1号館_3F_342演習室",
-   "Serial number": "Q2PD-K4JP-AW67",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.90",
-   "MAC address": "e0:cb:bc:48:78:a3",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 49
- },
- {
-   "Name": "ST001-6F-AP-09",
-   "Model": "MR33",
-   "Notes": "1号館_6F_609情報実習室北",
-   "Serial number": "Q2PD-R3HK-7LHH",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.44",
-   "MAC address": "e0:cb:bc:48:8a:d1",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 97
- },
- {
-   "Name": "ST001-3F-AP-05",
-   "Model": "MR33",
-   "Notes": "1号館_3F_311A演習室",
-   "Serial number": "Q2PD-8JRT-8Z6F",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.76",
-   "MAC address": "e0:cb:bc:49:1c:c7",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 35
- },
- {
-   "Name": "ST001-1F-AP-09",
-   "Model": "MR33",
-   "Notes": "1号館_1F_講師控室",
-   "Serial number": "Q2PD-4TGV-W74E",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.99",
-   "MAC address": "e0:cb:bc:49:11:81",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 10
- },
- {
-   "Name": "ST001-B1-AP-02",
-   "Model": "MR33",
-   "Notes": "1号館_B1F_B102実験室",
-   "Serial number": "Q2PD-4RG4-YZKG",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.32",
-   "MAC address": "e0:cb:bc:49:11:59",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 0
- },
- {
-   "Name": "ST001-5F-AP-08",
-   "Model": "MR33",
-   "Notes": "1号館_5F_513A演習室",
-   "Serial number": "Q2PD-72ZA-DKD6",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.12",
-   "MAC address": "e0:cb:bc:49:18:63",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 76
- },
- {
-   "Name": "ST001-4F-AP-05",
-   "Model": "MR33",
-   "Notes": "1号館_4F_431演習室前通路",
-   "Serial number": "Q2PD-5KKK-DJX4",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.57",
-   "MAC address": "e0:cb:bc:49:13:ea",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 54
- },
- {
-   "Name": "ST001-4F-AP-07",
-   "Model": "MR33",
-   "Notes": "1号館_4F_409A演習室",
-   "Serial number": "Q2PD-8BRA-VZJT",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.59",
-   "MAC address": "e0:cb:bc:48:bd:b1",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 56
- },
- {
-   "Name": "ST001-5F-AP-17",
-   "Model": "MR33",
-   "Notes": "1号館_5F_541実験室",
-   "Serial number": "Q2PD-ZL3S-T83W",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.5",
-   "MAC address": "e0:cb:bc:49:24:93",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 85
- },
- {
-   "Name": "ST001-6F-AP-16",
-   "Model": "MR33",
-   "Notes": "1号館_6F_617実験室",
-   "Serial number": "Q2PD-ZBCF-9LNA",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.50",
-   "MAC address": "e0:cb:bc:49:23:b4",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 104
- },
- {
-   "Name": "ST001-4F-AP-04",
-   "Model": "MR33",
-   "Notes": "1号館_4F_431演習室",
-   "Serial number": "Q2PD-553T-R37N",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.56",
-   "MAC address": "e0:cb:bc:49:12:7b",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 53
- },
- {
-   "Name": "ST001-3F-AP-13",
-   "Model": "MR33",
-   "Notes": "1号館_3F_335実験室",
-   "Serial number": "Q2PD-5ZVN-QF22",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.84",
-   "MAC address": "e0:cb:bc:49:15:5d",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 43
- },
- {
-   "Name": "ST001-B1-AP-06",
-   "Model": "MR33",
-   "Notes": "1号館_B1F_B105実験室",
-   "Serial number": "Q2PD-6WEF-NE94",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.29",
-   "MAC address": "e0:cb:bc:49:17:f6",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 4
- },
- {
-   "Name": "ST001-6F-AP-08",
-   "Model": "MR33",
-   "Notes": "1号館_6F_609情報実習室中央",
-   "Serial number": "Q2PD-MTD7-9F2E",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.42",
-   "MAC address": "e0:cb:bc:48:80:ec",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 96
- },
- {
-   "Name": "ST001-2F-AP-06",
-   "Model": "MR33",
-   "Notes": "1号館_2F_212A演習室",
-   "Serial number": "Q2PD-5QGU-BT6V",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.107",
-   "MAC address": "e0:cb:bc:49:14:74",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 22
- },
- {
-   "Name": "ST001-6F-AP-03",
-   "Model": "MR33",
-   "Notes": "1号館_6F_603実験室",
-   "Serial number": "Q2PD-56YL-SFLL",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.31",
-   "MAC address": "e0:cb:bc:34:f0:9c",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 91
- },
- {
-   "Name": "ST001-4F-AP-06",
-   "Model": "MR33",
-   "Notes": "1号館_4F_407A演習室",
-   "Serial number": "Q2PD-EVJ5-A7J5",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.58",
-   "MAC address": "e0:cb:bc:48:0e:07",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 55
- },
- {
-   "Name": "ST001-4F-AP-10",
-   "Model": "MR33",
-   "Notes": "1号館_4F_432実験室",
-   "Serial number": "Q2PD-SP88-VNZS",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.62",
-   "MAC address": "e0:cb:bc:48:93:9b",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 59
- },
- {
-   "Name": "ST001-5F-AP-18",
-   "Model": "MR33",
-   "Notes": "1号館_5F_542情報実習室南",
-   "Serial number": "Q2PD-5MC8-CREE",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.4",
-   "MAC address": "e0:cb:bc:49:14:1e",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 86
- },
- {
-   "Name": "ST001-4F-AP-11",
-   "Model": "MR33",
-   "Notes": "1号館_4F_433実験室",
-   "Serial number": "Q2PD-UFQ9-L5A6",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.63",
-   "MAC address": "e0:cb:bc:48:38:0b",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 60
- },
- {
-   "Name": "ST001-3F-AP-07",
-   "Model": "MR33",
-   "Notes": "1号館_3F_315A演習室",
-   "Serial number": "Q2PD-5BLD-GBFN",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.78",
-   "MAC address": "e0:cb:bc:49:13:1c",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 37
- },
- {
-   "Name": "ST001-6F-AP-11",
-   "Model": "MR33",
-   "Notes": "1号館_6F_612実験室西",
-   "Serial number": "Q2PD-87XB-BAME",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.45",
-   "MAC address": "e0:cb:bc:34:f9:aa",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 99
- },
- {
-   "Name": "ST001-1F-AP-04",
-   "Model": "MR42",
-   "Notes": "1号館_1F_107講義室 北",
-   "Serial number": "Q2KD-6D8C-X6DE",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.24",
-   "MAC address": "e0:cb:bc:8b:90:fd",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 116
- },
- {
-   "Name": "ST001-5F-AP-06",
-   "Model": "MR33",
-   "Notes": "1号館_5F_509A演習室",
-   "Serial number": "Q2PD-22PU-Y387",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.14",
-   "MAC address": "e0:cb:bc:49:08:c4",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 74
- },
- {
-   "Name": "ST001-6F-AP-05",
-   "Model": "MR33",
-   "Notes": "1号館_6F_605理工学研究科長室",
-   "Serial number": "Q2PD-79QZ-L2XM",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.39",
-   "MAC address": "e0:cb:bc:48:b7:39",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 93
- },
- {
-   "Name": "ST001-5F-AP-01",
-   "Model": "MR33",
-   "Notes": "1号館_5F_501A演習室",
-   "Serial number": "Q2PD-5DKD-N9WY",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.19",
-   "MAC address": "e0:cb:bc:49:13:4b",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 69
- },
- {
-   "Name": "ST001-3F-AP-15",
-   "Model": "MR33",
-   "Notes": "1号館_3F_318研究室前通路",
-   "Serial number": "Q2PD-4TYS-FALH",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.85",
-   "MAC address": "e0:cb:bc:48:af:a5",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 45
- },
- {
-   "Name": "ST001-5F-AP-07",
-   "Model": "MR33",
-   "Notes": "1号館_5F_511A演習室",
-   "Serial number": "Q2PD-ZLGG-MJLF",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.13",
-   "MAC address": "e0:cb:bc:48:b9:5b",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 75
- },
- {
-   "Name": "ST001-5F-AP-02",
-   "Model": "MR33",
-   "Notes": "1号館_5F_503A演習室",
-   "Serial number": "Q2PD-5QS7-J59U",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.17",
-   "MAC address": "e0:cb:bc:49:14:80",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 70
- },
- {
-   "Name": "ST001-5F-AP-03",
-   "Model": "MR33",
-   "Notes": "1号館_5F_505A演習室",
-   "Serial number": "Q2PD-7P9D-MVB4",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.239.226",
-   "MAC address": "e0:cb:bc:49:1a:31",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 71
- },
- {
-   "Name": "ST001-2F-AP-11",
-   "Model": "MR33",
-   "Notes": "1号館_2F_237実験室",
-   "Serial number": "Q2PD-ZF64-4EHU",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.95",
-   "MAC address": "e0:cb:bc:49:24:0f",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 27
- },
- {
-   "Name": "ST001-4F-AP-09",
-   "Model": "MR33",
-   "Notes": "1号館_4F_431実験室",
-   "Serial number": "Q2PD-TRSR-KKYT",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.61",
-   "MAC address": "e0:cb:bc:48:96:fa",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 58
- },
- {
-   "Name": "ST001-4F-AP-15",
-   "Model": "MR33",
-   "Notes": "1号館_4F_437演習室",
-   "Serial number": "Q2PD-5ZUC-Z4AD",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.67",
-   "MAC address": "e0:cb:bc:49:15:5b",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 64
- },
- {
-   "Name": "ST001-2F-AP-07",
-   "Model": "MR33",
-   "Notes": "1号館_2F_230実験室",
-   "Serial number": "Q2PD-8GSE-GWPJ",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.91",
-   "MAC address": "e0:cb:bc:49:1c:9a",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 23
- },
- {
-   "Name": "ST001-B1-AP-05",
-   "Model": "MR33",
-   "Notes": "1号館_B1F_B104実験室 入口側",
-   "Serial number": "Q2PD-623Z-CVLM",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.30",
-   "MAC address": "e0:cb:bc:49:15:63",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 3
- },
- {
-   "Name": "ST001-1F-AP-07",
-   "Model": "MR33",
-   "Notes": "1号館_1F_研究部",
-   "Serial number": "Q2PD-9XW2-TY4H",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.21",
-   "MAC address": "e0:cb:bc:49:21:3b",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 9
- },
- {
-   "Name": "ST001-2F-AP-10",
-   "Model": "MR33",
-   "Notes": "1号館_2F_235実験室",
-   "Serial number": "Q2PD-5ASF-ES4Q",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.94",
-   "MAC address": "e0:cb:bc:49:13:04",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 26
- },
- {
-   "Name": "ST001-6F-AP-17",
-   "Model": "MR33",
-   "Notes": "1号館_6F_618実験室",
-   "Serial number": "Q2PD-4KPR-KAZR",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.51",
-   "MAC address": "e0:cb:bc:49:10:c1",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 112
- },
- {
-   "Name": "ST001-1F-AP-10",
-   "Model": "MR33",
-   "Notes": "1号館_1F_教材作成室",
-   "Serial number": "Q2PD-6ZT4-5ZCD",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.38",
-   "MAC address": "e0:cb:bc:49:18:43",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 13
- },
- {
-   "Name": "ST001-B1-AP-01",
-   "Model": "MR33",
-   "Notes": "1号館_B1F_B101実験室",
-   "Serial number": "Q2PD-9Y5S-F6QD",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.34",
-   "MAC address": "e0:cb:bc:49:21:40",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 117
- },
- {
-   "Name": "ST001-B1-AP-07",
-   "Model": "MR33",
-   "Notes": "1号館_B1F_B106実験室A",
-   "Serial number": "Q2PD-ZNUG-5AFN",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.28",
-   "MAC address": "e0:cb:bc:49:24:d3",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 5
- },
- {
-   "Name": "ST001-4F-AP-02",
-   "Model": "MR33",
-   "Notes": "1号館_4F_403A演習室",
-   "Serial number": "Q2PD-64SS-YVHZ",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.54",
-   "MAC address": "e0:cb:bc:49:15:a0",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 51
- },
- {
-   "Name": "ST001-6F-AP-06",
-   "Model": "MR33",
-   "Notes": "1号館_6F_608情報実習室東",
-   "Serial number": "Q2PD-QHFH-QC8Y",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.40",
-   "MAC address": "e0:cb:bc:48:2b:a3",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 94
- },
- {
-   "Name": "ST001-B1-AP-04",
-   "Model": "MR33",
-   "Notes": "1号館_B1F_B104実験室 奥部屋",
-   "Serial number": "Q2PD-72VH-7VPQ",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.31",
-   "MAC address": "e0:cb:bc:49:18:5f",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 2
- },
- {
-   "Name": "ST001-6F-AP-02",
-   "Model": "MR33",
-   "Notes": "1号館_6F_602大学院合同研究室（数理情報学科）",
-   "Serial number": "Q2PD-4Z67-G4RM",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.30",
-   "MAC address": "e0:cb:bc:49:12:0e",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 90
- },
- {
-   "Name": "ST001-6F-AP-01",
-   "Model": "MR33",
-   "Notes": "1号館_6F_601実験室",
-   "Serial number": "Q2PD-ZEQJ-ME5R",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.32",
-   "MAC address": "e0:cb:bc:49:24:06",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 89
- },
- {
-   "Name": "ST001-2F-AP-09",
-   "Model": "MR33",
-   "Notes": "1号館_2F_233実験室",
-   "Serial number": "Q2PD-2385-LJXQ",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.93",
-   "MAC address": "e0:cb:bc:49:08:d4",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 25
- },
- {
-   "Name": "ST001-4F-AP-03",
-   "Model": "MR33",
-   "Notes": "1号館_4F_405A演習室",
-   "Serial number": "Q2PD-5ZXM-RE5C",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.55",
-   "MAC address": "e0:cb:bc:49:15:5e",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 52
- },
- {
-   "Name": "ST001-3F-AP-02",
-   "Model": "MR33",
-   "Notes": "1号館_3F_303A演習室",
-   "Serial number": "Q2PD-5D85-GGUP",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.73",
-   "MAC address": "e0:cb:bc:49:13:44",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 32
- },
- {
-   "Name": "ST001-6F-AP-15",
-   "Model": "MR33",
-   "Notes": "1号館_6F_616実験室",
-   "Serial number": "Q2PD-TVN3-MD9G",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.49",
-   "MAC address": "e0:cb:bc:48:97:5d",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 103
- },
- {
-   "Name": "ST001-4F-AP-01",
-   "Model": "MR33",
-   "Notes": "1号館_4F_401A演習室",
-   "Serial number": "Q2PD-5DSA-45Y6",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.53",
-   "MAC address": "e0:cb:bc:49:13:4f",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 50
- },
- {
-   "Name": "ST001-2F-AP-01",
-   "Model": "MR33",
-   "Notes": "1号館_2F_202A演習室",
-   "Serial number": "Q2PD-22MF-2LKZ",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.102",
-   "MAC address": "e0:cb:bc:49:08:c1",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 17
- },
- {
-   "Name": "ST001-B1-AP-09",
-   "Model": "MR33",
-   "Notes": "1号館_B1F_瀬田放送局",
-   "Serial number": "Q2PD-64P4-H9VB",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.236.26",
-   "MAC address": "e0:cb:bc:49:15:9e",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 7
- },
- {
-   "Name": "ST001-2F-AP-02",
-   "Model": "MR33",
-   "Notes": "1号館_2F_204A演習室",
-   "Serial number": "Q2PD-8JKN-8ATJ",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.103",
-   "MAC address": "e0:cb:bc:49:1c:c2",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 18
- },
- {
-   "Name": "ST001-3F-AP-01",
-   "Model": "MR33",
-   "Notes": "1号館_3F_301A演習室",
-   "Serial number": "Q2PD-9YR2-QENM",
-   "Firmware version": "MR 25.11",
-   "Public IP": "133.83.238.72",
-   "MAC address": "e0:cb:bc:49:21:50",
-   "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
-   "Major": 1,
-   "Minor": 31
- }
+    {
+        "Name": "ST001-3F-AP-18",
+        "Notes": "1号館_3F_340実習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 48
+    },
+    {
+        "Name": "ST001-2F-AP-05",
+        "Notes": "1号館_2F_210A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 21
+    },
+    {
+        "Name": "ST001-B1-AP-03",
+        "Notes": "1号館_B1F_B103実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 1
+    },
+    {
+        "Name": "ST001-5F-AP-05",
+        "Notes": "1号館_5F_507研究室前通路",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 73
+    },
+    {
+        "Name": "ST001-2F-AP-03",
+        "Notes": "1号館_2F_206A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 19
+    },
+    {
+        "Name": "ST001-6F-AP-04",
+        "Notes": "1号館_6F_604実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 92
+    },
+    {
+        "Name": "ST001-6F-AP-07",
+        "Notes": "1号館_6F_608情報実習室西",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 95
+    },
+    {
+        "Name": "ST001-4F-AP-18",
+        "Notes": "1号館_4F_441実習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 67
+    },
+    {
+        "Name": "ST001-5F-AP-20",
+        "Notes": "1号館_5F_542情報実習室北",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 88
+    },
+    {
+        "Name": "ST001-3F-AP-14",
+        "Notes": "1号館_3F_318研究室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 44
+    },
+    {
+        "Name": "ST001-5F-AP-10",
+        "Notes": "1号館_5F_531実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 78
+    },
+    {
+        "Name": "ST001-5F-AP-04",
+        "Notes": "1号館_5F_507研究室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 72
+    },
+    {
+        "Name": "ST001-1F-AP-11",
+        "Notes": "1号館_1F_エントランスホール",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 11
+    },
+    {
+        "Name": "ST001-5F-AP-19",
+        "Notes": "1号館_5F_542情報実習室中央",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 87
+    },
+    {
+        "Name": "ST001-2F-AP-12",
+        "Notes": "1号館_2F_239実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 28
+    },
+    {
+        "Name": "ST001-2F-AP-14",
+        "Notes": "1号館_2F_242実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 30
+    },
+    {
+        "Name": "ST001-3F-AP-12",
+        "Notes": "1号館_3F_334実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 42
+    },
+    {
+        "Name": "ST001-5F-AP-13",
+        "Notes": "1号館_5F_535数理情報学科事務室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 81
+    },
+    {
+        "Name": "ST001-5F-AP-09",
+        "Notes": "1号館_5F_530実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 77
+    },
+    {
+        "Name": "ST001-1F-AP-02",
+        "Notes": "1号館_1F_キャリアセンターインターンシップ支援オフィス 東",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 8
+    },
+    {
+        "Name": "ST001-4F-AP-12",
+        "Notes": "1号館_4F_434電子情報学科事務室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 61
+    },
+    {
+        "Name": "ST001-6F-AP-13",
+        "Notes": "1号館_6F_614実習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 101
+    },
+    {
+        "Name": "ST001-2F-AP-04",
+        "Notes": "1号館_2F_208A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 20
+    },
+    {
+        "Name": "ST001-5F-AP-12",
+        "Notes": "1号館_5F_534演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 80
+    },
+    {
+        "Name": "ST001-5F-AP-16",
+        "Notes": "1号館_5F_540実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 84
+    },
+    {
+        "Name": "ST001-6F-AP-14",
+        "Notes": "1号館_6F_615実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 102
+    },
+    {
+        "Name": "ST001-1F-AP-01",
+        "Notes": "1号館_1F_キャリアセンターインターンシップ支援オフィス 西",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 118
+    },
+    {
+        "Name": "ST001-3F-AP-20",
+        "Notes": null,
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 120
+    },
+    {
+        "Name": "ST001-2F-AP-13",
+        "Notes": "1号館_2F_241物質化学科事務室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 29
+    },
+    {
+        "Name": "ST001-5F-AP-14",
+        "Notes": "1号館_5F_538演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 82
+    },
+    {
+        "Name": "ST001-3F-AP-03",
+        "Notes": "1号館_3F_305A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 33
+    },
+    {
+        "Name": "ST001-3F-AP-11",
+        "Notes": "1号館_3F_333大学院合同研究室（物質化学科）",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 41
+    },
+    {
+        "Name": "ST001-4F-AP-17",
+        "Notes": "1号館_4F_440実習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 66
+    },
+    {
+        "Name": "ST001-3F-AP-08",
+        "Notes": "1号館_3F_330実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 38
+    },
+    {
+        "Name": "ST001-4F-AP-14",
+        "Notes": "1号館_4F_436実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 63
+    },
+    {
+        "Name": "ST001-1F-AP-13",
+        "Notes": "1号館_1F_理工学部教務課中央",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 15
+    },
+    {
+        "Name": "ST001-1F-AP-12",
+        "Notes": "1号館_1F_理事室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 12
+    },
+    {
+        "Name": "ST001-3F-AP-09",
+        "Notes": "1号館_3F_331実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 39
+    },
+    {
+        "Name": "ST001-3F-AP-10",
+        "Notes": "1号館_3F_332実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 40
+    },
+    {
+        "Name": "ST001-3F-AP-04",
+        "Notes": "1号館_3F_308演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 34
+    },
+    {
+        "Name": "ST001-1F-AP-03",
+        "Notes": "1号館_1F_107講義室 南",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 115
+    },
+    {
+        "Name": "ST001-1F-AP-06",
+        "Notes": "1号館_1F_107講義室 東",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 114
+    },
+    {
+        "Name": "ST001-2F-AP-08",
+        "Notes": "1号館_2F_231実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 119
+    },
+    {
+        "Name": "ST001-4F-AP-08",
+        "Notes": "1号館_4F_411A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 57
+    },
+    {
+        "Name": "ST001-6F-AP-18",
+        "Notes": "1号館_6F_619会議室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 106
+    },
+    {
+        "Name": "ST001-4F-AP-13",
+        "Notes": "1号館_4F_435実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 62
+    },
+    {
+        "Name": "ST001-5F-AP-11",
+        "Notes": "1号館_5F_533会議室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 79
+    },
+    {
+        "Name": "ST001-6F-AP-12",
+        "Notes": "1号館_6F_612実験室東",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 100
+    },
+    {
+        "Name": "ST001-3F-AP-17",
+        "Notes": "1号館_3F_338会議室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 47
+    },
+    {
+        "Name": "ST001-5F-AP-15",
+        "Notes": "1号館_5F_539実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 83
+    },
+    {
+        "Name": "ST001-1F-AP-14",
+        "Notes": "1号館_1F_理工学部教務課西",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 16
+    },
+    {
+        "Name": "ST001-4F-AP-19",
+        "Notes": "1号館_4F_443実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 68
+    },
+    {
+        "Name": "ST001-3F-AP-16",
+        "Notes": "1号館_3F_336機械システム工学科事務室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 46
+    },
+    {
+        "Name": "ST001-1F-AP-08",
+        "Notes": "1号館_1F_瀬田事務部",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 14
+    },
+    {
+        "Name": "ST001-1F-AP-05",
+        "Notes": "1号館_1F_107講義室 西",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 113
+    },
+    {
+        "Name": "ST001-B1-AP-08",
+        "Notes": "1号館_B1F_B106実験室B",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 6
+    },
+    {
+        "Name": "ST001-4F-AP-16",
+        "Notes": "1号館_4F_439実習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 65
+    },
+    {
+        "Name": "ST001-3F-AP-06",
+        "Notes": "1号館_3F_313A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 36
+    },
+    {
+        "Name": "ST001-6F-AP-10",
+        "Notes": "1号館_6F_609情報実習室南",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 98
+    },
+    {
+        "Name": "ST001-3F-AP-19",
+        "Notes": "1号館_3F_342演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 49
+    },
+    {
+        "Name": "ST001-6F-AP-09",
+        "Notes": "1号館_6F_609情報実習室北",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 97
+    },
+    {
+        "Name": "ST001-3F-AP-05",
+        "Notes": "1号館_3F_311A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 35
+    },
+    {
+        "Name": "ST001-1F-AP-09",
+        "Notes": "1号館_1F_講師控室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 10
+    },
+    {
+        "Name": "ST001-B1-AP-02",
+        "Notes": "1号館_B1F_B102実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 0
+    },
+    {
+        "Name": "ST001-5F-AP-08",
+        "Notes": "1号館_5F_513A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 76
+    },
+    {
+        "Name": "ST001-4F-AP-05",
+        "Notes": "1号館_4F_431演習室前通路",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 54
+    },
+    {
+        "Name": "ST001-4F-AP-07",
+        "Notes": "1号館_4F_409A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 56
+    },
+    {
+        "Name": "ST001-5F-AP-17",
+        "Notes": "1号館_5F_541実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 85
+    },
+    {
+        "Name": "ST001-6F-AP-16",
+        "Notes": "1号館_6F_617実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 104
+    },
+    {
+        "Name": "ST001-4F-AP-04",
+        "Notes": "1号館_4F_431演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 53
+    },
+    {
+        "Name": "ST001-3F-AP-13",
+        "Notes": "1号館_3F_335実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 43
+    },
+    {
+        "Name": "ST001-B1-AP-06",
+        "Notes": "1号館_B1F_B105実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 4
+    },
+    {
+        "Name": "ST001-6F-AP-08",
+        "Notes": "1号館_6F_609情報実習室中央",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 96
+    },
+    {
+        "Name": "ST001-2F-AP-06",
+        "Notes": "1号館_2F_212A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 22
+    },
+    {
+        "Name": "ST001-6F-AP-03",
+        "Notes": "1号館_6F_603実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 91
+    },
+    {
+        "Name": "ST001-4F-AP-06",
+        "Notes": "1号館_4F_407A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 55
+    },
+    {
+        "Name": "ST001-4F-AP-10",
+        "Notes": "1号館_4F_432実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 59
+    },
+    {
+        "Name": "ST001-5F-AP-18",
+        "Notes": "1号館_5F_542情報実習室南",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 86
+    },
+    {
+        "Name": "ST001-4F-AP-11",
+        "Notes": "1号館_4F_433実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 60
+    },
+    {
+        "Name": "ST001-3F-AP-07",
+        "Notes": "1号館_3F_315A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 37
+    },
+    {
+        "Name": "ST001-6F-AP-11",
+        "Notes": "1号館_6F_612実験室西",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 99
+    },
+    {
+        "Name": "ST001-1F-AP-04",
+        "Notes": "1号館_1F_107講義室 北",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 116
+    },
+    {
+        "Name": "ST001-5F-AP-06",
+        "Notes": "1号館_5F_509A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 74
+    },
+    {
+        "Name": "ST001-6F-AP-05",
+        "Notes": "1号館_6F_605理工学研究科長室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 93
+    },
+    {
+        "Name": "ST001-5F-AP-01",
+        "Notes": "1号館_5F_501A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 69
+    },
+    {
+        "Name": "ST001-3F-AP-15",
+        "Notes": "1号館_3F_318研究室前通路",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 45
+    },
+    {
+        "Name": "ST001-5F-AP-07",
+        "Notes": "1号館_5F_511A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 75
+    },
+    {
+        "Name": "ST001-5F-AP-02",
+        "Notes": "1号館_5F_503A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 70
+    },
+    {
+        "Name": "ST001-5F-AP-03",
+        "Notes": "1号館_5F_505A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 71
+    },
+    {
+        "Name": "ST001-2F-AP-11",
+        "Notes": "1号館_2F_237実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 27
+    },
+    {
+        "Name": "ST001-4F-AP-09",
+        "Notes": "1号館_4F_431実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 58
+    },
+    {
+        "Name": "ST001-4F-AP-15",
+        "Notes": "1号館_4F_437演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 64
+    },
+    {
+        "Name": "ST001-2F-AP-07",
+        "Notes": "1号館_2F_230実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 23
+    },
+    {
+        "Name": "ST001-B1-AP-05",
+        "Notes": "1号館_B1F_B104実験室 入口側",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 3
+    },
+    {
+        "Name": "ST001-1F-AP-07",
+        "Notes": "1号館_1F_研究部",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 9
+    },
+    {
+        "Name": "ST001-2F-AP-10",
+        "Notes": "1号館_2F_235実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 26
+    },
+    {
+        "Name": "ST001-6F-AP-17",
+        "Notes": "1号館_6F_618実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 112
+    },
+    {
+        "Name": "ST001-1F-AP-10",
+        "Notes": "1号館_1F_教材作成室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 13
+    },
+    {
+        "Name": "ST001-B1-AP-01",
+        "Notes": "1号館_B1F_B101実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 117
+    },
+    {
+        "Name": "ST001-B1-AP-07",
+        "Notes": "1号館_B1F_B106実験室A",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 5
+    },
+    {
+        "Name": "ST001-4F-AP-02",
+        "Notes": "1号館_4F_403A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 51
+    },
+    {
+        "Name": "ST001-6F-AP-06",
+        "Notes": "1号館_6F_608情報実習室東",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 94
+    },
+    {
+        "Name": "ST001-B1-AP-04",
+        "Notes": "1号館_B1F_B104実験室 奥部屋",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 2
+    },
+    {
+        "Name": "ST001-6F-AP-02",
+        "Notes": "1号館_6F_602大学院合同研究室（数理情報学科）",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 90
+    },
+    {
+        "Name": "ST001-6F-AP-01",
+        "Notes": "1号館_6F_601実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 89
+    },
+    {
+        "Name": "ST001-2F-AP-09",
+        "Notes": "1号館_2F_233実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 25
+    },
+    {
+        "Name": "ST001-4F-AP-03",
+        "Notes": "1号館_4F_405A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 52
+    },
+    {
+        "Name": "ST001-3F-AP-02",
+        "Notes": "1号館_3F_303A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 32
+    },
+    {
+        "Name": "ST001-6F-AP-15",
+        "Notes": "1号館_6F_616実験室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 103
+    },
+    {
+        "Name": "ST001-4F-AP-01",
+        "Notes": "1号館_4F_401A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 50
+    },
+    {
+        "Name": "ST001-2F-AP-01",
+        "Notes": "1号館_2F_202A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 17
+    },
+    {
+        "Name": "ST001-B1-AP-09",
+        "Notes": "1号館_B1F_瀬田放送局",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 7
+    },
+    {
+        "Name": "ST001-2F-AP-02",
+        "Notes": "1号館_2F_204A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 18
+    },
+    {
+        "Name": "ST001-3F-AP-01",
+        "Notes": "1号館_3F_301A演習室",
+        "Uuid": "ebf59ccc-21f2-4558-9488-00f2b388e5e6",
+        "Major": 1,
+        "Minor": 31
+    }
 ]
