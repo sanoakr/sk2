@@ -2,7 +2,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
     <head>
-        <title>自動出欠ログ検索フォーム</title>
+        <title>sk2 自動出欠ログ検索フォーム</title>
           <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
             <style type="text/css">
               /*<![CDATA[*/
@@ -44,7 +44,17 @@
                 font-weight: bold;
                 color: #fff;
                 margin: 0;
-                padding: 0.2em;
+                padding: 0.3em;
+                border-bottom: 1px solid #294172;
+            }
+            h3 {
+                text-align: center;
+                background-color: #3C6EB4;
+                font-size: 1.0em;
+                font-weight: bold;
+                color: #fff;
+                margin: 0;
+                padding: 0.1em;
                 border-bottom: 1px solid #294172;
             }
             hr {
@@ -52,7 +62,7 @@
             }
             .form {
                 font-size: 1em;
-                padding: 2em;
+                padding: 1em;
             }
             .content {
                 padding: 1em;
@@ -63,6 +73,11 @@
             select {
                 font-size: 1em;
                 border: 1px;
+                padding: 1px;
+            }
+            button {
+                font-size: 1.2em;
+                border: 5px;
             }
             img {
                 border: 2px solid #fff;
@@ -81,7 +96,7 @@
     </head>
 
     <body>
-        <h1>自動出欠ログ検索フォーム</h1>
+        <h1>sk2 自動出欠ログ検索フォーム</h1>
         <div class="form"><p>
         <?php
 $server = "localhost";
@@ -117,9 +132,9 @@ if ($sql_error = $link->connect_error) {
 $sql = "SELECT COUNT(*) FROM $dbtbl";
 if ($result = $link->query($sql)) {
     $row = $result->fetch_row();
-    echo "<p>sk2 has " . $row[0] . " records.</p>\n";
+    echo "<div>sk2 has " . $row[0] . " records.</div>\n";
 }
-echo "<h2></h2><br>\n";
+echo "<h3></h3><br>\n";
 //////////////////////////////
 if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     $$fid = $_POST[$fid];
@@ -142,31 +157,38 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
 //////////////////////////////
 echo "<div name='form'><form action='search.php' method ='post'>\n";
 
-echo $fid . ': <input type="text" name="' . $fid . '" value="' . $$fid . '">' . " (wildcard=%)\n";
+echo "学籍番号：" . '<input type="text" name="' . $fid . '" value=%>' . " (wildcard=%)<br>\n";
 
 foreach ($farr as $key) {
-    echo "&emsp;&emsp;$key:";
+    echo "送信タイプ：";
     makeSelector($link, $dbtbl, $key, $$key);
+    echo "<br>\n";
 }
 unset($key);
 
-echo "&emsp;&emsp;date:";
+echo "日付：";
 makeDtSelector($link, $dbtbl, $fdt, $date_from, $date_to, $$date_from, $$date_to);
-echo "&emsp;&emsp;weekday:";
+echo "<br>\n";
+
+echo "曜日：";
 makeWdSelector($link, $dbtbl, $fwd, $warray, $$fwd);
-echo "&emsp;&emsp;period:";
+echo "<br>\n";
+
+echo "講時：";
 makeHpSelector($link, $dbtbl, $fhour, $parray, $parray_from, $parray_to, $$fhour);
+echo "<br>\n";
 
 foreach ($aparr as $key) {
-    echo "&emsp;&emsp;$key:";
+    echo "${key}：";
     makeApSelector($link, $dbtbl, $key, $apnum, $$key);
+    echo "<br>\n";
 }
 unset($key);
-echo "<br><p><input type='submit' value='search'></p></form></div>\n";
+echo "<br><p><button type='submit' value='search'>&emsp;検索&emsp;</button></p></form></div>\n";
 
 //////////////////////////////
 if ($_SERVER["REQUEST_METHOD"] == 'POST') {
-    echo "<h2>Search Result</h2>\n";
+    echo "<h3></h3>\n";
     $sql = "SELECT * FROM $dbtbl WHERE ";
     //////////////////////////////
     $sql .= "$fid LIKE '" . $$fid . "' AND ";
@@ -199,10 +221,11 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     }
     //////////////////////////////
     $sql .= "True Limit 9999";
-    echo "$sql<h2></h2>\n";
+    echo "<p>${sql}</p>\n";
 
+    echo "<h2>Search Result: ";
     if ($result = $link->query($sql)) {
-        echo "<h3>$result->num_rows records found.</h3>";
+        echo "$result->num_rows records found.</h2>";
         while ($row = $result->fetch_assoc()) {
             echo "<div><pre>\n";
             foreach ($row as $key => $value) {
@@ -212,7 +235,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
         }
         echo "</pre></div>\n";
     } else {
-        echo "<p>Query Error</p><br>\n";
+        echo "</h2>\n<p>Query Error</p><br>\n";
     }
 }
 $link->close();
