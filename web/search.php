@@ -1,104 +1,52 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
-    <head>
-        <title>sk2 自動出欠ログ検索フォーム</title>
-          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-            <style type="text/css">
-              /*<![CDATA[*/
-            body {
-                background-color: #fff;
-                color: #000;
-                font-size: 1em;
-                font-family: sans-serif,helvetica;
-                margin: 0;
-                padding: 0;
-            }
-            :link {
-                color: #c00;
-            }
-            :visited {
-                color: #c00;
-            }
-            a:hover {
-                color: #f50;
-            }
-            h1 {
-                text-align: center;
-                margin: 0;
-                padding: 1em 2em 1em;
-                background-color: #294172;
-                color: #fff;
-                font-weight: normal;
-                font-size: 1.5em;
-                border-bottom: 1px solid #000;
-            }
-            h1 strong {
-                font-weight: bold;
-                font-size: 1.3em;
-            }
-            h2 {
-                text-align: center;
-                background-color: #3C6EB4;
-                font-size: 1.2em;
-                font-weight: bold;
-                color: #fff;
-                margin: 0;
-                padding: 0.3em;
-                border-bottom: 1px solid #294172;
-            }
-            h3 {
-                text-align: center;
-                background-color: #3C6EB4;
-                font-size: 1.0em;
-                font-weight: bold;
-                color: #fff;
-                margin: 0;
-                padding: 0.1em;
-                border-bottom: 1px solid #294172;
-            }
-            hr {
-                display: none;
-            }
-            .form {
-                font-size: 1em;
-                padding: 1em;
-            }
-            .content {
-                padding: 1em;
-            }
-            .alert {
-                border: 1px solid #000;
-            }
-            select {
-                font-size: 1em;
-                border: 1px;
-                padding: 1px;
-            }
-            button {
-                font-size: 1.2em;
-                border: 5px;
-            }
-            img {
-                border: 2px solid #fff;
-                padding: 2px;
-                margin: 2px;
-            }
-            a:hover img {
-                border: 1px solid #294172;
-            }
-            .logos {
-                margin: 1em;
-                text-align: center;
-            }
-            /*]]>*/
-        </style>
-    </head>
+  <head>
+    <title>sk2 自動出欠ログ検索フォーム</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="search.css">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+      <script src="jquery.matchHeight.js" type="text/javascript"></script>
+      <script type="text/javascript">
+	(function() {
+                /* matchHeight example */
 
-    <body>
-        <h1>sk2 自動出欠ログ検索フォーム</h1>
-        <div class="form"><p>
-        <?php
+                $(function() {
+                    // apply your matchHeight on DOM ready (they will be automatically re-applied on load or resize)
+
+                    // get test settings
+                    var byRow = $('body').hasClass('items');
+
+                    // apply matchHeight to each item container's items
+                    $('.items-container').each(function() {
+                        $(this).children('.item').matchHeight({
+                            byRow: byRow
+                        });
+                    });
+
+                    // test target
+                    $('.target-items').each(function() {
+                        $(this).children('.item-0, .item-2, .item-3').matchHeight({
+                            target: $(this).find('.item-1')
+                        });
+                    });
+
+                    // example of update callbacks (uncomment to test)
+                    $.fn.matchHeight._beforeUpdate = function(event, groups) {
+                        //var eventType = event ? event.type + ' event, ' : '';
+                        //console.log("beforeUpdate, " + eventType + groups.length + " groups");
+                    }
+
+                    $.fn.matchHeight._afterUpdate = function(event, groups) {
+                        //var eventType = event ? event.type + ' event, ' : '';
+                        //console.log("afterUpdate, " + eventType + groups.length + " groups");
+                    }
+                });
+
+            })();
+      </script>
+
+<?php
 $server = "localhost";
 $user = "sk2";
 $pass = "sk2loglog";
@@ -107,19 +55,30 @@ $dbchar = "UTF-8";
 $dbtbl = "st";
 
 $fid = 'id';
-$farr = array('type');
+$ftype = 'type';
 $fdt = 'datetime';
 $date_from = 'from';
 $date_to = 'to';
 $fwd = 'wday';
-$warray = array('*', '日', '月', '火', '水', '木', '金', '土');
+$warray = array('*', '土', '日', '月', '火', '水', '木', '金');
 $fhour = 'priod';
-$parray = array('*', '1講時', '2講時', '3講時', '4講時', '5講時', '6講時', '昼休み');
-$parray_from = array('*', '09:20', '11:05', '13:35', '15:20', '17:00', '18:40', '12:40');
-$parray_to = array('*', '10:05', '12:35', '15:05', '16:50', '18:30', '20:10', '13:30');
-$aparr = array('major', 'minor', 'distance');
+$parray = array('*', '1講時', '2講時', '昼休み', '3講時', '4講時', '5講時', '6講時');
+$parray_from = array('*', '09:20', '11:05', '12:40', '13:35', '15:20', '17:00', '18:40');
+$parray_to = array('*', '10:05', '12:35', '13:30', '15:05', '16:50', '18:30', '20:10');
+$parray_dist = array(0, 5, 10, 15, 20, 30, 40, 50);
+$fmajor = 'major';
+$fminor = 'minor';
+$fdist = 'distance';
+$fplace = 'place';
 $apnum = 3;
 
+$json_file = 'Seta_wifi_001.json';
+?>
+    </head>
+    <body>
+      <div class="container">
+        <h1>sk2 自動出欠ログ検索フォーム</h1>
+<?php
 //////////////////////////////
 $link = new mysqli($server, $user, $pass, $dbname);
 if ($sql_error = $link->connect_error) {
@@ -132,59 +91,148 @@ if ($sql_error = $link->connect_error) {
 $sql = "SELECT COUNT(*) FROM $dbtbl";
 if ($result = $link->query($sql)) {
     $row = $result->fetch_row();
-    echo "<div>sk2 has " . $row[0] . " records.</div>\n";
+    echo "<h2 class='test-summary'>sk2 has " . $row[0] . " records.</h2>";
 }
-echo "<h3></h3><br>\n";
 //////////////////////////////
 if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     $$fid = $_POST[$fid];
+    $$ftype = $_POST[$ftype];
 
-    foreach ($farr as $key) {
-        $$key = $_POST[$key];
-        //echo " $key=" . $$key;
-    }
-    unset($key);
+    //foreach ($farr as $key) {
+    //    $$key = $_POST[$key];
+    //    //echo " $key=" . $$key;
+    //}
+    //unset($key);
+
     $$date_from = $_POST[$date_from];
     $$date_to = $_POST[$date_to];
     $$fwd = $_POST[$fwd];
     $$fhour = $_POST[$fhour];
-    foreach ($aparr as $key) {
-        $$key = $_POST[$key];
-        //echo " $key=" . $$key;
-    }
-    unset($key);
+    //foreach ($aparr as $key) {
+    //    $$key = $_POST[$key];
+    //    //echo " $key=" . $$key;
+    //}
+    //unset($key);
+    $$fmajor = $_POST[$fmajor];
+    $$fminor = $_POST[$fminor];
+    $$fdist = $_POST[$fdist];
+    $$fplace = $_POST[$fplace];
+} else {
+    $$fid = '%';
+    $$ftype = '*';
+    $$date_from = '2019-05-01';
+    $$date_to = date("Y-m-d");
+    $$fwd = '*';
+    $$fhour = '*';;
+    $$fmajor = '*';
+    $$fminor = '*';
+    $$fdist = '0';
+    $$fplace = '*';
 }
+
 //////////////////////////////
-echo "<div name='form'><form action='search.php' method ='post'>\n";
-
-echo "学籍番号：" . '<input type="text" name="' . $fid . '" value=%>' . " (wildcard=%)<br>\n";
-
-foreach ($farr as $key) {
-    echo "送信タイプ：";
-    makeSelector($link, $dbtbl, $key, $$key);
-    echo "<br>\n";
+$json = file_get_contents($json_file);
+$json_arr = json_decode($json, true);
+foreach ($json_arr as $ap) {
+  if ($ap["Notes"] != null) {
+    $s_place = explode('_', $ap["Notes"]);
+    $build[$ap["Major"]][$ap["Minor"]] = $s_place[0];
+    $floor[$ap["Major"]][$ap["Minor"]] = $s_place[1];
+    $room[$ap["Major"]][$ap["Minor"]] = $s_place[2];
+    //echo $room[$ap["Major"]][$ap["Minor"]] . '<br>';
+    $place_major["$s_place[0]_$s_place[1]_$s_place[2]"] = $ap["Major"];
+    $place_minor["$s_place[0]_$s_place[1]_$s_place[2]"] = $ap["Minor"];
+    ksort($place_major);
+    ksort($place_minor);
+  }
 }
-unset($key);
 
-echo "日付：";
+//////////////////////////////
+echo <<< EOF
+<form action='search.php' method ='post'>
+<div class="items-container items">
+EOF;
+echo '<div class="item item-0"><h3>学籍番号</h3>';
+echo '<p><input type="text" name="' . $fid . '" value=' . $$fid . '>&emsp;(wildcard=%)<p>';
+echo <<< EOF
+<p>
+% 「全ユーザー」<br>
+T% 「理工学部生」<br>
+T19% 「理工学部の2019年度入学生」<br>
+</p></div>
+EOF;
+
+echo '<div class="item item-1"><h3>送信タイプ</h3><p>';
+makeSelector($link, $dbtbl, $ftype, $$ftype);
+echo <<< EOF
+</p>
+<p>M 「手動送信」<br>
+A 「自動送信」<br>
+</p></div>
+EOF;
+
+echo '<div class="item item-2"><h3>日付</h3><p>';
 makeDtSelector($link, $dbtbl, $fdt, $date_from, $date_to, $$date_from, $$date_to);
-echo "<br>\n";
+echo <<< EOF
+</p><p>
+</p></div>
+EOF;
 
-echo "曜日：";
+echo '<div class="item item-3"><h3>曜日</h3><p>';
 makeWdSelector($link, $dbtbl, $fwd, $warray, $$fwd);
-echo "<br>\n";
+echo <<< EOF
+</p><p>
+</p></div>
+EOF;
 
-echo "講時：";
+echo '<div class="item item-4"><h3>講時</h3><p>';
 makeHpSelector($link, $dbtbl, $fhour, $parray, $parray_from, $parray_to, $$fhour);
-echo "<br>\n";
+echo <<< EOF
+</p><p>
+</p></div>
+EOF;
 
-foreach ($aparr as $key) {
-    echo "${key}：";
-    makeApSelector($link, $dbtbl, $key, $apnum, $$key);
-    echo "<br>\n";
-}
-unset($key);
-echo "<br><p><button type='submit' value='search'>&emsp;検索&emsp;</button></p></form></div>\n";
+echo '<div class="item item-5"><h3>教室</h3><p>';
+makeRoomSelector($link, $dbtbl, $fplace, $place_major, $$fplace);
+echo <<< EOF
+</p><p>
+</p></div>
+EOF;
+
+echo '<div class="item item-6"><h3>Major</h3><p>';
+makeApSelector($link, $dbtbl, $fmajor, $apnum, $$fmajor);
+echo <<< EOF
+</p>
+<p>M 「手動送信」<br>
+A 「自動送信」<br>
+</p></div>
+EOF;
+
+echo '<div class="item item-7"><h3>Minor</h3><p>';
+makeApSelector($link, $dbtbl, $fminor, $apnum, $$fminor);
+echo <<< EOF
+</p>
+<p>M 「手動送信」<br>
+A 「自動送信」<br>
+</p></div>
+EOF;
+
+echo '<div class="item item-8"><h3>距離</h3><p>';
+makeApSelector($link, $dbtbl, $fdist, $apnum, $$fdist);
+echo <<< EOF
+</p>
+<p>M 「手動送信」<br>
+A 「自動送信」<br>
+</p></div>
+EOF;
+
+echo <<< EOF
+</div>
+<p>
+<button type='submit' value='search' class='button'>検索</button>
+</p>
+</form>
+EOF;
 
 //////////////////////////////
 if ($_SERVER["REQUEST_METHOD"] == 'POST') {
@@ -192,24 +240,27 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     $sql = "SELECT * FROM $dbtbl WHERE ";
     //////////////////////////////
     $sql .= "$fid LIKE '" . $$fid . "' AND ";
-    //////////////////////////////
-    foreach ($farr as $key) {
-        if ($$key != '*') {
-            $sql .= "$key='" . $$key . "' AND ";
-        }
+    if ($$ftype != '*') {
+        $sql .= "$ftype='" . $$ftype . "' AND ";
     }
+    //////////////////////////////
+    //foreach ($farr as $key) {
+    //    if ($$key != '*') {
+    //        $sql .= "$key='" . $$key . "' AND ";
+    //    }
+    //}
     //////////////////////////////
     $sql .= "( $fdt BETWEEN '" . $$date_from . " 00:00:00' AND '" . $$date_to . " 23:59:59') AND ";
     //////////////////////////////
-    foreach ($aparr as $key) {
-        if ($$key != '*') {
-            $sql .= '(';
-            for ($w = 0; $w < $apnum; $w++) {
-                $sql .= "  $key$w='" . $$key . "' OR ";
-            }
-            $sql .= 'False) AND ';
-        }
-    }
+    //foreach (array($aparr as $key) {
+    //    if ($$key != '*') {
+    //        $sql .= '(';
+    //        for ($w = 0; $w < $apnum; $w++) {
+    //            $sql .= "  $key$w='" . $$key . "' OR ";
+    //        }
+    //        $sql .= 'False) AND ';
+    //    }
+    //}
     //////////////////////////////
     if ($$fwd != 0) {
         $sql .= "dayofweek($fdt)=" . $$fwd . " AND ";
@@ -220,18 +271,34 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
         //$sql .= "( date_format(datetime, '%h:%m:%s') between '" . $parray_from[$$fhour] . ":00' AND '" . $parray_to[$$fhour] . ":00') AND ";
     }
     //////////////////////////////
+    if ($$fplace != '*') {
+        $sql .= "(";
+	$sql .= "(" . $fmajor . "0='" . $place_major[$$fplace] . "' AND " . $fminor . "0='" . $place_minor[$$fplace] . "') OR ";
+	$sql .= "(" . $fmajor . "1='" . $place_major[$$fplace] . "' AND " . $fminor . "1='" . $place_minor[$$fplace] . "') OR ";
+	$sql .= "(" . $fmajor . "2='" . $place_major[$$fplace] . "' AND " . $fminor . "2='" . $place_minor[$$fplace] . "')";
+        $sql .= ") AND ";
+    }
+    //////////////////////////////
     $sql .= "True Limit 9999";
     echo "<p>${sql}</p>\n";
 
     echo "<h2>Search Result: ";
     if ($result = $link->query($sql)) {
         echo "$result->num_rows records found.</h2>";
+        echo "<div><pre>\n";
+	$data = array();
         while ($row = $result->fetch_assoc()) {
-            echo "<div><pre>\n";
             foreach ($row as $key => $value) {
+                $data[$key] = $value;
                 echo "$value, ";
             }
-            echo "\n";
+	    for ($i=0; $i<$apnum; $i++) {
+              if (!empty($room[$data["major$i"]][$data["minor$i"]])) {
+  	        echo $room[$data["major$i"]][$data["minor$i"]];
+              }
+              echo ", ";
+            }
+            echo "<br>";
         }
         echo "</pre></div>\n";
     } else {
@@ -241,8 +308,10 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
 $link->close();
 ?>
    </div></p>
+	</div>
   </body>
 </html>
+
 <!--//////////////////////////////////////////////////-->
 <?php
 function makeSelector($link, $tbl, $name, $init = '*')
@@ -365,5 +434,22 @@ function makeHpSelector($link, $tbl, $key, $pary, $fromary, $toary, $init = 0)
     }
     echo "</select>\n";
 }
-
+function makeRoomSelector($link, $dbtbl, $key, $place_major, $init = '*')
+{
+    echo '<select name="' . $key . '">' . "\n";
+    echo '<option value="*"';
+    if ($init == '*') {
+        echo ' selected';
+    }
+    echo '>*</option>' . "\n";
+    foreach ($place_major as $place => $val) {
+        echo '<option value=' . $place;
+        if ($init == $place) {
+            echo ' selected';
+        }
+        echo '>' . $place . "</option>\n";
+    }
+    echo "</select>\n";
+}
 ?>
+
