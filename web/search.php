@@ -1,3 +1,7 @@
+<?php
+    session_start();
+?>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
@@ -194,7 +198,9 @@ $froom2 = 'room2';
 $froomck1 = 'rcheck1';
 $froomck2 = 'rcheck2';
 $apnum = 3;
+
 $json_file = 'Seta_wifi_001.json';
+$download = 'csvdl.php';
 ?>
 </head>
 
@@ -542,31 +548,42 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     $sql .= "True Limit 9999";
 
     echo "<p>${sql}</p></div>\n";
-
     echo "<h2>Search Result: ";
     if ($result = $link->query($sql)) {
         echo "$result->num_rows records found.</h2>";
+        echo '<p class="box"><a href="' . $download . '">Download CSV file</a></p>';
+
         echo '<div class="result"><pre>';
-	    $data = array();
+        $csv = '';
+        $data = array();
             while ($row = $result->fetch_assoc()) {
                 foreach ($row as $key => $value) {
                     $data[$key] = $value;
-                    echo "$value, ";
+                    $csv .= "$value, ";
+                    //echo "$value, ";
                 }
 	        for ($i=0; $i<$apnum; $i++) {
                 if (!empty($build[$data["major$i"]][$data["minor$i"]])) {
-      	            echo $build[$data["major$i"]][$data["minor$i"]] . '_';
+                    $csv .= $build[$data["major$i"]][$data["minor$i"]] . '_';
+                    //echo $build[$data["major$i"]][$data["minor$i"]] . '_';
                 }
                 if (!empty($floor[$data["major$i"]][$data["minor$i"]])) {
-      	            echo $floor[$data["major$i"]][$data["minor$i"]] . '_';
+                    $csv .= $floor[$data["major$i"]][$data["minor$i"]] . '_';
+                    //echo $floor[$data["major$i"]][$data["minor$i"]] . '_';
                 }
                 if (!empty($room[$data["major$i"]][$data["minor$i"]])) {
-      	            echo $room[$data["major$i"]][$data["minor$i"]];
+                    $csv .= $room[$data["major$i"]][$data["minor$i"]];
+                    //echo $room[$data["major$i"]][$data["minor$i"]];
                 }
-                echo ", ";
+                $csv .= ", ";
+                //echo ", ";
             }
-            echo "<br>";
+            $csv .= "\n";
+            //echo "<br>";
         }
+        $_SESSION['test'] = "ABC\n";
+        $_SESSION['csv'] = $csv;
+        echo $csv;
         echo "</pre></div>\n";
     } else {
         echo "</h2>\n<p>Query Error</p><br>\n";
