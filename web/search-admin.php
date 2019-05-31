@@ -547,8 +547,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     //////////////////////////////
     $sql .= "True Limit 9999";
 
-    echo "</div>\n";
-    //echo "<p>${sql}</p></div>\n";
+    echo "<p>${sql}</p></div>\n";
     echo "<h2>Search Result: ";
     if ($result = $link->query($sql)) {
         echo "$result->num_rows records found.</h2>";
@@ -560,32 +559,25 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
         while ($row = $result->fetch_assoc()) {
             foreach ($row as $key => $value) {
                 $data[$key] = $value;
-                if ($key == $fid || $key == $fdt || $key == $ftype) {
-                    $csv .= "$value, ";
-                }
-                //echo "$value, ";
+                $csv .= "$value, ";
             }
 	        for ($i=1; $i<=$apnum; $i++) {
                 if (!empty($build[$data["major$i"]][$data["minor$i"]])) {
                     $csv .= $build[$data["major$i"]][$data["minor$i"]] . '_';
-                    //echo $build[$data["major$i"]][$data["minor$i"]] . '_';
                 }
                 if (!empty($floor[$data["major$i"]][$data["minor$i"]])) {
                     $csv .= $floor[$data["major$i"]][$data["minor$i"]] . '_';
-                    //echo $floor[$data["major$i"]][$data["minor$i"]] . '_';
                 }
                 if (!empty($room[$data["major$i"]][$data["minor$i"]])) {
                     $csv .= $room[$data["major$i"]][$data["minor$i"]];
-                    //echo $room[$data["major$i"]][$data["minor$i"]];
                 }
                 if ($i != $apnum) {
                     $csv .= ", ";
                 }
-                //echo ", ";
             }
             $csv .= "\n";
-            //echo "<br>";
         }
+        $_SESSION['test'] = "ABC\n";
         $_SESSION['csv'] = $csv;
         echo $csv;
         echo "</pre></div>\n";
