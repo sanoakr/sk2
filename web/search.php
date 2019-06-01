@@ -330,9 +330,8 @@ echo "<form action='search.php' method ='post'>";
 echo '<div class="item"><h3>学籍番号</h3>';
 echo '<p><input type="text" name="' . $fid . '" value=' . $$fid . '></p>';
 echo <<< EOF
-<p>* = 「全ユーザー」<br>
-T* = 「理工学部生」<br>
-T19* = 「理工学部の2019年度入学生」</p>
+<p>検索パターンのワイルドカードは * です。<br>
+例：「*」 = 「全ユーザー」、「T*」 = 「理工学部生」、「T19*」 = 「理工学部の2019年度入学生」</p>
 </div>
 EOF;
 
@@ -356,7 +355,10 @@ echo '/>OR ';
 makeRoomSelector([$fbuild2, $ffloor2, $froom2], [$build_arr, $floor_arr, $room_arr], 0, $$fbuild2);
 makeRoomSelector([$fbuild2, $ffloor2, $froom2], [$build_arr, $floor_arr, $room_arr], 1, $$ffloor2);
 makeRoomSelector([$fbuild2, $ffloor2, $froom2], [$build_arr, $floor_arr, $room_arr], 2, $$froom2);
-echo "</p></div>";
+echo "</p>";
+echo "プライバシー保護のため、上記で選択された「建物」「フロア」「教室」のうち、もっとも指定範囲が広いレベルで検索出力されます。<br>";
+echo "検索結果に教室名まで表示するためには、選択した全てのリスト上で「建物」「フロア」「教室」の全て指定して下さい。";
+echo "</div>";
 
 //foreach ($uq_room_arr as $k => $v) {
 //    foreach ($v as $k2 => $v2) {
@@ -430,6 +432,7 @@ EOF;
 echo <<< EOF
 <p>
 <button type='submit' value='search' class='button'>検索</button>
+（1回の検索あたりの検索出力上限は 9999 です）
 </p>
 </form>
 </div>
@@ -488,12 +491,17 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     }*/
     //////////////////////////////
     $place0 = '*';
+    $plevel = array( 0 => 0);
+
     if ($room0 != '' && $room0 != '*') {
         $place0 = $room0;
+        $plevel[0] = 3;
     } elseif ($floor0 != '' && $floor0 != '*') {
         $place0 = $floor0;
+        $plevel[0] = 2;
     } elseif ($build0 != '' && $build0 != '*') {
         $place0 = $build0;
+        $plevel[0] = 1;
     }
     if ($place0 != '*') {
         $sql .= "("; 
@@ -508,13 +516,17 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     }
     /////
     if ($$froomck1) {
+        $plevel[1] = 0;
         $place1 = '*';
         if ($room1 != '' && $room1 != '*') {
             $place1 = $room1;
+            $plevel[1] = 3;
         } elseif ($floor1 != '' && $floor1 != '*') {
             $place1 = $floor1;
+            $plevel[1] = 2;
         } elseif ($build1 != '' && $build1 != '*') {
             $place1 = $build1;
+            $plevel[1] = 1;
         }
         $sql .= "OR ("; 
         foreach ($place_code[$place1] as $code) {
@@ -526,13 +538,17 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     }
     /////
     if ($$froomck2) {
+        $plevel[2] = 0;
         $place2 = '*';
         if ($room2 != '' && $room2 != '*') {
             $place2 = $room2;
+            $plevel[2] = 3;
         } elseif ($floor2 != '' && $floor2 != '*') {
             $place2 = $floor2;
+            $plevel[2] = 2;
         } elseif ($build2 != '' && $build2 != '*') {
             $place2 = $build2;
+            $plevel[2] = 1;
         }
         $sql .= "OR ("; 
         foreach ($place_code[$place2] as $code) {
@@ -553,10 +569,11 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     if ($result = $link->query($sql)) {
         echo "$result->num_rows records found.</h2>";
         echo '<p class="box"><a href="' . $download . '">Download CSV file</a></p>';
-
         echo '<div class="result"><pre>';
+
         $csv = '';
         $data = array();
+        $room_level = min($plevel);
         while ($row = $result->fetch_assoc()) {
             foreach ($row as $key => $value) {
                 $data[$key] = $value;
@@ -566,15 +583,15 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
                 //echo "$value, ";
             }
 	        for ($i=1; $i<=$apnum; $i++) {
-                if (!empty($build[$data["major$i"]][$data["minor$i"]])) {
+                if (!empty($build[$data["major$i"]][$data["minor$i"]]) && $room_level > 0) {
                     $csv .= $build[$data["major$i"]][$data["minor$i"]] . '_';
                     //echo $build[$data["major$i"]][$data["minor$i"]] . '_';
                 }
-                if (!empty($floor[$data["major$i"]][$data["minor$i"]])) {
+                if (!empty($floor[$data["major$i"]][$data["minor$i"]]) && $room_level > 1) {
                     $csv .= $floor[$data["major$i"]][$data["minor$i"]] . '_';
                     //echo $floor[$data["major$i"]][$data["minor$i"]] . '_';
                 }
-                if (!empty($room[$data["major$i"]][$data["minor$i"]])) {
+                if (!empty($room[$data["major$i"]][$data["minor$i"]]) && $room_level > 2) {
                     $csv .= $room[$data["major$i"]][$data["minor$i"]];
                     //echo $room[$data["major$i"]][$data["minor$i"]];
                 }
