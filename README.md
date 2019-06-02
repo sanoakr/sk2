@@ -5,20 +5,11 @@
 龍大理工学部で計画されている学生向けの自動出欠ログシステムです。
 
 ----
-
-## Changes ##
-- 2018.08.29
-	- ログイン時にAP情報 JSON を返信 
-
-- ログデータ登録時にもキーを送信（データフォーマット少し変わりました）
-- データベースへのユーザ名はエンコードせずそのまま
-
 ## memo & Todo ##
 - 認証更新のタイミングは？（現在180日で再認証）
     - パスワード変更をどうdetectする? -> AD から取れる？
     - 全てのアクセスでEDSを叩くのは非現実的
     - パスワードを保存しておくのもダメ
-- ログ記録と履歴読み出しが分離したので Kafka 経由のデータベース作成もあり
 - sk2 サーバが兼任している認証とデータ登録を分離？
 
 ----
@@ -72,7 +63,7 @@
 |:----:|:------|:------|
 | 1 | 全学認証ID | @mail.ryukoku.ac.jp なし |
 | 2 | 認証時に受け取ったキー | hash(user + salt) |
-| 3 | ログタイプ | 1char [A/M]：Auto/Manual |
+| 3 | ログタイプ | 8char [A/M]：Auto/Manual + Version Info|
 | 4 | 日時 | yyy-MM-dd HH-mm-ss |
 | 5 | Beacon0 Major | 整数値文字列 |
 | 6 | Beacon0 Minor | 整数値文字列 |
@@ -117,12 +108,13 @@
 
 ## sk2 Record Table (MariaDB) ##
 
+```
 MariaDB [sk2]> desc base;
 +-----------+----------------------+------+-----+---------+-------+
 | Field     | Type                 | Null | Key | Default | Extra |
 +-----------+----------------------+------+-----+---------+-------+
 | id        | varchar(128)         | YES  |     | NULL    |       |
-| type      | varchar(1)           | YES  |     | NULL    |       |
+| type      | varchar(8)           | YES  |     | NULL    |       |
 | datetime  | datetime             | YES  |     | NULL    |       |
 | major0    | smallint(5) unsigned | YES  |     | NULL    |       |
 | minor0    | smallint(5) unsigned | YES  |     | NULL    |       |
@@ -134,4 +126,5 @@ MariaDB [sk2]> desc base;
 | minor2    | smallint(5) unsigned | YES  |     | NULL    |       |
 | distance2 | float unsigned       | YES  |     | NULL    |       |
 +-----------+----------------------+------+-----+---------+-------+
-12 rows in set (0.01 sec)
+12 rows in set (0.00 sec)
+```
