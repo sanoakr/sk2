@@ -365,11 +365,11 @@ echo "</p></div>";
 //}
 
 echo '<div class="item"><h3>送信タイプ</h3><p>';
-makeSelector($link, $dbtbl, $ftype, $$ftype);
+makeTypeSelector($ftype, $$ftype);
+//makeSelector($link, $dbtbl, $ftype, $$ftype);
 echo <<< EOF
 </p>
-<p>M =「手動送信」<br>
-A =「自動送信」<br>
+<p>M =「手動送信」、A =「自動送信」<br>
 </p></div>
 EOF;
 
@@ -442,7 +442,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     //////////////////////////////
     $sql .= "$fid LIKE '" . str_replace('*', '%', $$fid) . "' AND ";
     if ($$ftype != '*') {
-        $sql .= "$ftype='" . $$ftype . "' AND ";
+        $sql .= "$ftype LIKE '" . $$ftype . "%' AND ";
     }
     //////////////////////////////
     //foreach ($farr as $key) {
@@ -610,6 +610,21 @@ function makeSelector($link, $tbl, $name, $init = '*')
 
             echo $row[$name] . "</option>\n";
         }
+    }
+    echo "</select>\n";
+}
+function makeTypeSelector($key, $init) {
+    $types = array('*', 'M', 'A');
+    echo '<select name="' . $key . '">' . '\n';
+    //echo '<option value="*">*</option>' . "\n";
+    foreach ($types as $t) {
+        echo '<option value="' . $t . '"';
+        if ($t == $init) {
+            echo ' selected>';
+        } else {
+            echo '>';
+        }
+        echo $t . "</option>\n";
     }
     echo "</select>\n";
 }
