@@ -31,6 +31,8 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.PREF_UID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_ALARM
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_SEND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_PERIOD_IN_MILLISEC
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TYPE_SEND_AUTO
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TYPE_SEND_MANUAL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.VALID_IBEACON_UUID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.apNameMap
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.localQueue
@@ -114,7 +116,7 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
         Log.i(TAG, "on StartCommand: send=$send, alarm=$alarm")
 
         /** Type Check: Alarm からだと AUTO **/
-        val type = if (alarm == true) 'A' else 'M'
+        val type = if (alarm == true) TYPE_SEND_AUTO else TYPE_SEND_MANUAL
 
         /** Initialize Scan Result **/
         scanArray = ScanArray()
@@ -211,7 +213,7 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** 出席データをサーバに送信 ***/
-    private fun sendInfoToServer(type: Char) { // not Boolean, couldn't return from in any async blocks
+    private fun sendInfoToServer(type: String) { // not Boolean, couldn't return from in any async blocks
         val curDatetime = Moment() // 現在時刻
 
         Log.d(TAG, "Try to send an attendance info to the Server with type $type")
@@ -224,7 +226,7 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
 
             /** 失敗のブロードキャストメッセージを送信して終了 **/
             sendBroadcastMessage(Sk2Globals.BROADCAST_ATTEND_NO_VALITTIME)
-            Log.d(TAG,"sendInfoToServer; Out of the time for be parmitted")
+            Log.d(TAG,"sendInfoToServer; Out of the time for be permitted")
         }
 
         val message: String  /** 送信データ用文字列 **/

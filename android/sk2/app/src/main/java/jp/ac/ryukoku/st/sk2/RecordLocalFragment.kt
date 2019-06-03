@@ -86,7 +86,7 @@ class RecordLocalAdapter: BaseAdapter(), AnkoLogger {
                         typeface = Typeface.DEFAULT_BOLD
                     }.lparams { horizontalGravity = left; weight = 1f }
                     /** ////////////////////////////////////////////////////////////////////////////// **/
-                    textView(type.toString()) {
+                    textView(type.substring(0,1).toUpperCase()) {
                         textSize = Sk2Globals.TEXT_SIZE_Large
                         //textColor = Color.BLACK
                         backgroundColor = Color.WHITE // for Huwai's initAdditionalStyle default Error.
@@ -125,7 +125,7 @@ class RecordLocalAdapter: BaseAdapter(), AnkoLogger {
         }
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
-    override fun getItem(position: Int): Triple<String, Char, List<StatBeacon>> {
+    override fun getItem(position: Int): Triple<String, String, List<StatBeacon>> {
         return list.get(position)
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/

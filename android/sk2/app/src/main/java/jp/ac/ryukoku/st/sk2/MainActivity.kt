@@ -34,6 +34,8 @@ import android.view.View
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.ACTION_BROADCAST
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_VERSION_CODE
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_VERSION_NAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_MARGIN_ATTEND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_MARGIN_MENU
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_SIZE_ATTEND
@@ -396,6 +398,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
     lateinit var sendInfo: TextView
     lateinit var attBt: Button
     lateinit var autoSw: Switch
+    lateinit var versionInfo: TextView
 
     companion object {
         const val TITLE = 1
@@ -407,6 +410,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
         const val LOG = 61
         const val HELP = 62
         const val EXIT = 63
+        const val VERSION = 99
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun createView(ui: AnkoContext<MainActivity>) = with(ui) {
@@ -548,7 +552,15 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
                     }.lparams { below(EXIT); centerHorizontally() }
                 }
             }.lparams {
-                alignParentBottom(); centerHorizontally(); bottomMargin = dip(16)
+                above(VERSION); centerHorizontally(); bottomMargin = dip(8)
+            }
+            /** ////////////////////////////////////////////////////////////////////////////// **/
+            versionInfo = textView("Version $APP_VERSION_NAME ($APP_VERSION_CODE)") {
+                id = VERSION
+                textColor = Color.BLACK
+                textSize = TEXT_SIZE_TINY
+            }.lparams {
+                alignParentBottom(); alignParentEnd(); bottomMargin = dip(4); rightMargin = dip(4)
             }
         }
     }
