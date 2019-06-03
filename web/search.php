@@ -330,8 +330,8 @@ echo "<form action='search.php' method ='post'>";
 echo '<div class="item"><h3>学籍番号</h3>';
 echo '<p><input type="text" name="' . $fid . '" value=' . $$fid . '></p>';
 echo <<< EOF
-<p>検索パターンのワイルドカードは * です。<br>
-例：「*」 = 「全ユーザー」、「T*」 = 「理工学部生」、「T19*」 = 「理工学部の2019年度入学生」</p>
+<p>検索パターンのワイルドカードは *、任意の1文字は _ です。<br>
+例：「*」 = 「全ユーザー」、「T*」 = 「理工学部生」、「_19*」 = 「全ての学部の2019年度入学生」</p>
 </div>
 EOF;
 

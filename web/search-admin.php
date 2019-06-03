@@ -197,6 +197,7 @@ $froom1 = 'room1';
 $froom2 = 'room2';
 $froomck1 = 'rcheck1';
 $froomck2 = 'rcheck2';
+$ftypeck = 'typeck';
 $apnum = 3;
 
 $json_file = 'Seta_wifi_001.json';
@@ -257,6 +258,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     $$froom2 = $_POST[$froom2];
     $$froomck1 = $_POST[$froomck1];
     $$froomck2 = $_POST[$froomck2];
+    $$ftypeck = $_POST[$ftypeck];
 } else {
     $$fid = '*';
     $$ftype = '*';
@@ -278,6 +280,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     $$froom2 = '*';
     $$froomck1 = '';
     $$froomck2 = '';
+    $$ftypeck = '';
 }
 
 //////////////////////////////
@@ -330,9 +333,10 @@ echo "<form action='search.php' method ='post'>";
 echo '<div class="item"><h3>学籍番号</h3>';
 echo '<p><input type="text" name="' . $fid . '" value=' . $$fid . '></p>';
 echo <<< EOF
-<p>* = 「全ユーザー」<br>
-T* = 「理工学部生」<br>
-T19* = 「理工学部の2019年度入学生」</p>
+<p>
+検索パターンのワイルドカードは * です。
+例：「*」 = 「全ユーザー」、「T*」 = 「理工学部生」、「T19*」 = 「理工学部の2019年度入学生」
+</p>
 </div>
 EOF;
 
@@ -365,11 +369,19 @@ echo "</p></div>";
 //}
 
 echo '<div class="item"><h3>送信タイプ</h3><p>';
-makeTypeSelector($ftype, $$ftype);
+//makeTypeSelector($ftype, $$ftype);
 //makeSelector($link, $dbtbl, $ftype, $$ftype);
+echo '<input type="text" name="' . $ftype . '" value=' . $$ftype . '>';
+echo '<input type="checkbox" name="' . $ftypeck . '" value="1"';
+if ($$ftypeck) {
+    echo ' checked="checked"';
+}
+echo '/>大文字/小文字を区別する</p>';
 echo <<< EOF
-</p>
-<p>M =「手動送信」、A =「自動送信」<br>
+<p>
+iOS: M =「手動送信」、A =「自動送信」 Android: m =「手動送信」、a =「自動送信」<br>
+データ・フォーマットは、上記の1文字+バージョン情報<br>
+例：「m*」= Android からの全ての自動送信、「_1.*」= Version 1. の全ての送信
 </p></div>
 EOF;
 
@@ -441,8 +453,13 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
     $sql = "SELECT * FROM $dbtbl WHERE ";
     //////////////////////////////
     $sql .= "$fid LIKE '" . str_replace('*', '%', $$fid) . "' AND ";
+    //////////////////////////////
     if ($$ftype != '*') {
-        $sql .= "$ftype LIKE '" . $$ftype . "%' AND ";
+        $sql .= "$ftype LIKE ";
+        if ($$ftypeck == 1) {
+            $sql .= "BINARY ";
+        }
+        $sql .= "'" . str_replace('*', '%', $$ftype) . "' AND ";
     }
     //////////////////////////////
     //foreach ($farr as $key) {
