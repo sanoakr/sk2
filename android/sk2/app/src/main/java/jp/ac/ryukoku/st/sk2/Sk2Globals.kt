@@ -21,6 +21,8 @@ class Sk2Globals: Application(), AnkoLogger {
     companion object {
         const val APP_NAME = "sk2"
         const val APP_TITLE = "龍大理工学部出欠システム"
+        const val APP_VERSION_CODE = BuildConfig.VERSION_CODE
+        const val APP_VERSION_NAME = BuildConfig.VERSION_NAME
 
         const val TITLE_RECORD = "出席ログ"
         const val TITLE_RECORD_TAB_SERVER = "on Server"
@@ -50,6 +52,10 @@ class Sk2Globals: Application(), AnkoLogger {
         const val SERVER_INFO_PORT = 4441                   // 出席データ取得用ポート
         const val SERVER_TIMEOUT_MILLISEC = 5000
         const val SERVER_HELP_URI = "https://sk2.st.ryukoku.ac.jp/index.html"
+
+        /*** サーバ送信用 送信タイプ文字列 ***/
+        const val TYPE_SEND_AUTO = "a$APP_VERSION_NAME"         // Use a/m for Android, A/M for iOS
+        const val TYPE_SEND_MANUAL = "m$APP_VERSION_NAME"
 
         /*** サーバ コマンドキー ***/
         const val SERVER_COMMAND_AUTH = "AUTH"
@@ -255,7 +261,7 @@ class Sk2Globals: Application(), AnkoLogger {
         /**  SharedPreferences **/
         lateinit var pref: SharedPreferences
         /**  出席情報のローカル記録用キュー **/
-        lateinit var localQueue: Queue<Triple<String,Char,List<StatBeacon>>>
+        lateinit var localQueue: Queue<Triple<String, String, List<StatBeacon>>>
         /**  AP情報の Map **/
         lateinit var apInfos: List<Map<String, Any>>
         lateinit var apNameMap: MutableMap<Triple<String, Int, Int>, Pair<String, String>>
@@ -331,9 +337,9 @@ class Sk2Globals: Application(), AnkoLogger {
     fun restoreQueue() {
         val gson = Gson()
         val jsonString = pref.getString(PREF_LOCAL_QUEUE,
-                gson.toJson(Queue<Triple<String,Char,List<StatBeacon>>>(mutableListOf())))
-        val type: Type = object: TypeToken<Queue<Triple<String, Char, Collection<StatBeacon>>>>(){}.type
-        val queue: Queue<Triple<String, Char,List<StatBeacon>>> = gson.fromJson<Queue<Triple<String, Char, List<StatBeacon>>>>(jsonString, type)
+                gson.toJson(Queue<Triple<String, String, List<StatBeacon>>>(mutableListOf())))
+        val type: Type = object: TypeToken<Queue<Triple<String, String, Collection<StatBeacon>>>>(){}.type
+        val queue: Queue<Triple<String, String, List<StatBeacon>>> = gson.fromJson<Queue<Triple<String, String, List<StatBeacon>>>>(jsonString, type)
 
         /** remove recodes null data contained **/
         localQueue.clear()

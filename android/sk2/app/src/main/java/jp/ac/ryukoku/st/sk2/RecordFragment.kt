@@ -127,7 +127,7 @@ class RecordAdapter: BaseAdapter() {
                         typeface = Typeface.DEFAULT_BOLD
                     }.lparams { horizontalGravity = left; weight = 1f }
                     /** ////////////////////////////////////////////////////////////////////////////// **/
-                    textView(item.type) {
+                    textView(item.type?.substring(0,1)?.toUpperCase()) {
                         textSize = Sk2Globals.TEXT_SIZE_Large
                         //textColor = Color.BLACK
                         backgroundColor = Color.WHITE // for Huwai's initAdditionalStyle default Error.

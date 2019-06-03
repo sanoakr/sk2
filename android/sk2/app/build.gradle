@@ -3,27 +3,36 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('/Users/sano/git/sk2/android/KeyStore')
+            storePassword 'sk2loglog'
+            keyAlias = 'sk2key'
+            keyPassword 'sk2loglog'
+        }
+    }
     compileSdkVersion 27
     buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "jp.ac.ryukoku.st.sk2"
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 15
-        versionName "1.01"
+        versionCode 16
+        versionName "1.0.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.3-alpha', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -31,7 +40,7 @@ dependencies {
     implementation "com.android.support:support-v4:$support_version"
     implementation "com.android.support:animated-vector-drawable:$support_version"
     implementation "com.android.support:support-media-compat:$support_version"
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13-beta-3'
 
     implementation 'com.google.android.gms:play-services-location:16.0.0'
     implementation "com.android.support:design:$support_version"
