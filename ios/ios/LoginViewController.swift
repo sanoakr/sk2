@@ -412,15 +412,12 @@ class ServerAuth: NSObject, StreamDelegate {
 					let splitRead2 = read.components(separatedBy: ",[")
 					let varAps = "[" + String(splitRead2[1])
 					
-					//
+					// APデータ
 					struct aps: Codable {
-						let name: String
-						struct iBeacon: Codable {
-	//						let uuid: String?
-							let major: Int?
-							let minor: Int?
-						}
-						let beaconIdParams: iBeacon?
+						let Name: String?
+                        let Notes: String?
+                        let Major: Int?
+                        let Minor: Int?
 					}
 					
 					// サーバーから取得した無線APの値をjsonデコード
@@ -430,16 +427,18 @@ class ServerAuth: NSObject, StreamDelegate {
 					let _ = appDelegate.deleteDbAll()
 
 					for json in apJson {
-						
-						if((json.beaconIdParams) != nil) {
-							// データ追加
-							let _ = appDelegate.putApData(name: json.name, major: (json.beaconIdParams?.major)!, minor: (json.beaconIdParams?.minor)!)
-						}
+                        if((json.Notes) != nil) {
+//                        if((json.beaconIdParams) != nil) {
+//                            // データ追加
+                         let _ = appDelegate.putApData(name: json.Name!, notes: json.Notes!, major: json.Major!, minor: json.Minor!)
+////                            let _ = appDelegate.putApData(name: json.Name, major: (json.beaconIdParams?.Major)!, minor: (json.beaconIdParams?.Minor)!)
+////                            let _ = appDelegate.putApData(name: json.Name, notes: json.Notes, major: (json.beaconIdParams?.Major)!, minor: (json.beaconIdParams?.Minor)!)
+                        }
 					}
 					
 //					// データベースからデータを抽出（デバッグ用）
-//					let _ = appDelegate.getApData()
-					
+//                    let _ = appDelegate.getApData()
+
 				} else {
 					// サーバーからのデータ取得が出来ていない場合は認証失敗を返す（臨時対応）
 					retval["auth"] = "false"

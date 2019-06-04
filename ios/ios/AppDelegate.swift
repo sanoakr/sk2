@@ -326,11 +326,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 	
 	// --------------------------------------------------------------------------------------------------------------------------
-	// ローカルDBのデータ追加
-	func putApData( name:String, major:Int, minor:Int) -> Bool {
+	// ローカルDBのオブジェクトの書込
+	func putApData( name:String, notes:String, major:Int, minor:Int) -> Bool {
 		let context = appDelegate.persistentContainer.viewContext
 		let IBeacon = NSEntityDescription.insertNewObject(forEntityName: "IBeacon", into: context)
-		IBeacon.setValue(name, forKey: "name")
+		IBeacon.setValue(notes, forKey: "name")
+//        IBeacon.setValue(notes, forKey: "notes")
 		IBeacon.setValue(major, forKey: "major")
 		IBeacon.setValue(minor, forKey: "minor")
 		
@@ -341,7 +342,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
 	
 	// --------------------------------------------------------------------------------------------------------------------------
-	// ローカルDBのデータ追加
+	// ローカルDBからオブジェクトの読込
 	func getApData() -> Bool {
 		let context = appDelegate.persistentContainer.viewContext
 		let request = NSFetchRequest<NSManagedObject>(entityName: "IBeacon")
