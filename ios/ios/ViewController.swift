@@ -313,7 +313,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		let key:String = myUserDefault.string(forKey: "key")!
 		
 		// データ送信
-		let result = sendAttend(user: user, key: key, type: "M")
+		let result = sendAttend(user: user, key: key, type: "M\(version)")
 		
 		// データが正常に記録された場合の処理
 		if result == "success" {
@@ -401,7 +401,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			print("自動送信機能のチェック：\(appDelegate.postInterval)ごと")   //デバッグ
 			
 			// データ送信
-			let result = sendAttend(user: user, key: key, type: "A")
+			let result = sendAttend(user: user, key: key, type: "A\(version)")
 			// データが正常に記録された場合の処理
 			if result == "success" {
 				// バイブレーション

@@ -283,7 +283,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 			}
 			
 			cell.labelDate.text = " \(splitRead[2])"
-			cell.labelMode.text = splitRead[1]
+            cell.labelMode.text = String(splitRead[1].prefix(1))
 			cell.labelVal1.text = "ap:\(String(describing: ap1)) major:\(splitRead[3]) minor:\(splitRead[4]) RSSI:\(splitRead[5])"
 			cell.labelVal2.text = "ap:\(String(describing: ap2)) major:\(splitRead[6]) minor:\(splitRead[7]) RSSI:\(splitRead[8])"
 			cell.labelVal3.text = "ap:\(String(describing: ap3)) major:\(splitRead[9]) minor:\(splitRead[10]) RSSI:\(splitRead[11])"
