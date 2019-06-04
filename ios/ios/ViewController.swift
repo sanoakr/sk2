@@ -34,6 +34,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	var labelUser : UILabel!
 	var labelAuto : UILabel!
 	var labelBeacon : UILabel!
+    var labelVersion : UILabel!
 	
 	// iBeacon
 	var myLocationManager : CLLocationManager!
@@ -48,6 +49,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	let btnHelpImageDefault :UIImage? = UIImage(named:"help.png")
 	let btnLogoutImageDefault :UIImage? = UIImage(named:"logout.png")
 	
+    // バージョン
+    let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as! String
+    
 	// UserDefaultの生成
 	let myUserDefault:UserDefaults = UserDefaults()
 	
@@ -254,6 +258,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 //		logoutBtn.titleEdgeInsets = UIEdgeInsetsMake(0, -50, 0, 50);
 		view.addSubview(logoutBtn)  // Viewに追加
 		
+        // --------------------------------------------------------------------------------------------------------------------------
+        // バージョン表示を生成
+        labelVersion = UILabel(frame: CGRect(x: -10, y:self.view.frame.height - 30, width:self.view.frame.width, height:30))
+        labelVersion.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
+        labelVersion.textColor = UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1)    // 色
+        labelVersion.textAlignment = NSTextAlignment.right    // 右寄せ
+        labelVersion.text = "version:\(version)"
+        view.addSubview(labelVersion)  // Viewに追加
+        
 		// --------------------------------------------------------------------------------------------------------------------------
 		// iBeacon 監視開始
 		
