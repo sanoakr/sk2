@@ -51,22 +51,21 @@ bFlag = 1 << 13
 bType = {("STB001", "固定ビーコン"), ("STB002", "携帯ビーコン"), ("STB003", "ボタンビーコン")}
 bSignal = {"A", "B", "C"}
 
-bIndex = 900000
 minorNum = 10
 
 for i, (code, type) in enumerate(bType):
-    for sig in bSignal:
-        for j in range(minorNum):
-            jstr = str(j).zfill(3)
+    for j, sig in enumerate(bSignal):
+        for k in range(minorNum):
+            kstr = str(k).zfill(3)
             bData = pd.DataFrame(
                 [
-                    code + sig + "-" + jstr,
+                    code + sig + "-" + kstr,
                     type,
                     sig,
-                    jstr,
-                    bFlag + i,
-                    j,
-                    type + "_" + sig + "_" + jstr,
+                    kstr,
+                    bFlag + (i << 4) + j,
+                    k,
+                    type + "_" + sig + "_" + kstr,
                 ],
                 index=df.columns,
             ).T
