@@ -50,7 +50,7 @@ df["Notes"] = df["Build"] + "_" + df["Floor"] + "_" + df["Room"]
 
 bFlag = 1 << 11
 bType = {(1, "STB001", "固定ビーコン"), (2, "STB002", "携帯ビーコン"), (3, "STB003", "ボタンビーコン")}
-bSignal = {(0b00, "S"), (0b01, "D"), (0b11, "L")}
+bSignal = {(0b00, "S"), (0b01, "L"), (0b11, "D")}
 
 minorNum = 4
 
