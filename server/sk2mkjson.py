@@ -44,28 +44,30 @@ df = df.rename(
 df["Notes"] = df["Build"] + "_" + df["Floor"] + "_" + df["Room"]
 
 ### add Beacons
-## Major 16bits = Unused(3)+BeaconFlag(1)+BeaconType(8)+SignalType(4)
+## Major 16bits = Unused(2)+SignalType(2)+BeaconFlag(1)+BeaconType(11)
+## //// Major 16bits = Unused(3)+BeaconFlag(1)+BeaconType(8)+SignalType(4)
 ## Minor 16bits = Sequency
 
-bFlag = 1 << 13
-bType = {("STB001", "固定ビーコン"), ("STB002", "携帯ビーコン"), ("STB003", "ボタンビーコン")}
-bSignal = {"A", "B", "C"}
+bFlag = 1 << 12
+bType = {(1, "STB001", "固定ビーコン"), (2, "STB002", "携帯ビーコン"), (3, "STB003", "ボタンビーコン")}
+bSignal = {(0b00, "S"), (0b01, "D"), (0b11, "L")}
 
-minorNum = 10
+minorNum = 4
 
-for i, (code, type) in enumerate(bType):
-    for j, sig in enumerate(bSignal):
-        for k in range(minorNum):
-            kstr = str(k).zfill(3)
+for (i, code, type) in bType:
+    for (val, opr) in bSignal:
+        sFlag = val << 13
+        for n in range(1, minorNum + 1):
+            nStr = str(n).zfill(3)
             bData = pd.DataFrame(
                 [
-                    code + sig + "-" + kstr,
+                    code + opr + "-" + nStr,
                     type,
-                    sig,
-                    kstr,
-                    bFlag + (i << 4) + j,
-                    k,
-                    type + "_" + sig + "_" + kstr,
+                    opr,
+                    nStr,
+                    sFlag + bFlag + i,
+                    n,
+                    type + "_" + opr + "_" + nStr,
                 ],
                 index=df.columns,
             ).T
