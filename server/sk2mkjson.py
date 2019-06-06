@@ -48,7 +48,7 @@ df["Notes"] = df["Build"] + "_" + df["Floor"] + "_" + df["Room"]
 ## //// Major 16bits = Unused(3)+BeaconFlag(1)+BeaconType(8)+SignalType(4)
 ## Minor 16bits = Sequency
 
-bFlag = 1 << 12
+bFlag = 1 << 11
 bType = {(1, "STB001", "固定ビーコン"), (2, "STB002", "携帯ビーコン"), (3, "STB003", "ボタンビーコン")}
 bSignal = {(0b00, "S"), (0b01, "D"), (0b11, "L")}
 
@@ -56,7 +56,7 @@ minorNum = 4
 
 for (i, code, type) in bType:
     for (val, opr) in bSignal:
-        sFlag = val << 13
+        sFlag = val << 12
         for n in range(1, minorNum + 1):
             nStr = str(n).zfill(3)
             bData = pd.DataFrame(
@@ -73,4 +73,4 @@ for (i, code, type) in bType:
             ).T
             df = df.append(bData, ignore_index=True)
 
-print(df.to_json(orient="index", force_ascii=False))
+print(df.to_json(orient="records", force_ascii=False))
