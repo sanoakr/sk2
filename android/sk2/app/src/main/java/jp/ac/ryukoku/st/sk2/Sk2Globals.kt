@@ -306,7 +306,8 @@ class Sk2Globals: Application(), AnkoLogger {
         /** List<Map> から (Uuid, Major, Minor) => (Name, Notes) **/
         apNameMap = mutableMapOf()
         apInfos.forEach { ap ->
-            if (ap.containsKey(APMAP_KEY_MAJOR) && ap[APMAP_KEY_MAJOR] != null
+            if (ap.containsKey(APMAP_KEY_UUID) && ap[APMAP_KEY_UUID] != null
+                    && ap.containsKey(APMAP_KEY_MAJOR) && ap[APMAP_KEY_MAJOR] != null
                     && ap.containsKey(APMAP_KEY_MINOR) && ap[APMAP_KEY_MINOR] != null
                     && ap.containsKey(APMAP_KEY_NAME)  && ap[APMAP_KEY_NAME] != null
                     && ap.containsKey(APMAP_KEY_NOTES) && ap[APMAP_KEY_NOTES] != null) {
