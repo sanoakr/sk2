@@ -363,53 +363,80 @@ class ServerAuth: NSObject, StreamDelegate {
 		let commandLength = ccommand.count
 		let text : String = ccommand.withUnsafeMutableBytes{ bytes in return String(bytesNoCopy: bytes, length: commandLength, encoding: String.Encoding.utf8, freeWhenDone: false)!}
 		
-		// "end"を受信したら接続切断
+        // "end"を受信したら接続切断
 		if (String(describing: command) == "end") {
 			
 			self.outputStream.close()
 			self.outputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
 			
-	//		while(!inputStream.hasBytesAvailable){}
-			let bufferSize = 10240
-			var buffer = Array<UInt8>(repeating: 0, count: bufferSize)
-			let bytesRead = inputStream.read(&buffer, maxLength: bufferSize)
-			var read:String = NSString(bytes: UnsafePointer(buffer), length: bytesRead, encoding:String.Encoding.utf8.rawValue)! as String
-			
-			while (inputStream!.hasBytesAvailable){
-				
-				let bytesRead:Int=inputStream!.read(&buffer, maxLength: buffer.count)
-//				print("bytesRead: \(bytesRead)")
-				
-				// データ処理を一時的に待つ（これがないとうまくいかない場合がおおい）
-				sleep(UInt32(1))
-				
-				if (bytesRead > 0) { // had here (bytesRead >= 0) too
-//					read = String(bytes: buffer, encoding: String.Encoding.utf8)!
-					read += NSString(bytes: UnsafePointer(buffer), length: bytesRead, encoding:String.Encoding.utf8.rawValue)! as String
-					print("---------------------> \(buffer.count)")
-				} else {
-					print("# error")
-				}
-			}
-			
-//			print("---------------------> \(read)")
+            let read = NSMutableData()
+            
+            // とりあえず動かす版
+            for _ in 1..<64 {
+//                print("hasBytesAvailable: \(inputStream.hasBytesAvailable)");
+                let bufferSize = 4096
+                var buffer = Array<UInt8>(repeating: 0, count: bufferSize)
+                let bytesRead = inputStream.read(&buffer, maxLength: bufferSize)
+                read.append(NSData(bytes: UnsafePointer(buffer), length: bytesRead) as Data)
+//                print("bytesRead: \(bytesRead)")
+            }
+            
+            //
+            // 本当は以下のように処理したい
+            //
+            
+//            let bufferSize = 10240
+//            var buffer = Array<UInt8>(repeating: 0, count: bufferSize)
+//            let bytesRead = inputStream.read(&buffer, maxLength: bufferSize)
+//
+//            let read = NSMutableData()
+////            var read : String = NSString(bytes: UnsafePointer(buffer), length: bytesRead, encoding:String.Encoding.utf8.rawValue)! as String
+//            print("read: \(read)")
+//            read.append(NSData(bytes: UnsafePointer(buffer), length: bytesRead) as Data)
+//
+//            while (inputStream!.hasBytesAvailable){
+//
+//                let bytesRead:Int=inputStream!.read(&buffer, maxLength: buffer.count)
+////                print("bytesRead: \(bytesRead)")
+//
+//                // データ処理を一時的に待つ（これがないとうまくいかない場合がおおい）
+////                sleep(UInt32(1))
+//
+//                if (bytesRead >= 0) { // had here (bytesRead >= 0) too
+////                    read = String(bytes: buffer, encoding: String.Encoding.utf8)!
+////                    read += NSString(bytes: UnsafePointer(buffer), length: bytesRead, encoding:String.Encoding.utf8.rawValue)! as String
+//                    print("---------------------> \(buffer.count)")
+////                    print(read)
+//
+//                    // データが断片化する可能性があるのでキューにためておく
+//                    read.append(NSData(bytes: UnsafePointer(buffer), length: bytesRead) as Data)
+//                } else {
+//                    print("# error")
+//                }
+//            }
+            
+//            print("---------------------> \(read)")
+            let readVal: String = String(data: read as Data, encoding: .utf8)!
+            
+//            print("readVal: \(readVal)")
+            
 			// 認証失敗
-			if read.contains("authfail") {
+			if readVal.contains("authfail") {
 				retval["auth"] = "false"
 
 			// 認証成功
 			} else {
 				// 値を最後までリードできているかチェック
 				// 最後の文字が"]"の場合は、データを正しく受信できていると判断
-				if read.hasSuffix("]") {
+				if readVal.hasSuffix("]") {
 					
-					let splitRead = read.components(separatedBy: ",")
+					let splitRead = readVal.components(separatedBy: ",")
 					retval["auth"] = "true"
 					retval["key"] = splitRead[0]
 					retval["engName"] = splitRead[1]
 					retval["jpnName"] = splitRead[2]
 					
-					let splitRead2 = read.components(separatedBy: ",[")
+					let splitRead2 = readVal.components(separatedBy: ",[")
 					let varAps = "[" + String(splitRead2[1])
 					
 					// APデータ
