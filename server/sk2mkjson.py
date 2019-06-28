@@ -37,6 +37,7 @@ df = df.rename(
         "場所": "Room",
         "メジャー番号": "Major",
         "マイナー番号": "Minor",
+        #"UUID": "Uuid",
     }
 )
 
@@ -48,26 +49,39 @@ df["Notes"] = df["Build"] + "_" + df["Floor"] + "_" + df["Room"]
 ## //// Major 16bits = Unused(3)+BeaconFlag(1)+BeaconType(8)+SignalType(4)
 ## Minor 16bits = Sequency
 
+## 固定ビーコン配置
+bPlace = {
+    1: "瀬田バス停北",
+    2: "瀬田バス停南",
+    3: "瀬田生協売店",
+}
+
 bFlag = 1 << 11
 bType = {(1, "STB001", "固定ビーコン"), (2, "STB002", "携帯ビーコン"), (3, "STB003", "ボタンビーコン")}
 bSignal = {(0b00, "S"), (0b01, "L"), (0b11, "D")}
 
 minorNum = 4
+#uuid = "ebf59ccc-21f2-4558-9488-00f2b388e5e6"
 
 for (i, code, type) in bType:
     for (val, opr) in bSignal:
         sFlag = val << 12
         for n in range(1, minorNum + 1):
+            if i == 1 and n in bPlace:
+                bName = type + "／" + bPlace[n]
+            else:
+                bName = type
             nStr = str(n).zfill(3)
             bData = pd.DataFrame(
                 [
                     code + opr + "-" + nStr,
-                    type,
+                    bName,
                     opr,
                     nStr,
+                    #uuid,
                     sFlag + bFlag + i,
                     n,
-                    type + "_" + opr + "_" + nStr,
+                    bName + "_" + opr + "_" + nStr,
                 ],
                 index=df.columns,
             ).T

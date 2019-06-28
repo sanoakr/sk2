@@ -5751,112 +5751,40 @@
         "Notes": "瑞光館_2F_データベース室"
     },
     {
-        "Name": "STB001S-001",
-        "Build": "固定ビーコン",
-        "Floor": "S",
-        "Room": "001",
-        "Major": 2049,
-        "Minor": 1,
-        "Notes": "固定ビーコン_S_001"
-    },
-    {
-        "Name": "STB001S-002",
-        "Build": "固定ビーコン",
-        "Floor": "S",
-        "Room": "002",
-        "Major": 2049,
-        "Minor": 2,
-        "Notes": "固定ビーコン_S_002"
-    },
-    {
-        "Name": "STB001S-003",
-        "Build": "固定ビーコン",
-        "Floor": "S",
-        "Room": "003",
-        "Major": 2049,
-        "Minor": 3,
-        "Notes": "固定ビーコン_S_003"
-    },
-    {
-        "Name": "STB001S-004",
-        "Build": "固定ビーコン",
-        "Floor": "S",
-        "Room": "004",
-        "Major": 2049,
-        "Minor": 4,
-        "Notes": "固定ビーコン_S_004"
-    },
-    {
-        "Name": "STB001L-001",
-        "Build": "固定ビーコン",
-        "Floor": "L",
-        "Room": "001",
-        "Major": 6145,
-        "Minor": 1,
-        "Notes": "固定ビーコン_L_001"
-    },
-    {
-        "Name": "STB001L-002",
-        "Build": "固定ビーコン",
-        "Floor": "L",
-        "Room": "002",
-        "Major": 6145,
-        "Minor": 2,
-        "Notes": "固定ビーコン_L_002"
-    },
-    {
-        "Name": "STB001L-003",
-        "Build": "固定ビーコン",
-        "Floor": "L",
-        "Room": "003",
-        "Major": 6145,
-        "Minor": 3,
-        "Notes": "固定ビーコン_L_003"
-    },
-    {
-        "Name": "STB001L-004",
-        "Build": "固定ビーコン",
-        "Floor": "L",
-        "Room": "004",
-        "Major": 6145,
-        "Minor": 4,
-        "Notes": "固定ビーコン_L_004"
-    },
-    {
-        "Name": "STB001D-001",
-        "Build": "固定ビーコン",
+        "Name": "STB002D-001",
+        "Build": "携帯ビーコン",
         "Floor": "D",
         "Room": "001",
-        "Major": 14337,
+        "Major": 14338,
         "Minor": 1,
-        "Notes": "固定ビーコン_D_001"
+        "Notes": "携帯ビーコン_D_001"
     },
     {
-        "Name": "STB001D-002",
-        "Build": "固定ビーコン",
+        "Name": "STB002D-002",
+        "Build": "携帯ビーコン",
         "Floor": "D",
         "Room": "002",
-        "Major": 14337,
+        "Major": 14338,
         "Minor": 2,
-        "Notes": "固定ビーコン_D_002"
+        "Notes": "携帯ビーコン_D_002"
     },
     {
-        "Name": "STB001D-003",
-        "Build": "固定ビーコン",
+        "Name": "STB002D-003",
+        "Build": "携帯ビーコン",
         "Floor": "D",
         "Room": "003",
-        "Major": 14337,
+        "Major": 14338,
         "Minor": 3,
-        "Notes": "固定ビーコン_D_003"
+        "Notes": "携帯ビーコン_D_003"
     },
     {
-        "Name": "STB001D-004",
-        "Build": "固定ビーコン",
+        "Name": "STB002D-004",
+        "Build": "携帯ビーコン",
         "Floor": "D",
         "Room": "004",
-        "Major": 14337,
+        "Major": 14338,
         "Minor": 4,
-        "Notes": "固定ビーコン_D_004"
+        "Notes": "携帯ビーコン_D_004"
     },
     {
         "Name": "STB002S-001",
@@ -5931,40 +5859,148 @@
         "Notes": "携帯ビーコン_L_004"
     },
     {
-        "Name": "STB002D-001",
-        "Build": "携帯ビーコン",
+        "Name": "STB001D-001",
+        "Build": "固定ビーコン／瀬田バス停北",
         "Floor": "D",
         "Room": "001",
-        "Major": 14338,
+        "Major": 14337,
         "Minor": 1,
-        "Notes": "携帯ビーコン_D_001"
+        "Notes": "固定ビーコン／瀬田バス停北_D_001"
     },
     {
-        "Name": "STB002D-002",
-        "Build": "携帯ビーコン",
+        "Name": "STB001D-002",
+        "Build": "固定ビーコン／瀬田バス停南",
         "Floor": "D",
         "Room": "002",
-        "Major": 14338,
+        "Major": 14337,
         "Minor": 2,
-        "Notes": "携帯ビーコン_D_002"
+        "Notes": "固定ビーコン／瀬田バス停南_D_002"
     },
     {
-        "Name": "STB002D-003",
-        "Build": "携帯ビーコン",
+        "Name": "STB001D-003",
+        "Build": "固定ビーコン／瀬田生協売店",
         "Floor": "D",
         "Room": "003",
-        "Major": 14338,
+        "Major": 14337,
         "Minor": 3,
-        "Notes": "携帯ビーコン_D_003"
+        "Notes": "固定ビーコン／瀬田生協売店_D_003"
     },
     {
-        "Name": "STB002D-004",
-        "Build": "携帯ビーコン",
+        "Name": "STB001D-004",
+        "Build": "固定ビーコン",
         "Floor": "D",
         "Room": "004",
-        "Major": 14338,
+        "Major": 14337,
         "Minor": 4,
-        "Notes": "携帯ビーコン_D_004"
+        "Notes": "固定ビーコン_D_004"
+    },
+    {
+        "Name": "STB001S-001",
+        "Build": "固定ビーコン／瀬田バス停北",
+        "Floor": "S",
+        "Room": "001",
+        "Major": 2049,
+        "Minor": 1,
+        "Notes": "固定ビーコン／瀬田バス停北_S_001"
+    },
+    {
+        "Name": "STB001S-002",
+        "Build": "固定ビーコン／瀬田バス停南",
+        "Floor": "S",
+        "Room": "002",
+        "Major": 2049,
+        "Minor": 2,
+        "Notes": "固定ビーコン／瀬田バス停南_S_002"
+    },
+    {
+        "Name": "STB001S-003",
+        "Build": "固定ビーコン／瀬田生協売店",
+        "Floor": "S",
+        "Room": "003",
+        "Major": 2049,
+        "Minor": 3,
+        "Notes": "固定ビーコン／瀬田生協売店_S_003"
+    },
+    {
+        "Name": "STB001S-004",
+        "Build": "固定ビーコン",
+        "Floor": "S",
+        "Room": "004",
+        "Major": 2049,
+        "Minor": 4,
+        "Notes": "固定ビーコン_S_004"
+    },
+    {
+        "Name": "STB001L-001",
+        "Build": "固定ビーコン／瀬田バス停北",
+        "Floor": "L",
+        "Room": "001",
+        "Major": 6145,
+        "Minor": 1,
+        "Notes": "固定ビーコン／瀬田バス停北_L_001"
+    },
+    {
+        "Name": "STB001L-002",
+        "Build": "固定ビーコン／瀬田バス停南",
+        "Floor": "L",
+        "Room": "002",
+        "Major": 6145,
+        "Minor": 2,
+        "Notes": "固定ビーコン／瀬田バス停南_L_002"
+    },
+    {
+        "Name": "STB001L-003",
+        "Build": "固定ビーコン／瀬田生協売店",
+        "Floor": "L",
+        "Room": "003",
+        "Major": 6145,
+        "Minor": 3,
+        "Notes": "固定ビーコン／瀬田生協売店_L_003"
+    },
+    {
+        "Name": "STB001L-004",
+        "Build": "固定ビーコン",
+        "Floor": "L",
+        "Room": "004",
+        "Major": 6145,
+        "Minor": 4,
+        "Notes": "固定ビーコン_L_004"
+    },
+    {
+        "Name": "STB003D-001",
+        "Build": "ボタンビーコン",
+        "Floor": "D",
+        "Room": "001",
+        "Major": 14339,
+        "Minor": 1,
+        "Notes": "ボタンビーコン_D_001"
+    },
+    {
+        "Name": "STB003D-002",
+        "Build": "ボタンビーコン",
+        "Floor": "D",
+        "Room": "002",
+        "Major": 14339,
+        "Minor": 2,
+        "Notes": "ボタンビーコン_D_002"
+    },
+    {
+        "Name": "STB003D-003",
+        "Build": "ボタンビーコン",
+        "Floor": "D",
+        "Room": "003",
+        "Major": 14339,
+        "Minor": 3,
+        "Notes": "ボタンビーコン_D_003"
+    },
+    {
+        "Name": "STB003D-004",
+        "Build": "ボタンビーコン",
+        "Floor": "D",
+        "Room": "004",
+        "Major": 14339,
+        "Minor": 4,
+        "Notes": "ボタンビーコン_D_004"
     },
     {
         "Name": "STB003S-001",
@@ -6037,41 +6073,5 @@
         "Major": 6147,
         "Minor": 4,
         "Notes": "ボタンビーコン_L_004"
-    },
-    {
-        "Name": "STB003D-001",
-        "Build": "ボタンビーコン",
-        "Floor": "D",
-        "Room": "001",
-        "Major": 14339,
-        "Minor": 1,
-        "Notes": "ボタンビーコン_D_001"
-    },
-    {
-        "Name": "STB003D-002",
-        "Build": "ボタンビーコン",
-        "Floor": "D",
-        "Room": "002",
-        "Major": 14339,
-        "Minor": 2,
-        "Notes": "ボタンビーコン_D_002"
-    },
-    {
-        "Name": "STB003D-003",
-        "Build": "ボタンビーコン",
-        "Floor": "D",
-        "Room": "003",
-        "Major": 14339,
-        "Minor": 3,
-        "Notes": "ボタンビーコン_D_003"
-    },
-    {
-        "Name": "STB003D-004",
-        "Build": "ボタンビーコン",
-        "Floor": "D",
-        "Room": "004",
-        "Major": 14339,
-        "Minor": 4,
-        "Notes": "ボタンビーコン_D_004"
     }
 ]
