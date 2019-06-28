@@ -19,13 +19,15 @@ class LoginViewController: UIViewController {
 	// UIを宣言
 	var leftBarButton: UIBarButtonItem!
 	
-
+    // ローディングを宣言
+    var activityIndicatorView = UIActivityIndicatorView()
+    
 	@IBOutlet var useridField: UITextField!
 	@IBOutlet var passwordField: UITextField!
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		
+        
 //		// データベースからデータをロード
 //		print("load begin")
 //		container = NSPersistentContainer(name: "sk2")
@@ -108,9 +110,16 @@ class LoginViewController: UIViewController {
         } else if ( message == "timeOver" ) {
             showAlertAutoHidden(title:"認証切れ", message: "認証の有効期限が切れたため、再度ログインが必要です。", showTime: 3)
         }
-		
+        
+        // --------------------------------------------------------------------------------------------------------------------------
+        // ローディング
+        activityIndicatorView.center = view.center
+        activityIndicatorView.style = .whiteLarge
+        activityIndicatorView.color = .black
+        
+        view.addSubview(activityIndicatorView)
 	}
-	
+    
 	var container: NSPersistentContainer!	//データベース読み込みのコンテナ
 	
     //
@@ -134,13 +143,13 @@ class LoginViewController: UIViewController {
 	// ログインボタンの動作
 	@IBAction func login(_ sender: UIButton) {
 		
+        // ローディング開始
+        activityIndicatorView.startAnimating()
+        
 		// 認証サーバーに問い合わせ
 		ServerAuth_.connect()
 		
 		let sendtext = "AUTH,\(String(describing: useridField.text!)),\(String(describing: passwordField.text!))"
-		
-		// ローディング開始
-//		startIndicator()
 		
 		_ = ServerAuth_.sendCommand(command: sendtext)
 		let retval = ServerAuth_.sendCommand(command: "end")
@@ -179,6 +188,9 @@ class LoginViewController: UIViewController {
 			self.present(navigationController, animated: true , completion: nil)
 			
 		} else if result == "timeout" {
+            
+            self.activityIndicatorView.stopAnimating()
+            
 			print("Auth timeout.")
 			
 			// UIAlertControllerを作成する.
@@ -196,6 +208,9 @@ class LoginViewController: UIViewController {
 			present(myAlert, animated: true, completion: nil)
 			
 		} else {
+            
+            self.activityIndicatorView.stopAnimating()
+            
 			print("Auth Failure.")
 			
 			// UIAlertControllerを作成する.
@@ -275,85 +290,12 @@ class ServerAuth: NSObject, StreamDelegate {
 		print("connect success!!")
 	}
 	
-	// inputStream/outputStreamに何かしらのイベントが起きたら起動してくれる関数
-	// 今回の場合では、同期型なのでoutputStreamの時しか起動してくれない
-	func stream(_ stream:Stream, handle eventCode : Stream.Event){
-		print(stream)
-	}
-	
-//	// サーバーにコマンド文字列を送信する関数
-//	func sendCommand(command: String) -> Dictionary<String, Any> {
+//    // inputStream/outputStreamに何かしらのイベントが起きたら起動してくれる関数
+//    // 今回の場合では、同期型なのでoutputStreamの時しか起動してくれない
+//    func stream(_ stream:Stream, handle eventCode : Stream.Event){
+//        print(stream)
+//    }
 //
-//		var retval = Dictionary<String, String>()
-//
-//		var ccommand = command.data(using: String.Encoding.utf8, allowLossyConversion: false)!
-//		let text : String = ccommand.withUnsafeMutableBytes{ bytes in return String(bytesNoCopy: bytes, length: ccommand.count, encoding: String.Encoding.utf8, freeWhenDone: false)!}
-//
-//		// エラー処理
-//		var timeout = 5 * 100000 // タイムアウト値は5秒
-//
-//		while !self.outputStream.hasSpaceAvailable {
-//
-//			usleep(1000) // wait until the socket is ready
-//			timeout -= 100
-//
-//			if (timeout < 0 || self.outputStream.streamError != nil) {
-//				print("time out")
-//				retval["auth"] = "timeout"
-//
-//				self.inputStream.close()
-//				self.inputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
-//				self.outputStream.close()
-//				self.outputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
-//				return retval // disconnectStream will be called.
-//			}
-//		}
-//
-//		// "end"を受信したら接続切断
-//		if (String(describing: command) == "end") {
-//
-//			self.outputStream.close()
-//			self.outputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
-//
-//			while(!inputStream.hasBytesAvailable){}
-//
-//			let bufferSize = 1024*10	// default:1024
-//			var buffer = Array<UInt8>(repeating: 0, count: bufferSize)
-//			let bytesRead = inputStream.read(&buffer, maxLength: bufferSize)
-//			print("bytesRead: \(bytesRead)")
-//			if (bytesRead >= 0) {
-//				let read = NSString(bytes: &buffer, length: bytesRead, encoding: String.Encoding.utf8.rawValue)!
-//				// デバッグ
-//				print("Receive: \(read)")
-//
-//				// 認証失敗
-//				if read.contains("authfail") {
-//					retval["auth"] = "false"
-//
-//					// 認証成功
-//				} else {
-//					let splitRead = read.components(separatedBy: ",")
-//					retval["auth"] = "true"
-//					retval["key"] = splitRead[0]
-//					retval["engName"] = splitRead[1]
-//					retval["jpnName"] = splitRead[2]
-//					retval["ap"] = splitRead[3]
-////					let matched = matches(for: "\\[.+\\]", in: read as String)
-////					print(matched)
-//
-//				}
-//			}
-//			self.inputStream.close()
-//			self.inputStream.remove(from: RunLoop.current, forMode: RunLoopMode.defaultRunLoopMode)
-//		} else {
-//			self.outputStream.write( command, maxLength: text.utf8.count)
-//			print("Send: \(text)")
-//		}
-//
-//		return retval
-//
-//	}
-	
 	// サーバーにコマンド文字列を送信する関数
 	func sendCommand(command: String) -> Dictionary<String, Any> {
 		
@@ -363,53 +305,53 @@ class ServerAuth: NSObject, StreamDelegate {
 		let commandLength = ccommand.count
 		let text : String = ccommand.withUnsafeMutableBytes{ bytes in return String(bytesNoCopy: bytes, length: commandLength, encoding: String.Encoding.utf8, freeWhenDone: false)!}
 		
-		// "end"を受信したら接続切断
+        // "end"を受信したら接続切断
 		if (String(describing: command) == "end") {
 			
 			self.outputStream.close()
 			self.outputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
 			
-	//		while(!inputStream.hasBytesAvailable){}
-			let bufferSize = 10240
-			var buffer = Array<UInt8>(repeating: 0, count: bufferSize)
-			let bytesRead = inputStream.read(&buffer, maxLength: bufferSize)
-			var read:String = NSString(bytes: UnsafePointer(buffer), length: bytesRead, encoding:String.Encoding.utf8.rawValue)! as String
-			
-			while (inputStream!.hasBytesAvailable){
-				
-				let bytesRead:Int=inputStream!.read(&buffer, maxLength: buffer.count)
-//				print("bytesRead: \(bytesRead)")
-				
-				// データ処理を一時的に待つ（これがないとうまくいかない場合がおおい）
-				sleep(UInt32(1))
-				
-				if (bytesRead > 0) { // had here (bytesRead >= 0) too
-//					read = String(bytes: buffer, encoding: String.Encoding.utf8)!
-					read += NSString(bytes: UnsafePointer(buffer), length: bytesRead, encoding:String.Encoding.utf8.rawValue)! as String
-					print("---------------------> \(buffer.count)")
-				} else {
-					print("# error")
-				}
-			}
-			
-//			print("---------------------> \(read)")
+            let read = NSMutableData()
+            
+            // inputStreamからバイトデータを読み込む
+            var bytesRead = 1
+            
+            while(bytesRead > 0) {
+                
+//                LoginViewController().showLoading();
+                
+                let bufferSize = 4096
+                var buffer = Array<UInt8>(repeating: 0, count: bufferSize)
+                bytesRead = inputStream.read(&buffer, maxLength: bufferSize)
+                // データが断片化する可能性があるのでキューにためておく
+                read.append(NSData(bytes: UnsafePointer(buffer), length: bytesRead) as Data)
+                
+//                sleep(UInt32(1))    //デバッグ
+                print("bytesRead: \(bytesRead)")   // デバッグ
+                print("hasBytesAvailable: \(inputStream.hasBytesAvailable)")   // デバッグ
+            }
+            
+            // 受信したバイトデータを文字列に変換
+            let readVal: String = String(data: read as Data, encoding: .utf8)!
+//            print("---------------------> \(readVal)")  // デバッグ
+            
 			// 認証失敗
-			if read.contains("authfail") {
+			if readVal.contains("authfail") {
 				retval["auth"] = "false"
 
 			// 認証成功
 			} else {
 				// 値を最後までリードできているかチェック
 				// 最後の文字が"]"の場合は、データを正しく受信できていると判断
-				if read.hasSuffix("]") {
+				if readVal.hasSuffix("]") {
 					
-					let splitRead = read.components(separatedBy: ",")
+					let splitRead = readVal.components(separatedBy: ",")
 					retval["auth"] = "true"
 					retval["key"] = splitRead[0]
 					retval["engName"] = splitRead[1]
 					retval["jpnName"] = splitRead[2]
 					
-					let splitRead2 = read.components(separatedBy: ",[")
+					let splitRead2 = readVal.components(separatedBy: ",[")
 					let varAps = "[" + String(splitRead2[1])
 					
 					// APデータ
