@@ -10,6 +10,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
+import android.view.Gravity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import org.jetbrains.anko.*
@@ -65,9 +66,11 @@ class Sk2Globals: Application(), AnkoLogger {
         const val NAME_DEMOUSER = "$NAME_START_TESTUSER-demo"
 
         /*** View カラー ***/
-        var COLOR_BACKGROUND = Color.parseColor("#ecf000")
+        var COLOR_BACKGROUND = Color.parseColor("#fbfbfb") //#ecf0f1
         var COLOR_BACKGROUND_TITLE = Color.parseColor("#eeeeee")
-        var COLOR_NORMAL = Color.parseColor("#3498db")
+        var COLOR_NORMAL = Color.parseColor("#2589cd") //#3498db
+        var COLOR_NORMAL_LIGHT = Color.parseColor("#127ac0") //#2085c6
+        var COLOR_HINT= Color.parseColor("#8a8a8a")
         //var COLOR_ACTIVE = Color.parseColor("#1abc9c")
         //var COLOR_ONDOWN = Color.parseColor("#2980b9")
         //var COLOR_DISABLE = Color.parseColor("#bdc3c7")
@@ -136,11 +139,14 @@ class Sk2Globals: Application(), AnkoLogger {
         // 自動記録のインターバル
         const val AUTO_SEND_INTERVAL_IN_MILLISEC: Long = 10*60*1000
         const val AUTO_SEND_INTERVAL_IN_MILLISEC_DEBUG: Long = 1*60*1000
+        // BLEチェックのインターバル
+        const val BLE_CHECK_INTERVAL_IN_MILLISEC: Long = 5000
+
         /** Auto Interval Alarm **/
         // リクエストコード
         const val ALARM_REQUEST_CODE_AUTO = 0
 
-        /** Local Queue Lenght **/
+        /** Local Queue Length **/
         const val LOCAL_QUEUE_MAX_LENGTH: Int = 100
 
         /*** Toast メッセージ ***/
@@ -174,7 +180,7 @@ class Sk2Globals: Application(), AnkoLogger {
         const val MAX_SEND_BEACON_NUM: Int = 3
 
         /*** 出席ボタンを押したときのバイブレーション継続時間 msec; 0 にするとエラー ***/
-        const val ATTENDANCE_VIBRATE_MILLISEC: Long = 10
+        const val ATTENDANCE_VIBRATE_MILLISEC: Long = 388
 
         /*** 送信できるのは FROM時0分から TO時59分まで ***/
         const val PERMISSION_SENDING_TIME_FROM: Int = 8
@@ -280,7 +286,7 @@ class Sk2Globals: Application(), AnkoLogger {
     /** メイン画面へ **/
     fun startMain() {
         /** ユーザIDが空でなければ && 教室AP情報を持っていれば **/
-        if (pref.getString(PREF_UID, "").isNotBlank() && pref.getString(PREF_ROOM_JSON, "").isNotBlank()) {
+        if (pref.getString(PREF_UID, "") is String && pref.getString(PREF_ROOM_JSON, "") is String) {
             /** 期限を確認して **/
             val today: Long = System.currentTimeMillis() / LOGIN_TIME_DAY_UNIT_MILLSEC
             if (today - pref.getLong(PREF_LOGIN_TIME, 0L) / LOGIN_TIME_DAY_UNIT_MILLSEC < LOGIN_EXPIRY_PERIOD_DAYS) {
@@ -438,10 +444,10 @@ class Sk2Globals: Application(), AnkoLogger {
         val btAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
 
         if (btAdapter == null || !hasBLE()) {
-            toast(TOAST_CHECK_BLE_NON)  // BLE がない
+            toast(TOAST_CHECK_BLE_NON).setGravity(Gravity.CENTER, 0, 0)  // BLE がない
             return false
         } else if (!btAdapter.isEnabled) {
-            toast(TOAST_CHECK_BLE_OFF)  // BLE が OFF
+            toast(TOAST_CHECK_BLE_OFF).setGravity(Gravity.CENTER, 0, 0)  // BLE が OFF
             return false
         }
         return true

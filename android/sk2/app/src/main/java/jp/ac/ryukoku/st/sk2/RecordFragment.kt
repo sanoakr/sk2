@@ -3,6 +3,7 @@ package jp.ac.ryukoku.st.sk2
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -61,7 +62,7 @@ class RecordFragment : Fragment() {
                             uiThread {
                                 adapter = recAdapter
                                 if (recAdapter.list.isEmpty())
-                                    toast(TOAST_LOG_NO_SERVER_RECORDS)
+                                    toast(TOAST_LOG_NO_SERVER_RECORDS).setGravity(Gravity.CENTER, 0, 0)
                             }
                         }
                     }

@@ -4,9 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.PowerManager
 import android.provider.Settings
 import com.google.android.material.snackbar.Snackbar
 import androidx.core.app.ActivityCompat
@@ -24,9 +21,8 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_ATTEND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TEXT_SIZE_LARGE
 import no.nordicsemi.android.support.v18.scanner.*
 import org.jetbrains.anko.*
-//import org.jetbrains.anko.sdk25.coroutines.onClick
 import android.content.*
-import android.os.Vibrator
+import android.os.*
 import androidx.fragment.app.FragmentActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.view.Gravity
@@ -36,6 +32,7 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_VERSION_CODE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_VERSION_NAME
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BLE_CHECK_INTERVAL_IN_MILLISEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_MARGIN_ATTEND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_MARGIN_MENU
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_SIZE_ATTEND
@@ -72,6 +69,8 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_MAIN_AUTO_ON
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.apNameMap
 import me.mattak.moment.Moment
 import org.jetbrains.anko.sdk27.coroutines.onClick
+import java.util.*
+import kotlin.collections.ArrayList
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /** Sk2 Main Activity **/
@@ -93,6 +92,9 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
     private var scanReceiver: ScanReceiver? = null
     /** バイブレータ **/
     private var vibrator: Vibrator? = null
+    /** BLE ボタンの更新タイマー **/
+    private lateinit var btTimer : Timer
+    private val btHandler = Handler()
 
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /********************************************************************/
@@ -116,17 +118,6 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
         }
         /** Doze mode での実行許可を要求 (> 23M) **/
         requestDozeIgnore()
-
-        /** BLE のチェック **/
-        if (!sk2.checkBt() && pref.getString(PREF_UID, "") != NAME_DEMOUSER) {
-            // ダメならボタンをグレーアウト
-            mainUi.attBt.background = ContextCompat.getDrawable(this, R.drawable.button_states_disabled)
-            mainUi.attBt.text = BUTTON_TEXT_ATTEND_FALSE
-            toast(Sk2Globals.TOAST_CHECK_BLE_OFF)
-        } else {
-            mainUi.attBt.background = ContextCompat.getDrawable(this, R.drawable.button_states_blue)
-            mainUi.attBt.text = BUTTON_TEXT_ATTEND_TRUE
-        }
 
         /** SharedPreference の変更を通知するリスナー **/
         pref.registerOnSharedPreferenceChangeListener(this)
@@ -163,6 +154,16 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
         if (!checkInfo(mainUi))
             startActivity(intentFor<LoginActivity>().clearTop())
 
+        /** BLE チェック Timer **/
+        btTimer = Timer()
+        btTimer.schedule(object : TimerTask() {
+            override fun run() {
+                btHandler.post {
+                    updateBLEbt()
+                }
+            }
+        }, BLE_CHECK_INTERVAL_IN_MILLISEC, BLE_CHECK_INTERVAL_IN_MILLISEC)
+
         /** 自動モードの設定 **/
         val auto = sk2.getAutoRunning()
         mainUi.autoSw.isChecked = auto
@@ -178,6 +179,12 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
         }
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
+    override fun onPause() {
+        btTimer.cancel()
+
+        super.onPause()
+    }
+    /** ////////////////////////////////////////////////////////////////////////////// **/
     override fun onDestroy() {
         mScanner.stopScan(mScanCallback)
         // ローカルキューを保存
@@ -189,10 +196,27 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
     /** Disable Back Key **/
     override fun onBackPressed() {}
     /** ////////////////////////////////////////////////////////////////////////////// **/
+
+    /** /////////////////////////////////////// **/
+    /** BLE のチェック **/
+    private fun updateBLEbt() {
+        if (!sk2.checkBt() && pref.getString(PREF_UID, "") != NAME_DEMOUSER) {
+            // ダメならボタンをグレーアウト
+            mainUi.attBt.background = ContextCompat.getDrawable(this, R.drawable.button_states_disabled)
+            mainUi.attBt.text = BUTTON_TEXT_ATTEND_FALSE
+            toast(Sk2Globals.TOAST_CHECK_BLE_OFF).setGravity(Gravity.CENTER, 0, 0)
+
+        } else {
+            mainUi.attBt.background = ContextCompat.getDrawable(this, R.drawable.button_states_blue)
+            mainUi.attBt.text = BUTTON_TEXT_ATTEND_TRUE
+
+        }
+    }
+    /** /////////////////////////////////////// **/
     /*** ユーザー情報のチェック ***/
     private fun checkInfo(ui: MainActivityUi): Boolean {
         val uid = pref.getString(PREF_UID, "")
-        val name = pref.getString(PREF_USER_NAME, "")
+        val name= pref.getString(PREF_USER_NAME, "")
         /***
         val time = sk2.userMap.getOrDefault("name", 0L)
         // check key life
@@ -200,7 +224,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
         val over = (now - time) > lifetime
          ***/
 
-        return if (uid == "") { // 空ならダメ
+        return if (uid.isNullOrBlank()) { // Null or 空白ならダメ(空もダメ)
             false
         } else {
             // 画面上部のユーザ情報を設定
@@ -290,7 +314,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
 
             /** message は Toast 表示 **/
             if (! message.isNullOrEmpty())
-                toast(message)
+                toast(message).setGravity(Gravity.CENTER, 0, 0)
             /** scanResult は SendInfo へ表示 **/
             if (pref.getBoolean(PREF_DEBUG, false) && ! scanResult.isNullOrEmpty())
                 mainUi.sendInfo.text = scanResult
@@ -443,10 +467,10 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
                 onClick {
                     if (isChecked) {
                         sk2.setAlarmService()
-                        toast(TOAST_MAIN_AUTO_ON)
+                        toast(TOAST_MAIN_AUTO_ON).setGravity(Gravity.CENTER, 0, 0)
                     } else {
                         sk2.stopAlarmService()
-                        toast(TOAST_MAIN_AUTO_OFF)
+                        toast(TOAST_MAIN_AUTO_OFF).setGravity(Gravity.CENTER, 0, 0)
                     }
                     sk2.setAutoRunning(isChecked)
                 }
@@ -495,6 +519,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
                         id = LOG
                         imageResource = R.drawable.ic_action_record
                         background = ContextCompat.getDrawable(context, R.drawable.button_menu)
+                        contentDescription = "Log Button"
                         onClick {
                             startActivity<RecordPagerActivity>()
                         }
@@ -514,6 +539,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
                         id = HELP
                         imageResource = R.drawable.ic_action_help
                         background = ContextCompat.getDrawable(context, R.drawable.button_menu)
+                        contentDescription = "Help Button"
                         onClick {
                             startActivity<HelpActivity>()
                         }
@@ -533,6 +559,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
                         id = EXIT
                         imageResource = R.drawable.ic_action_exit
                         background = ContextCompat.getDrawable(context, R.drawable.button_menu)
+                        contentDescription = "Exit Button"
                         onClick {
                             alert(LOGOUT_DIALOG_MSG, LOGOUT_DIALOG_TITLE) {
                                 positiveButton(LOGOUT_DIALOG_OK) { _ -> sk2.readyTologout()

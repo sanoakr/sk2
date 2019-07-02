@@ -1,19 +1,20 @@
 package jp.ac.ryukoku.st.sk2
 
 import android.app.Activity
-import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.text.InputType.*
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_NAME
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.APP_TITLE
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BUTTON_TEXT_LOGIN
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_BACKGROUND
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_NORMAL
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_HINT
+import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.COLOR_NORMAL_LIGHT
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.HINT_PASSWD
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.HINT_UID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.NAME_START_TESTUSER
@@ -43,7 +44,6 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOGIN_FAIL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TOAST_LOGIN_SUCCESS
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onClick
-//import org.jetbrains.anko.sdk25.coroutines.onClick
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.InputStreamReader
@@ -86,9 +86,9 @@ class LoginActivity : Activity() {
     /** サーバでログイン認証 **/
     fun attemptLogin(user: String, passwd: String) {
         when {
-            user.isBlank() -> toast(TOAST_LOGIN_ATTEMPT_UID)
-            ! user.startsWith(NAME_START_TESTUSER) && passwd.isBlank() -> toast(TOAST_LOGIN_ATTEMPT_PASSWD)
-            user.contains('@') -> toast(TOAST_LOGIN_ATTEMPT_ATMARK)
+            user.isBlank() -> toast(TOAST_LOGIN_ATTEMPT_UID).setGravity(Gravity.CENTER, 0, 0)
+            ! user.startsWith(NAME_START_TESTUSER) && passwd.isBlank() -> toast(TOAST_LOGIN_ATTEMPT_PASSWD).setGravity(Gravity.CENTER, 0, 0)
+            user.contains('@') -> toast(TOAST_LOGIN_ATTEMPT_ATMARK).setGravity(Gravity.CENTER, 0, 0)
         }
         /** sk2 サーバで認証してログイン **/
         doAsync {
@@ -128,7 +128,7 @@ class LoginActivity : Activity() {
         } catch (e: Exception) {
             /** サーバ接続時にエラーが出たら Toast 表示だけ **/
             result = SERVER_REPLY_FAIL
-            toast(TOAST_CANT_CONNECT_SERVER)
+            toast(TOAST_CANT_CONNECT_SERVER).setGravity(Gravity.CENTER, 0, 0)
         }
         return result
     }
@@ -151,12 +151,12 @@ class LoginActivity : Activity() {
                     .putLong(PREF_LOGIN_TIME, time)     // not in use
                     .putString(PREF_ROOM_JSON, json)
                     .apply()
-            toast(TOAST_LOGIN_SUCCESS)
+            toast(TOAST_LOGIN_SUCCESS).setGravity(Gravity.CENTER, 0, 0)
             /** メイン画面へ **/
             sk2.startMain()
         } else {
             // in fail
-            toast(TOAST_LOGIN_FAIL)
+            toast(TOAST_LOGIN_FAIL).setGravity(Gravity.CENTER, 0, 0)
         }
     }
 }
@@ -199,6 +199,7 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
                 //id = USER
                 textSize = TEXT_SIZE_LARGE
                 hint = HINT_UID
+                hintTextColor = COLOR_HINT
                 inputType = TYPE_TEXT_VARIATION_EMAIL_ADDRESS
             }.lparams { below(LABEL); width = matchParent; height = dip(50) }
             /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -207,6 +208,7 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
                 //id = PASS
                 textSize = TEXT_SIZE_LARGE
                 hint = HINT_PASSWD
+                hintTextColor = COLOR_HINT
                 inputType = TYPE_CLASS_TEXT or TYPE_TEXT_VARIATION_PASSWORD
             }.lparams { below(R.id.username); width = matchParent; height = dip(50) }
             /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -216,7 +218,8 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
                 textColor = Color.WHITE
                 textSize = TEXT_SIZE_LARGE
                 padding = dip(0)
-                backgroundColor = COLOR_NORMAL
+                backgroundColor = COLOR_NORMAL_LIGHT
+                //backgroundColor = COLOR_NORMAL
                 onClick {
                     alert {
                         positiveButton(PRIVACY_POLICY_YES_TEXT) { _ ->
@@ -228,7 +231,7 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
                                 textView(PRIVACY_POLICY_TITLE) {
                                     textSize = TEXT_SIZE_LARGE
                                     textColor = Color.WHITE
-                                    backgroundColor = COLOR_NORMAL
+                                    backgroundColor = COLOR_NORMAL_LIGHT
                                     padding = dip(4)
                                 }.lparams {
                                     width = matchParent
@@ -246,7 +249,7 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
                 }
             }.lparams {
                 below(R.id.password); centerHorizontally(); width = matchParent
-                topMargin = dip(50)
+                topMargin = dip(30)
             }
         }
     }
