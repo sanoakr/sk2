@@ -8,9 +8,9 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
-import android.support.design.widget.Snackbar
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
+import com.google.android.material.snackbar.Snackbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import android.widget.Button
 import android.widget.Switch
 import android.widget.TextView
@@ -27,8 +27,8 @@ import org.jetbrains.anko.*
 //import org.jetbrains.anko.sdk25.coroutines.onClick
 import android.content.*
 import android.os.Vibrator
-import android.support.v4.app.FragmentActivity
-import android.support.v4.content.LocalBroadcastManager
+import androidx.fragment.app.FragmentActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.view.Gravity
 import android.view.View
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.ACTION_BROADCAST
