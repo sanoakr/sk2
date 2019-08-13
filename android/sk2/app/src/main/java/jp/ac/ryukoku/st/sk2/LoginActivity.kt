@@ -123,7 +123,8 @@ class LoginActivity : Activity() {
             bufWriter.flush()
 
             /** Receive message **/
-            result = bufReader.use(BufferedReader::readText)
+            //while (input.available() == 0) {}  // waiting
+            result = bufReader.use { it.readText() }
 
         } catch (e: Exception) {
             /** サーバ接続時にエラーが出たら Toast 表示だけ **/
@@ -250,6 +251,14 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
             }.lparams {
                 below(R.id.password); centerHorizontally(); width = matchParent
                 topMargin = dip(30)
+            }
+            /** ////////////////////////////////////////////////////////////////////////////// **/
+            textView("Version ${Sk2Globals.APP_VERSION_NAME} (${Sk2Globals.APP_VERSION_CODE})") {
+                id = MainActivityUi.VERSION
+                textColor = Color.BLACK
+                textSize = Sk2Globals.TEXT_SIZE_TINY
+            }.lparams {
+                alignParentBottom(); alignParentEnd()
             }
         }
     }

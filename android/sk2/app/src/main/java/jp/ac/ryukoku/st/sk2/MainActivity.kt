@@ -185,6 +185,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
         super.onPause()
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
+    /*
     override fun onDestroy() {
         mScanner.stopScan(mScanCallback)
         // ローカルキューを保存
@@ -192,6 +193,7 @@ class MainActivity : FragmentActivity(), SharedPreferences.OnSharedPreferenceCha
 
         super.onDestroy()
     }
+    */
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /** Disable Back Key **/
     override fun onBackPressed() {}

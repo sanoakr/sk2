@@ -134,8 +134,8 @@ class Sk2Globals: Application(), AnkoLogger {
 
         /*** Timer ***/
         // BLE Scan する時間長
-        const val SCAN_PERIOD_IN_MILLISEC: Long = 500
-        const val MAX_COUNT_NOBEACON = 10
+        const val SCAN_PERIOD_IN_MILLISEC: Long = 1000
+        const val MAX_COUNT_NOBEACON = 5
         // 自動記録のインターバル
         const val AUTO_SEND_INTERVAL_IN_MILLISEC: Long = 10*60*1000
         const val AUTO_SEND_INTERVAL_IN_MILLISEC_DEBUG: Long = 1*60*1000
@@ -180,7 +180,7 @@ class Sk2Globals: Application(), AnkoLogger {
         const val MAX_SEND_BEACON_NUM: Int = 3
 
         /*** 出席ボタンを押したときのバイブレーション継続時間 msec; 0 にするとエラー ***/
-        const val ATTENDANCE_VIBRATE_MILLISEC: Long = 388
+        const val ATTENDANCE_VIBRATE_MILLISEC: Long = 100
 
         /*** 送信できるのは FROM時0分から TO時59分まで ***/
         const val PERMISSION_SENDING_TIME_FROM: Int = 8

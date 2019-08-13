@@ -52,7 +52,7 @@ import javax.net.ssl.SSLSocketFactory
 /*** BLEスキャン・出席記録送信用サービスクラス ***/
 class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
     companion object {
-        val TAG = this::class.java.simpleName!!
+        val TAG = this::class.java.simpleName
 
         /*** my SharedPreferences ***/
         lateinit var sk2: Sk2Globals
