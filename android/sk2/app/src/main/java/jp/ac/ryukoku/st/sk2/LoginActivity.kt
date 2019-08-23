@@ -49,6 +49,7 @@ import java.io.BufferedWriter
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.net.InetSocketAddress
+import java.nio.charset.Charset
 import javax.net.ssl.SSLSocketFactory
 
 /** ////////////////////////////////////////////////////////////////////////////// **/
@@ -93,16 +94,20 @@ class LoginActivity : Activity() {
         /** sk2 サーバで認証してログイン **/
         doAsync {
             val result = authServer(user, passwd)
+
             uiThread {
-                login(user, result)
+                if (result == SERVER_REPLY_FAIL)
+                    toast(TOAST_CANT_CONNECT_SERVER).setGravity(Gravity.CENTER, 0, 0)
+                else
+                    login(user, result)
             }
         }
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /** サーバ認証 **/
     private fun authServer(user: String, passwd: String): String {
-
-        lateinit var result: String /** 認証結果受信用 **/
+        var result: String /** 認証結果受信用 **/
+        //var resultByte: ByteArray
         try {
             /** SSL Socket **/
             val sslSocketFactory = SSLSocketFactory.getDefault()
@@ -123,13 +128,23 @@ class LoginActivity : Activity() {
             bufWriter.flush()
 
             /** Receive message **/
-            //while (input.available() == 0) {}  // waiting
+            /*
+            var line: String?
+            do {
+                line = bufReader.readLine()
+                Log.d("XXX", line)
+                result += line
+            } while (line != null)
+            */
+            //resultByte = input.readBytes()
+            //result = String(resultByte, Charsets.UTF_8)
             result = bufReader.use { it.readText() }
+            //Log.d("XXX", result.last().toString())
+            //Log.d("XXX", resultByte.size.toString())
 
         } catch (e: Exception) {
-            /** サーバ接続時にエラーが出たら Toast 表示だけ **/
+            /** サーバ接続時にエラーが出たら Toast メッセージを返す **/
             result = SERVER_REPLY_FAIL
-            toast(TOAST_CANT_CONNECT_SERVER).setGravity(Gravity.CENTER, 0, 0)
         }
         return result
     }
@@ -137,13 +152,13 @@ class LoginActivity : Activity() {
     /** ログインする **/
     private fun login(user: String, result: String) {
         if (result != SERVER_REPLY_AUTH_FAIL) { // サーバからの返信が失敗でなければ
-            Log.d("XXX", result)
             /** サーバ返信を ',' で分割 **/
             val v: List<String> = result.split(",", limit = 4)
             val time: Long = System.currentTimeMillis() // 現在時刻
             /** ユーザ名の空白は全て半角スペース一つに圧縮 **/
             val clrName: String = v[2].replace(Regex("\\s+"), " ")
             val json = v[3]
+            //Log.d("XXX", json.last().toString())
 
             pref.edit() // SharedPreference に保存
                     .putString(PREF_UID, user)
@@ -152,6 +167,7 @@ class LoginActivity : Activity() {
                     .putLong(PREF_LOGIN_TIME, time)     // not in use
                     .putString(PREF_ROOM_JSON, json)
                     .apply()
+            //Log.d("XXX", pref.getString(PREF_ROOM_JSON, "Non").last().toString())
             toast(TOAST_LOGIN_SUCCESS).setGravity(Gravity.CENTER, 0, 0)
             /** メイン画面へ **/
             sk2.startMain()
@@ -176,7 +192,7 @@ class LoginActivityUi: AnkoComponent<LoginActivity> {
     override fun createView(ui: AnkoContext<LoginActivity>) = with(ui) {
         relativeLayout {
             padding = dip(16)
-            backgroundColor = Sk2Globals.COLOR_BACKGROUND
+            backgroundColor = COLOR_BACKGROUND
             /** ////////////////////////////////////////////////////////////////////////////// **/
             textView("$APP_TITLE $APP_NAME") {
                 id = TITLE

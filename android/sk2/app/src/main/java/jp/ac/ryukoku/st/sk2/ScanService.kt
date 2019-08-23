@@ -10,8 +10,8 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.util.Log
-import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
-import com.neovisionaries.bluetooth.ble.advertising.IBeacon
+//import com.neovisionaries.bluetooth.ble.advertising.ADPayloadParser
+//import com.neovisionaries.bluetooth.ble.advertising.IBeacon
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.ACTION_BROADCAST
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BROADCAST_ATTEND_FAIL
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.BROADCAST_ATTEND_NO_BEACON
@@ -33,7 +33,7 @@ import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCANSERVICE_EXTRA_SEND
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.SCAN_PERIOD_IN_MILLISEC
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TYPE_SEND_AUTO
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.TYPE_SEND_MANUAL
-import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.VALID_IBEACON_UUID
+//import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.VALID_IBEACON_UUID
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.apNameMap
 import jp.ac.ryukoku.st.sk2.Sk2Globals.Companion.localQueue
 import me.mattak.moment.Moment
@@ -160,12 +160,12 @@ class ScanService : Service(), AnkoLogger /*, BootstrapNotifier*/ {
             if (scanArray.isNotEmpty() && send == true) {
                 sendInfoToServer(type)
             } else {
-                sendBroadcastMessage(Sk2Globals.BROADCAST_ATTEND_NO_BEACON)
+                sendBroadcastMessage(BROADCAST_ATTEND_NO_BEACON)
             }
             /** ////////////////////////////////////////////////////////////////////////////// **/
             /** Stop Service **/
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                stopForeground(Service.STOP_FOREGROUND_DETACH)
+                stopForeground(STOP_FOREGROUND_DETACH)
             else
                 stopForeground(true)
         }

@@ -191,7 +191,7 @@ class Sk2Globals: Application(), AnkoLogger {
 
         /*** AP Map の Key ***/
         //const val APMAP_KEY_BEACON = "beaconIdParams"
-        const val APMAP_KEY_UUID = "Uuid"
+        //const val APMAP_KEY_UUID = "Uuid"
         const val APMAP_KEY_MAJOR = "Major"
         const val APMAP_KEY_MINOR = "Minor"
         const val APMAP_KEY_NAME = "Name"
@@ -286,46 +286,55 @@ class Sk2Globals: Application(), AnkoLogger {
     /** メイン画面へ **/
     fun startMain() {
         /** ユーザIDが空でなければ && 教室AP情報を持っていれば **/
-        if (pref.getString(PREF_UID, "") is String && pref.getString(PREF_ROOM_JSON, "") is String) {
+        if (pref.getString(PREF_UID, null).isNullOrBlank().not()
+                && pref.getString(PREF_ROOM_JSON, null).isNullOrBlank().not()) {
             /** 期限を確認して **/
             val today: Long = System.currentTimeMillis() / LOGIN_TIME_DAY_UNIT_MILLSEC
             if (today - pref.getLong(PREF_LOGIN_TIME, 0L) / LOGIN_TIME_DAY_UNIT_MILLSEC < LOGIN_EXPIRY_PERIOD_DAYS) {
                 /** AP Map を作成 **/
-                readApMap()
-                /** そのままメインアクティビティへ **/
-                val intent = Intent(this, MainActivity::class.java)
-                intent.flags = (Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(intent)
+                if (readApMap()) {
+                    /** そのままメインアクティビティへ **/
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.flags = (Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
+                }
             }
         }
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** サーバからの AP JSON ファイルを List<Map> にして、さらに (Uuid, Major, Minor) => (Name, Notes) の Map をつくる **/
-    fun readApMap() {
+    fun readApMap(): Boolean {
         /** JSON から List<Map> **/
         val gson = Gson()
-        val jsonString = pref.getString(PREF_ROOM_JSON, gson.toJson(mapOf<String, Any>()))
-        if (jsonString != null) {
+        val jsonString: String? = pref.getString(PREF_ROOM_JSON, null)
+        //Log.d("XXX", jsonString.last().toString())
+
+        if (jsonString.isNullOrBlank().not()) {
             val type: Type = object : TypeToken<List<Map<String, Any>>>() {}.type
             apInfos = gson.fromJson(jsonString, type)
+        } else {
+            //Log.d("sk2", "JsonString is Blank")
+            return false
         }
         /** List<Map> から (Uuid, Major, Minor) => (Name, Notes) **/
         apNameMap = mutableMapOf()
         apInfos.forEach { ap ->
-            if (ap.containsKey(APMAP_KEY_UUID) && ap[APMAP_KEY_UUID] != null
-                    && ap.containsKey(APMAP_KEY_MAJOR) && ap[APMAP_KEY_MAJOR] != null
+            if (//ap.containsKey(APMAP_KEY_UUID) && ap[APMAP_KEY_UUID] != null &&
+                    ap.containsKey(APMAP_KEY_MAJOR) && ap[APMAP_KEY_MAJOR] != null
                     && ap.containsKey(APMAP_KEY_MINOR) && ap[APMAP_KEY_MINOR] != null
                     && ap.containsKey(APMAP_KEY_NAME)  && ap[APMAP_KEY_NAME] != null
                     && ap.containsKey(APMAP_KEY_NOTES) && ap[APMAP_KEY_NOTES] != null) {
-                val uuid = ap[APMAP_KEY_UUID] as String
+                val uuid = VALID_IBEACON_UUID[0]
+                //val uuid = ap[APMAP_KEY_UUID] as String
                 val major = (ap[APMAP_KEY_MAJOR] as Double).toInt()
                 val minor = (ap[APMAP_KEY_MINOR] as Double).toInt()
                 val name = ap[APMAP_KEY_NAME] as String
                 val notes = ap[APMAP_KEY_NOTES] as String
-                //Log.d("sk2", "$uuid, $major, $minor, $name, $notes")
+                //Log.d("sk2", "$major, $minor, $name, $notes")
                 apNameMap[Triple(uuid, major, minor)] = Pair(name, notes)
             }
         }
+        return true
     }
     /** ////////////////////////////////////////////////////////////////////////////// **/
     /*** ローカルキューを Json String に変換して SharedPreferences に保存 ***/
