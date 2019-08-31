@@ -64,14 +64,15 @@ minorNum = 4
 #uuid = "ebf59ccc-21f2-4558-9488-00f2b388e5e6"
 
 for (i, code, type) in bType:
+    bName = type
     for (val, opr) in bSignal:
         sFlag = val << 12
         for n in range(1, minorNum + 1):
-            if i == 1 and n in bPlace:
-                bName = type + "／" + bPlace[n]
-            else:
-                bName = type
             nStr = str(n).zfill(3)
+            if i == 1 and n in bPlace:
+                nStr= str(n).zfill(3) + "／" + bPlace[n]
+            else:
+                nStr = str(n).zfill(3)
             bData = pd.DataFrame(
                 [
                     code + opr + "-" + nStr,

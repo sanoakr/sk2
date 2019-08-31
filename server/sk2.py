@@ -145,6 +145,7 @@ class AsyncClient(asyncio.Protocol):
 
         self.transport.write(reply_msg.encode())  # data bytes
         logger.info('Sent: {!r}'.format(reply_msg[0:20]))
+        #logger.info('Sent: {!r}'.format(reply_msg[0:]))
 
         self.transport.close()
         logger.info('Close the client socket')

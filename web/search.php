@@ -357,7 +357,9 @@ makeRoomSelector([$fbuild2, $ffloor2, $froom2], [$build_arr, $floor_arr, $room_a
 makeRoomSelector([$fbuild2, $ffloor2, $froom2], [$build_arr, $floor_arr, $room_arr], 2, $$froom2);
 echo "</p>";
 echo "プライバシー保護のため、上記で選択された「建物」「フロア」「教室」のうち、もっとも指定範囲が広いレベルで検索出力されます。<br>";
-echo "検索結果に教室名まで表示するためには、選択した全てのリスト上で「建物」「フロア」「教室」の全て指定して下さい。";
+echo "検索結果に教室名まで表示するためには、選択した全てのリスト上で「建物」「フロア」「教室」の全て指定して下さい。<br>";
+echo "ボタンビーコンでは、発信種別「S(ingle Click)」「L(ong Click)」「D(ouble Click)」が記録・選択可能です。";
+echo "固定・携帯ビーコンの発信種別は「S」のみが利用可能です（「L」「D」の選択も可能ですが、記録情報は存在しません）。";
 echo "</div>";
 
 //foreach ($uq_room_arr as $k => $v) {

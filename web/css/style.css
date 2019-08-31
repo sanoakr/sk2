@@ -929,6 +929,7 @@
 	{
 		position: relative;
 		text-align: center;
+		font-size: 120%;
 	}
 	
 	#footer header h2
@@ -939,6 +940,11 @@
 	#footer header .byline
 	{
 		color: rgba(255,255,255,.2);
+	}
+
+	#footer img
+	{
+		height: 80px;
 	}
 
 /*********************************************************************************/
@@ -957,13 +963,13 @@
 		padding: 3em 0em;
 		border-top: 1px solid;
 		border-color: rgba(255,255,255,.05);
-		color:  rgba(255, 255, 255, 0.5);
+		color:  rgba(255, 255, 255, .8);
 	}
 	
 	#copyright a
 	{
 		text-decoration: none;
-		color:  rgba(255,255,255,.5);
+		color:  rgba(255,255,255,.8);
 	}
 	
 /*********************************************************************************/
