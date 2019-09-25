@@ -1,5 +1,7 @@
 <?php
-    session_start();
+$lifetime=3*60; // 3min
+session_start();
+setcookie(session_name(),session_id(),time()+$lifetime);
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
@@ -42,18 +44,14 @@
         var orgs0 = [$('#build0').html(), $('#floor0').html(), $('#room0').html()];
         var orgs1 = [$('#build1').html(), $('#floor1').html(), $('#room1').html()];
         var orgs2 = [$('#build2').html(), $('#floor2').html(), $('#room2').html()];
-        choice_select(1, [$(
-            '#build0'), $('#floor0'), $('#room0')], orgs0);
-        choice_select(2, [$('#build0'), $(
-            '#floor0'), $('#room0')], orgs0);
-        choice_select(1, [$('#build1'), $('#floor1'), $(
-            '#room1')], orgs1);
-        choice_select(2,
-            [$('#build1'), $('#floor1'), $('#room1')], orgs1);
-        choice_select(1, [$('#build2'), $(
-            '#floor2'), $('#room2')], orgs2);
-        choice_select(2, [$('#build2'), $('#floor2'), $(
-            '#room2')], orgs2);
+
+        choice_select(1, [$('#build0'), $('#floor0'), $('#room0')], orgs0);
+        choice_select(2, [$('build0'), $('#floor0'), $('#room0')], orgs0);
+        choice_select(1, [$('#build1'), $('#floor1'), $('#room1')], orgs1);
+        choice_select(2, [$('#build1'), $('#floor1'), $('#room1')], orgs1);
+        choice_select(1, [$('#build2'), $('#floor2'), $('#room2')], orgs2);
+        choice_select(2, [$('#build2'), $('#floor2'), $('#room2')], orgs2);
+
         // 変更時に設定
         $('#build0').change(function() {
             choice_select(1, [$('#build0'), $('#floor0'), $('#room0')], orgs0);
@@ -181,7 +179,7 @@ $warray = array('*', '日', '月', '火', '水', '木', '金', '土'); // MySQL 
 $fhour = 'priod';
 $parray = array('昼休み', '1講時', '2講時', '3講時', '4講時', '5講時', '6講時');
 $parray_from = array('12:40', '09:20', '11:05', '13:35', '15:20', '17:00', '18:40');
-$parray_to = array('13:30', '11:05', '12:35', '15:05', '16:50', '18:30', '20:10');
+$parray_to = array('13:30', '10:50', '12:35', '15:05', '16:50', '18:30', '20:10');
 $parray_dist = array(0, 5, 10, 15, 20, 30, 40, 50);
 $fmajor = 'major';
 $fminor = 'minor';
@@ -587,7 +585,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
                 }
                 //echo "$value, ";
             }
-	        for ($i=1; $i<=$apnum; $i++) {
+	        for ($i=0; $i<$apnum; $i++) {
                 if (!empty($build[$data["major$i"]][$data["minor$i"]]) && $room_level > 0) {
                     $csv .= $build[$data["major$i"]][$data["minor$i"]] . '_';
                     //echo $build[$data["major$i"]][$data["minor$i"]] . '_';
@@ -609,6 +607,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
             //echo "<br>";
         }
         $_SESSION['csv'] = $csv;
+        //echo $_SESSION['csv'];
         echo $csv;
         echo "</pre></div>\n";
     } else {

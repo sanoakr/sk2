@@ -4,7 +4,6 @@
 #
 # self-signed certificates: openssl req -new -x509 -days 1000 -nodes -out cert.pem -keyout cert.pem
 #
-
 import asyncio
 import ssl
 import os
@@ -51,7 +50,6 @@ room_jsonfile = sk2_dir + "Seta_wifi_001.json"
 TESTUSER = "testuser"
 DEMOUSER = "testuser-demo"
 
-
 class AsyncClient(asyncio.Protocol):
     def connection_made(self, transport):
         peername = transport.get_extra_info('peername')
@@ -65,7 +63,7 @@ class AsyncClient(asyncio.Protocol):
 
         # Authentication
         if len(pieces) == 3 and pieces[0] == "AUTH":
-            user = pieces[1]
+            user = pieces[1].strip().lower() # ユーザー名は前後空白を削除して小文字に
             pwd = pieces[2]
             if (user.startswith(TESTUSER)):
                 if (user == DEMOUSER):
@@ -87,7 +85,7 @@ class AsyncClient(asyncio.Protocol):
 
         # sk2 Log write
         elif len(pieces) >= 7:  # 7 = user(1)/key(1)/marker(1)/datetime(1)/beacon0(3)
-            user = pieces[0]
+            user = pieces[1].strip().lower() # ユーザー名は前後空白を削除して小文字に
             key = pieces[1]
 
             # check key

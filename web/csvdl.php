@@ -1,5 +1,7 @@
 <?php
+$lifetime=10; // 10sec
 session_start();
+setcookie(session_name(),session_id(),time()+$lifetime);
 
 header("Content-Type: application/octet-stream");
 header("Content-Disposition: attachment; filename=" . date('YmdHis') . rand() . '.csv');
