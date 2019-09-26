@@ -85,7 +85,7 @@ class AsyncClient(asyncio.Protocol):
 
         # sk2 Log write
         elif len(pieces) >= 7:  # 7 = user(1)/key(1)/marker(1)/datetime(1)/beacon0(3)
-            user = pieces[1].strip().lower() # ユーザー名は前後空白を削除して小文字に
+            user = pieces[0].strip().lower() # ユーザー名は前後空白を削除して小文字に
             key = pieces[1]
 
             # check key
@@ -129,7 +129,7 @@ class AsyncClient(asyncio.Protocol):
                             + " VALUES "
                             + "(%s, %s, %s, %s, %s, %s,"
                             + " %s, %s, %s, %s, %s, %s)",
-                            (pieces[0], pieces[2], pieces[3],
+                            (user, pieces[2], pieces[3],
                              int(pieces[4] or 0), int(
                                  pieces[5] or 0), float(pieces[6] or 0.0),
                              int(pieces[7] or 0), int(
