@@ -607,6 +607,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
             //echo "<br>";
         }
         $_SESSION['csv'] = $csv;
+        $_SESSION['adm'] = 'user';
         //echo $_SESSION['csv'];
         echo $csv;
         echo "</pre></div>\n";

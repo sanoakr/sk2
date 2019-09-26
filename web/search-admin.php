@@ -591,9 +591,8 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
             }
             $csv .= "\n";
         }
-        $_SESSION['test'] = "ABC\n";
         $_SESSION['csv'] = $csv;
-        //echo $_SESSION['csv'];
+        $_SESSION['adm'] = 'admin';
         echo $csv;
         echo "</pre></div>\n";
     } else {
