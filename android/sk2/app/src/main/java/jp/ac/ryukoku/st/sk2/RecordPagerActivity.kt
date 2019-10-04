@@ -31,8 +31,8 @@ class RecordPagerActivity: FragmentActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             window.statusBarColor = COLOR_BACKGROUND
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-
         }
+
         recordPagerUi.setContentView(this)
         recordPagerUi.showPages(supportFragmentManager)
         /** Tab Title **/
@@ -93,12 +93,12 @@ class RecordPagerUi : AnkoComponent<RecordPagerActivity> {
 }
 /** ////////////////////////////////////////////////////////////////////////////// **/
 /** Flagment Adapter **/
-class RecordPageAdapter(fm: FragmentManager): FragmentPagerAdapter(fm) {
-    override fun getItem(position: Int): Fragment? {
+class RecordPageAdapter(fm: FragmentManager): FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+    override fun getItem(position: Int): Fragment {
         return when (position) {
             0 -> RecordLocalFragment()
             1 -> RecordFragment()
-            else -> null
+            else -> RecordLocalFragment()
         }
     }
     override fun getCount(): Int {

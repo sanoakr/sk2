@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: "com.github.ben-manes.versions"
 
 android {
     signingConfigs {
@@ -32,14 +33,16 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    //androidTestImplementation('androidx.test.espresso:espresso-core:3.2.0', {
     androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     //implementation "com.android.support:animated-vector-drawable:$support_version"
-    implementation 'androidx.media:media:1.0.1'
+    implementation 'androidx.media:media:1.1.0'
+    implementation 'androidx.fragment:fragment:1.1.0'
     testImplementation 'junit:junit:4.13-beta-3'
 
     implementation 'com.google.android.gms:play-services-location:17.0.0'
@@ -51,7 +54,7 @@ dependencies {
     implementation "org.jetbrains.anko:anko-coroutines:$anko_version"
 
     implementation 'me.mattak:moment:0.0.4'
-    implementation 'no.nordicsemi.android.support.v18:scanner:1.1.0'
+    implementation 'no.nordicsemi.android.support.v18:scanner:1.4.3'
     implementation 'com.neovisionaries:nv-bluetooth:1.8'
 
     implementation 'com.google.code.gson:gson:2.8.5'
