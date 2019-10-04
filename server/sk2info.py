@@ -33,7 +33,6 @@ max_reverslines = 100
 #mac = re.compile("[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[[[[[0-9a-f]{2}")
 #room_file = sk2_dir + "room.csv"
 
-
 class AsyncClient(asyncio.Protocol):
     def connection_made(self, transport):
         peername = transport.get_extra_info('peername')
@@ -47,7 +46,8 @@ class AsyncClient(asyncio.Protocol):
 
         # history info
         if len(pieces) == 2:
-            user = pieces[0]
+            user = pieces[0].strip().lower() # ユーザー名は前後空白を削除して小文字に
+            #user = pieces[0]
             key = pieces[1]
 
             correct_key = hashlib.md5((user + reply_salt).encode()).hexdigest()
