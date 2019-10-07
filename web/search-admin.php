@@ -510,7 +510,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
         $place0 = $build0;
     }
     if ($place0 != '*') {
-        $sql .= "("; 
+        $sql .= "( ("; 
         foreach ($place_code[$place0] as $code) {
             for ($i=0; $i<$apnum; $i++) {
                 $sql .=  "(" . $fmajor . $i . "='" . $code[0] . "' AND " . $fminor . $i . "='" . $code[1] . "') OR ";
@@ -518,7 +518,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
         }
         $sql .= "False) ";
     } else {
-        $sql .= " True ";
+        $sql .= " ( True ";
     }
     /////
     if ($$froomck1) {
@@ -556,7 +556,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
         }
         $sql .= "False) "; 
     }
-    $sql .= " AND ";
+    $sql .= " ) AND ";
 
     //////////////////////////////
     $sql .= "True Limit 9999";
