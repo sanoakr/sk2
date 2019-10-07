@@ -70,7 +70,7 @@ class LoginViewController: UIViewController {
 		useridField.borderStyle = .none
 		useridField.autocapitalizationType = .none
 		useridField.placeholder = "全学統合認証ID"
-		useridField.bounds.insetBy(dx: 10, dy: 10)
+//		useridField.bounds.insetBy(dx: 10, dy: 10)
 		useridField.layer.cornerRadius = 0
 		useridField.layer.borderWidth  = 0
 		useridField.layer.masksToBounds = true
@@ -184,8 +184,7 @@ class LoginViewController: UIViewController {
 			
 			// トップ画面に遷移
 			let modalViewController = ViewController()
-			let navigationController = UINavigationController(rootViewController: modalViewController)
-			self.present(navigationController, animated: true , completion: nil)
+            self.navigationController?.pushViewController(modalViewController, animated: false)
 			
 		} else if result == "timeout" {
             
