@@ -13,8 +13,43 @@ import CoreLocation
 import AudioToolbox
 import Foundation
 import CoreData
+import CoreBluetooth    // for get bluetooth state
 
-class ViewController: UIViewController, CLLocationManagerDelegate {
+class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralManagerDelegate {
+    
+    // bluetoothの状況を取得
+    func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        
+        switch (central.state) {
+            case .poweredOff:
+                print("Bluetoothの電源がOff")
+                // 背景色を変える
+                self.view.backgroundColor = UIColor(red: 0.33, green: 0.33, blue: 0.33, alpha: 1)    //#ecf0f1
+                // 無効化のメッセージを表示する
+                labelMsg.text = "Bluetoothをオンにしてください"
+                // 出席ボタンを無効化する
+                btnDisable()
+                debugText2.text += String(describing: "Bluetoothの電源がOff\n")
+            case .poweredOn:
+                print("Bluetoothの電源はOn")
+                self.view.backgroundColor = appDelegate.backgroundColor // 背景色をセット
+                // 無効化のメッセージを消す
+                labelMsg.text = ""
+                // 出席ボタンを有効化する
+                btnNormal()
+                debugText2.text += String(describing: "Bluetoothの電源がOn\n")
+                centralManager.scanForPeripherals(withServices: nil, options:nil)
+            case .resetting:
+                print("レスティング状態")
+            case .unauthorized:
+                print("非認証状態")
+            case .unknown:
+                print("不明")
+            case .unsupported:
+                print("非対応")
+        }
+    }
+    
 	
 	// AppDelegateのインスタンスを取得
 	let appDelegate: AppDelegate = UIApplication.shared.delegate as! AppDelegate
@@ -35,6 +70,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	var labelAuto : UILabel!
 	var labelBeacon : UILabel!
     var labelVersion : UILabel!
+    var labelMsg : UILabel!
 	
 	// iBeacon
 	var myLocationManager : CLLocationManager!
@@ -55,9 +91,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	// UserDefaultの生成
 	let myUserDefault:UserDefaults = UserDefaults()
 	
+    var centralManager: CBCentralManager!
+    
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
+        
+        //CBCentralManagerを初期化
+        centralManager = CBCentralManager(delegate: self, queue: nil)
+
+        
 		// デバイスの固有ID取得
 //		print("DeviceID: \(String(describing: UIDevice.current.identifierForVendor))")
 		
@@ -193,6 +236,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		btnDisable()
 		view.addSubview(attendBtn)  // Viewに追加
 		
+        // --------------------------------------------------------------------------------------------------------------------------
+        //   メッセージラベル
+        labelMsg = UILabel(frame: CGRect(
+                        x:0,
+                        y: Int(self.view.frame.height - 160),
+                        width:Int(self.view.frame.width),
+                        height:30
+        ))
+//        labelMsg.layer.borderWidth = 2.0    // 枠線の幅
+//        labelMsg.layer.borderColor = UIColor.red.cgColor    // 枠線の色
+        labelMsg.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
+        labelMsg.textAlignment = NSTextAlignment.center    // センター寄せ
+        labelMsg.text = ""
+        view.addSubview(labelMsg)  // Viewに追加
+        
 		// --------------------------------------------------------------------------------------------------------------------------
 		// ログボタンを設置
 		let logViewBtn = UIButton(
@@ -302,6 +360,34 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	
 	// 出席ボタンイベント　ボタン押下
 	@objc func sendAttend(sender: UIButton) {
+        
+        //非同期処理を行う予定
+        /// 条件をクリアするまで待ちます
+        ///
+        /// - Parameters:
+        ///   - waitContinuation: 待機条件
+        ///   - compleation: 通過後の処理
+        func wait(_ waitContinuation: @escaping (()->Bool), compleation: @escaping (()->Void)) {
+            var wait = waitContinuation()
+            // 0.01秒周期で待機条件をクリアするまで待ちます。
+            let semaphore = DispatchSemaphore(value: 0)
+            DispatchQueue.global().async {
+                while wait {
+                    DispatchQueue.main.async {
+                        wait = waitContinuation()
+                        semaphore.signal()
+                    }
+                    semaphore.wait()
+                    Thread.sleep(forTimeInterval: 0.01)
+                }
+                // 待機条件をクリアしたので通過後の処理を行います。
+                DispatchQueue.main.async {
+                    compleation()
+                }
+            }
+        }
+
+
 		// ボタンの動き
 		attendBtn.backgroundColor = appDelegate.ifOnDownColor //色
 		attendBtn.layer.shadowOpacity = 0
@@ -311,22 +397,32 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// 登録されているUserDefaultから設定値を呼び出す
 		let user:String = myUserDefault.string(forKey: "user")!
 		let key:String = myUserDefault.string(forKey: "key")!
+        var result:String = ""
+        // Grand Central Dispatch（GCD）を用いて非同期処理を行う
+        DispatchQueue.global().async {
+            result = self.sendAttend(user: user, key: key, type: "M\(self.version)")
+        }
+        print("result: \(result)")
+        // 待機条件をクリアしたので通過後の処理を行います。
+        wait( { return result == "" } ) {
+             print("result: \(result)")
+                       
+            // データが正常に記録された場合の処理
+            if result == "success" {
+
+                // ウィンドウを表示
+                self.showAlertAutoHidden(title : "出席を記録しました", message: "", time: 0.5)
+
+                // バイブレーション
+                AudioServicesPlaySystemSound(1003);
+                AudioServicesDisposeSystemSoundID(1003);
+
+                print("sendAttend: success")
+            }
+        }
+           
+
 		
-		// データ送信
-		let result = sendAttend(user: user, key: key, type: "M\(version)")
-		
-		// データが正常に記録された場合の処理
-		if result == "success" {
-			
-			// ウィンドウを表示
-			showAlertAutoHidden(title : "出席を記録しました", message: "", time: 0.5)
-			
-			// バイブレーション
-			AudioServicesPlaySystemSound(1003);
-			AudioServicesDisposeSystemSoundID(1003);
-			
-			print("sendAttend: success")
-		}
 	}
 	
 	// 自動送信機能のトグルスイッチ
@@ -394,21 +490,24 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// 自動送信がオンの場合
 		if(autoSender == 1) {
 			
-			// 登録されているUserDefaultから設定値を呼び出す
-			let user:String = myUserDefault.string(forKey: "user")!
-			let key:String = myUserDefault.string(forKey: "key")!
-			
-			print("自動送信機能のチェック：\(appDelegate.postInterval)ごと")   //デバッグ
-			
-			// データ送信
-			let result = sendAttend(user: user, key: key, type: "A\(version)")
-			// データが正常に記録された場合の処理
-			if result == "success" {
-				// バイブレーション
-				AudioServicesPlaySystemSound(1003);
-				AudioServicesDisposeSystemSoundID(1003);
-				print("Attendance data was sent to the server.")
-			}
+            // 圏外かどうか判定
+            if(beaconFlg == true) {
+                // 登録されているUserDefaultから設定値を呼び出す
+                let user:String = myUserDefault.string(forKey: "user")!
+                let key:String = myUserDefault.string(forKey: "key")!
+                
+                print("自動送信機能のチェック：\(appDelegate.postInterval)ごと")   //デバッグ
+                
+                // データ送信
+                let result = sendAttend(user: user, key: key, type: "A\(version)")
+                // データが正常に記録された場合の処理
+                if result == "success" {
+                    // バイブレーション
+                    AudioServicesPlaySystemSound(1003);
+                    AudioServicesDisposeSystemSoundID(1003);
+                    print("Attendance data was sent to the server.")
+                }
+            }
 		}
 	}
 	
@@ -666,21 +765,25 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 				case CLProximity.unknown :
 //					print("Proximity: Unknown");
 					proximity = "3.Unknown"
+                    beaconFlg = false
 					break
 					
 				case CLProximity.far:
 //					print("Proximity: Far");
 					proximity = "2.Far"
+                    beaconFlg = true
 					break
 					
 				case CLProximity.near:
 //					print("Proximity: Near");
 					proximity = "1.Near"
+                    beaconFlg = true
 					break
 					
 				case CLProximity.immediate:
 //					print("Proximity: Immediate");
 					proximity = "0.Immediate"
+                    beaconFlg = true
 					break
 				}
 				
@@ -735,84 +838,125 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	
 	func sendAttend(user: String, key: String, type: String) -> String{
 		
-        let resultVal:String
+        var resultVal:String = ""
 		let now = appDelegate.currentTime()
         var sendtext = "\(key),\(type),\(now)"
-		
+        
 		print("--------------------- sendAttend begin ---------------------")
-		
-//        var testData:Array = self.beaconDetails
-//        print("data1:\(testData)")
-//
-//        for i in 0..<5 {
-//            sleep(1)
-//            testData = testData + self.beaconDetails
-//            print("data\(i):\(testData)")
-//        }
         
-//        // iBeacon値の正確性を高めるためscanを10回分蓄積する
-//        // キューを生成してサブスレッドで実行
-//        DispatchQueue(label: "jp.classmethod.app.queue").async {
-//            var testData:Array = self.beaconDetails
-//            print("data1:\(testData)")
-//
-//            for i in 0..<5 {
-//                sleep(1)
-//                testData = testData + self.beaconDetails
-//                print("data\(i):\(testData)")
-//            }
-//
-//            // メインスレッドで実行
-//            DispatchQueue.main.sync {
-//                print("finish")
-//
-//
-//
-//            }
-//        }
-//        print("--------------------- sendAttend end ---------------------")
-//        return "resultVal"
-        
-        // iBeaconの検出数が3以上ある場合
-        if(beaconDetails.count > 2) {
-            for i in stride(from: 0, to: 3, by: 1) {
-                sendtext += ",\(beaconDetails[i])"
-                print("\(i)回目のループの値は\(beaconDetails[i])")
-            }
-        } else {
-            // 検出したiBeaconの値を入れる
-            for value in beaconDetails {
-                sendtext += ",\(value)"
-            }
-            // 不足分をカラの値に入れる
-            for _ in stride(from: 0, to: (3 - beaconDetails.count), by: 1) {
-                sendtext += ",,,"
+        // Grand Central Dispatch（GCD）を用いて非同期処理を行う
+        DispatchQueue.global().async {
+            // iBeaconの状態をチェック
+            var beaconStatus = 0
+            var cnt = 0
+            repeat {
+                if(self.beaconFlg == true) {
+                    beaconStatus = 1
+                } else {
+                    beaconStatus = 0
+                }
+                print(Date())
+                print(beaconStatus)
+                sleep(1)
+                cnt = cnt+1
+                
+                // 10カウント（10秒）経過してもbeaconを受信できない場合は処理しない
+                if(cnt > 10) {
+                    beaconStatus = 2
+                }
+            } while(beaconStatus == 0)  //処理し続ける条件
+            
+            // メイン処理を実行
+            DispatchQueue.main.async {
+                
+                // beaconStatusが1のときのみ処理を行う
+                if( beaconStatus == 1 ) {
+                    // iBeaconの検出数が3以上ある場合
+                    if(self.beaconDetails.count > 2) {
+                        for i in stride(from: 0, to: 3, by: 1) {
+                            sendtext += ",\(self.beaconDetails[i])"
+                            print("\(i)回目のループの値は\(self.beaconDetails[i])")
+                        }
+                    } else {
+                        // 検出したiBeaconの値を入れる
+                        for value in self.beaconDetails {
+                            sendtext += ",\(value)"
+                        }
+                        // 不足分をカラの値に入れる
+                        for _ in stride(from: 0, to: (3 - self.beaconDetails.count), by: 1) {
+                            sendtext += ",,,"
+                        }
+                    }
+                    print("sendtext:\(sendtext)")
+
+                    // socket通信
+                    self.Connection.connect()
+
+                    // ローカルログへ保存
+                    self.saveLocalLog(sendtext: sendtext)
+
+                    sendtext = "\(user)," + sendtext
+                    let retVal = self.Connection.sendCommand(command: sendtext)
+
+                    // 値がカラの場合はエラー
+                    if(retVal.isEmpty) {
+                        resultVal = "fail"
+                    } else {
+                        let result:String = retVal["response"] as! String;
+
+                        // 出席が正常に記録された場合の処理
+                        if result == "success" {
+                            resultVal = "success"
+                        } else {
+                            resultVal = "fail"
+                        }
+                    }
+                } else {
+                    resultVal = "fail"
+                }
             }
         }
-        print("sendtext:\(sendtext)")
-
-        // socket通信
-        Connection.connect()
-
-        // ローカルログへ保存
-        saveLocalLog(sendtext: sendtext)
-
-        sendtext = "\(user)," + sendtext
-        let retVal = Connection.sendCommand(command: sendtext)
-
-        // 値がカラの場合はエラー
-        if(retVal.isEmpty) {
-            resultVal = "fail"
-        } else {
-            let result:String = retVal["response"] as! String;
-
-            // 出席が正常に記録された場合の処理
-            if result == "success" {
-                resultVal = "success"
-            } else {
-                resultVal = "fail"
-            }
-        }
+        
+//        // iBeaconの検出数が3以上ある場合
+//        if(beaconDetails.count > 2) {
+//            for i in stride(from: 0, to: 3, by: 1) {
+//                sendtext += ",\(beaconDetails[i])"
+//                print("\(i)回目のループの値は\(beaconDetails[i])")
+//            }
+//        } else {
+//            // 検出したiBeaconの値を入れる
+//            for value in beaconDetails {
+//                sendtext += ",\(value)"
+//            }
+//            // 不足分をカラの値に入れる
+//            for _ in stride(from: 0, to: (3 - beaconDetails.count), by: 1) {
+//                sendtext += ",,,"
+//            }
+//        }
+//        print("sendtext:\(sendtext)")
+//
+//        // socket通信
+//        Connection.connect()
+//
+//        // ローカルログへ保存
+//        saveLocalLog(sendtext: sendtext)
+//
+//        sendtext = "\(user)," + sendtext
+//        let retVal = Connection.sendCommand(command: sendtext)
+//
+//        // 値がカラの場合はエラー
+//        if(retVal.isEmpty) {
+//            resultVal = "fail"
+//        } else {
+//            let result:String = retVal["response"] as! String;
+//
+//            // 出席が正常に記録された場合の処理
+//            if result == "success" {
+//                resultVal = "success"
+//            } else {
+//                resultVal = "fail"
+//            }
+//        }
         
         print("--------------------- sendAttend end ---------------------")
 
