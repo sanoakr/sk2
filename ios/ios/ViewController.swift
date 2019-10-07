@@ -361,7 +361,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 	// 出席ボタンイベント　ボタン押下
 	@objc func sendAttend(sender: UIButton) {
         
-        //非同期処理を行う予定
         /// 条件をクリアするまで待ちます
         ///
         /// - Parameters:
@@ -387,42 +386,49 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
             }
         }
 
+        // ボタンの動き
+        self.attendBtn.backgroundColor = self.appDelegate.ifOnDownColor //色
+        self.attendBtn.layer.shadowOpacity = 0
+        
+        // キューを生成してサブスレッドで実行
+        DispatchQueue(label: "jp.classmethod.app.queue").async {
+            
+            print("beaconDetails: \(String(describing: self.beaconDetails))")
+            
+            // 登録されているUserDefaultから設定値を呼び出す
+            let user:String = self.myUserDefault.string(forKey: "user")!
+            let key:String = self.myUserDefault.string(forKey: "key")!
+            
+            var result:String! = nil
+//            let result = sendAttend(user: user, key: key, type: "M\(self.version)")
+            self.sendAttend(user: user, key: key, type: "M\(self.version)") { (resultVal) in
+                result =  resultVal
+//                print("resultValは: \(resultVal)")
+            }
+            
+            wait( { return result == nil } ) {
+//                print("result: \(String(describing: result))")
 
-		// ボタンの動き
-		attendBtn.backgroundColor = appDelegate.ifOnDownColor //色
-		attendBtn.layer.shadowOpacity = 0
-		
-		print("beaconDetails: \(String(describing: beaconDetails))")
-		
-		// 登録されているUserDefaultから設定値を呼び出す
-		let user:String = myUserDefault.string(forKey: "user")!
-		let key:String = myUserDefault.string(forKey: "key")!
-        var result:String = ""
-        // Grand Central Dispatch（GCD）を用いて非同期処理を行う
-        DispatchQueue.global().async {
-            result = self.sendAttend(user: user, key: key, type: "M\(self.version)")
-        }
-        print("result: \(result)")
-        // 待機条件をクリアしたので通過後の処理を行います。
-        wait( { return result == "" } ) {
-             print("result: \(result)")
-                       
-            // データが正常に記録された場合の処理
-            if result == "success" {
+                // データが正常に記録された場合の処理
+                if result == "success" {
+                    // ウィンドウを表示
+                    self.showAlertAutoHidden(title : "出席を記録しました", message: "", time: 0.5)
+                    // バイブレーション
+                    AudioServicesPlaySystemSound(1003);
+                    AudioServicesDisposeSystemSoundID(1003);
 
-                // ウィンドウを表示
-                self.showAlertAutoHidden(title : "出席を記録しました", message: "", time: 0.5)
-
-                // バイブレーション
-                AudioServicesPlaySystemSound(1003);
-                AudioServicesDisposeSystemSoundID(1003);
-
-                print("sendAttend: success")
+//                    print("sendAttend: success")
+                    
+                // 正常に記録できなかった場合
+                } else {
+                    // ウィンドウを表示
+                    self.showAlertAutoHidden(title : "出席が記録できませんでした", message: "", time: 0.5)
+                    // バイブレーション
+                    AudioServicesPlaySystemSound(1003);
+                    AudioServicesDisposeSystemSoundID(1003);
+                }
             }
         }
-           
-
-		
 	}
 	
 	// 自動送信機能のトグルスイッチ
@@ -498,15 +504,15 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                 
                 print("自動送信機能のチェック：\(appDelegate.postInterval)ごと")   //デバッグ
                 
-                // データ送信
-                let result = sendAttend(user: user, key: key, type: "A\(version)")
-                // データが正常に記録された場合の処理
-                if result == "success" {
-                    // バイブレーション
-                    AudioServicesPlaySystemSound(1003);
-                    AudioServicesDisposeSystemSoundID(1003);
-                    print("Attendance data was sent to the server.")
-                }
+//                // データ送信
+//                let result = sendAttend(user: user, key: key, type: "A\(version)")
+//                // データが正常に記録された場合の処理
+//                if result == "success" {
+//                    // バイブレーション
+//                    AudioServicesPlaySystemSound(1003);
+//                    AudioServicesDisposeSystemSoundID(1003);
+//                    print("Attendance data was sent to the server.")
+//                }
             }
 		}
 	}
@@ -835,133 +841,226 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 		manager.stopRangingBeacons(in: region as! CLBeaconRegion)
 	}
 	
-	
-	func sendAttend(user: String, key: String, type: String) -> String{
-		
-        var resultVal:String = ""
-		let now = appDelegate.currentTime()
-        var sendtext = "\(key),\(type),\(now)"
-        
-		print("--------------------- sendAttend begin ---------------------")
-        
-        // Grand Central Dispatch（GCD）を用いて非同期処理を行う
-        DispatchQueue.global().async {
-            // iBeaconの状態をチェック
-            var beaconStatus = 0
-            var cnt = 0
-            repeat {
-                if(self.beaconFlg == true) {
-                    beaconStatus = 1
-                } else {
-                    beaconStatus = 0
-                }
-                print(Date())
-                print(beaconStatus)
-                sleep(1)
-                cnt = cnt+1
-                
-                // 10カウント（10秒）経過してもbeaconを受信できない場合は処理しない
-                if(cnt > 10) {
-                    beaconStatus = 2
-                }
-            } while(beaconStatus == 0)  //処理し続ける条件
+
+    func sendAttend(user: String, key: String, type: String, complete:@escaping (String) -> ()) {
             
-            // メイン処理を実行
-            DispatchQueue.main.async {
+            var resultVal:String = ""
+            let now = appDelegate.currentTime()
+            var sendtext = "\(key),\(type),\(now)"
+            
+            print("--------------------- sendAttend begin ---------------------")
+            
+            // Grand Central Dispatch（GCD）を用いて非同期処理を行う
+            DispatchQueue.global().async {
+                // iBeaconの状態をチェック
+                var beaconStatus = 0
+                var cnt = 0
+                repeat {
+                    if(self.beaconFlg == true) {
+                        beaconStatus = 1
+                    } else {
+                        beaconStatus = 0
+                    }
+                    print(Date())
+                    print(beaconStatus)
+                    sleep(1)
+                    cnt = cnt+1
+                    
+                    // 10カウント（10秒）経過してもbeaconを受信できない場合は処理しない
+                    if(cnt > 10) {
+                        beaconStatus = 2
+                    }
+                } while(beaconStatus == 0)  //処理し続ける条件
                 
-                // beaconStatusが1のときのみ処理を行う
-                if( beaconStatus == 1 ) {
-                    // iBeaconの検出数が3以上ある場合
-                    if(self.beaconDetails.count > 2) {
-                        for i in stride(from: 0, to: 3, by: 1) {
-                            sendtext += ",\(self.beaconDetails[i])"
-                            print("\(i)回目のループの値は\(self.beaconDetails[i])")
-                        }
-                    } else {
-                        // 検出したiBeaconの値を入れる
-                        for value in self.beaconDetails {
-                            sendtext += ",\(value)"
-                        }
-                        // 不足分をカラの値に入れる
-                        for _ in stride(from: 0, to: (3 - self.beaconDetails.count), by: 1) {
-                            sendtext += ",,,"
-                        }
-                    }
-                    print("sendtext:\(sendtext)")
-
-                    // socket通信
-                    self.Connection.connect()
-
-                    // ローカルログへ保存
-                    self.saveLocalLog(sendtext: sendtext)
-
-                    sendtext = "\(user)," + sendtext
-                    let retVal = self.Connection.sendCommand(command: sendtext)
-
-                    // 値がカラの場合はエラー
-                    if(retVal.isEmpty) {
-                        resultVal = "fail"
-                    } else {
-                        let result:String = retVal["response"] as! String;
-
-                        // 出席が正常に記録された場合の処理
-                        if result == "success" {
-                            resultVal = "success"
+                // メイン処理を実行
+                DispatchQueue.main.async {
+                    
+                    print("beaconStatus: \(beaconStatus)")
+                    
+                    // beaconStatusが1のときのみ処理を行う
+                    if( beaconStatus == 1 ) {
+                        // iBeaconの検出数が3以上ある場合
+                        if(self.beaconDetails.count > 2) {
+                            for i in stride(from: 0, to: 3, by: 1) {
+                                sendtext += ",\(self.beaconDetails[i])"
+                                print("\(i)回目のループの値は\(self.beaconDetails[i])")
+                            }
                         } else {
-                            resultVal = "fail"
+                            // 検出したiBeaconの値を入れる
+                            for value in self.beaconDetails {
+                                sendtext += ",\(value)"
+                            }
+                            // 不足分をカラの値に入れる
+                            for _ in stride(from: 0, to: (3 - self.beaconDetails.count), by: 1) {
+                                sendtext += ",,,"
+                            }
                         }
+                        print("sendtext:\(sendtext)")
+
+                        // socket通信
+                        self.Connection.connect()
+
+                        // ローカルログへ保存
+                        self.saveLocalLog(sendtext: sendtext)
+
+                        sendtext = "\(user)," + sendtext
+                        let retVal = self.Connection.sendCommand(command: sendtext)
+
+                        // 値がカラの場合はエラー
+                        if(retVal.isEmpty) {
+                            resultVal = "fail"
+                        } else {
+                            let result:String = retVal["response"] as! String;
+
+                            // 出席が正常に記録された場合の処理
+                            if result == "success" {
+                                resultVal = "success"
+                            } else {
+                                resultVal = "fail"
+                            }
+                        }
+                    } else {
+                        resultVal = "fail"
                     }
-                } else {
-                    resultVal = "fail"
+                    complete(resultVal)
                 }
             }
-        }
-        
-//        // iBeaconの検出数が3以上ある場合
-//        if(beaconDetails.count > 2) {
-//            for i in stride(from: 0, to: 3, by: 1) {
-//                sendtext += ",\(beaconDetails[i])"
-//                print("\(i)回目のループの値は\(beaconDetails[i])")
-//            }
-//        } else {
-//            // 検出したiBeaconの値を入れる
-//            for value in beaconDetails {
-//                sendtext += ",\(value)"
-//            }
-//            // 不足分をカラの値に入れる
-//            for _ in stride(from: 0, to: (3 - beaconDetails.count), by: 1) {
-//                sendtext += ",,,"
-//            }
-//        }
-//        print("sendtext:\(sendtext)")
-//
-//        // socket通信
-//        Connection.connect()
-//
-//        // ローカルログへ保存
-//        saveLocalLog(sendtext: sendtext)
-//
-//        sendtext = "\(user)," + sendtext
-//        let retVal = Connection.sendCommand(command: sendtext)
-//
-//        // 値がカラの場合はエラー
-//        if(retVal.isEmpty) {
-//            resultVal = "fail"
-//        } else {
-//            let result:String = retVal["response"] as! String;
-//
-//            // 出席が正常に記録された場合の処理
-//            if result == "success" {
-//                resultVal = "success"
-//            } else {
-//                resultVal = "fail"
-//            }
-//        }
-        
-        print("--------------------- sendAttend end ---------------------")
+            
+            
+            print("resultVal: \(resultVal)")
+            print("--------------------- sendAttend end ---------------------")
 
-        return resultVal
-	}
+        }
+    
+//	func sendAttend(user: String, key: String, type: String) -> String{
+//
+//        var resultVal:String = ""
+//		let now = appDelegate.currentTime()
+//        var sendtext = "\(key),\(type),\(now)"
+//
+//		print("--------------------- sendAttend begin ---------------------")
+//
+//        // Grand Central Dispatch（GCD）を用いて非同期処理を行う
+//        DispatchQueue.global().async {
+//            // iBeaconの状態をチェック
+//            var beaconStatus = 0
+//            var cnt = 0
+//            repeat {
+//                if(self.beaconFlg == true) {
+//                    beaconStatus = 1
+//                } else {
+//                    beaconStatus = 0
+//                }
+//                print(Date())
+//                print(beaconStatus)
+//                sleep(1)
+//                cnt = cnt+1
+//
+//                // 10カウント（10秒）経過してもbeaconを受信できない場合は処理しない
+//                if(cnt > 10) {
+//                    beaconStatus = 2
+//                }
+//            } while(beaconStatus == 0)  //処理し続ける条件
+//
+//            // メイン処理を実行
+//            DispatchQueue.main.async {
+//
+//                print("beaconStatus: \(beaconStatus)")
+//
+//                // beaconStatusが1のときのみ処理を行う
+//                if( beaconStatus == 1 ) {
+//                    // iBeaconの検出数が3以上ある場合
+//                    if(self.beaconDetails.count > 2) {
+//                        for i in stride(from: 0, to: 3, by: 1) {
+//                            sendtext += ",\(self.beaconDetails[i])"
+//                            print("\(i)回目のループの値は\(self.beaconDetails[i])")
+//                        }
+//                    } else {
+//                        // 検出したiBeaconの値を入れる
+//                        for value in self.beaconDetails {
+//                            sendtext += ",\(value)"
+//                        }
+//                        // 不足分をカラの値に入れる
+//                        for _ in stride(from: 0, to: (3 - self.beaconDetails.count), by: 1) {
+//                            sendtext += ",,,"
+//                        }
+//                    }
+//                    print("sendtext:\(sendtext)")
+//
+//                    // socket通信
+//                    self.Connection.connect()
+//
+//                    // ローカルログへ保存
+//                    self.saveLocalLog(sendtext: sendtext)
+//
+//                    sendtext = "\(user)," + sendtext
+//                    let retVal = self.Connection.sendCommand(command: sendtext)
+//
+//                    // 値がカラの場合はエラー
+//                    if(retVal.isEmpty) {
+//                        resultVal = "fail"
+//                    } else {
+//                        let result:String = retVal["response"] as! String;
+//
+//                        // 出席が正常に記録された場合の処理
+//                        if result == "success" {
+//                            resultVal = "success"
+//                        } else {
+//                            resultVal = "fail"
+//                        }
+//                    }
+//                } else {
+//                    resultVal = "fail"
+//                }
+//            }
+//        }
+//
+////        // iBeaconの検出数が3以上ある場合
+////        if(beaconDetails.count > 2) {
+////            for i in stride(from: 0, to: 3, by: 1) {
+////                sendtext += ",\(beaconDetails[i])"
+////                print("\(i)回目のループの値は\(beaconDetails[i])")
+////            }
+////        } else {
+////            // 検出したiBeaconの値を入れる
+////            for value in beaconDetails {
+////                sendtext += ",\(value)"
+////            }
+////            // 不足分をカラの値に入れる
+////            for _ in stride(from: 0, to: (3 - beaconDetails.count), by: 1) {
+////                sendtext += ",,,"
+////            }
+////        }
+////        print("sendtext:\(sendtext)")
+////
+////        // socket通信
+////        Connection.connect()
+////
+////        // ローカルログへ保存
+////        saveLocalLog(sendtext: sendtext)
+////
+////        sendtext = "\(user)," + sendtext
+////        let retVal = Connection.sendCommand(command: sendtext)
+////
+////        // 値がカラの場合はエラー
+////        if(retVal.isEmpty) {
+////            resultVal = "fail"
+////        } else {
+////            let result:String = retVal["response"] as! String;
+////
+////            // 出席が正常に記録された場合の処理
+////            if result == "success" {
+////                resultVal = "success"
+////            } else {
+////                resultVal = "fail"
+////            }
+////        }
+//
+//        print("resultVal: \(resultVal)")
+//        print("--------------------- sendAttend end ---------------------")
+//
+//        return resultVal
+//	}
 	
 	// ローカルログの保存
 	@objc internal func saveLocalLog(sendtext: String) {
