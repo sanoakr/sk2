@@ -17,15 +17,21 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.1.0</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>5</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSApplicationCategoryType</key>
 	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>出席確認用beacon発信機の検出し操作外でも自動的に出席情報を送信するために利用します</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>出席確認用beacon発信機の検出に利用します</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>出席確認用beacon発信機の検出に利用します</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>出席確認用beacon発信機の検出し操作外でも自動的に出席情報を送信するために利用します</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>出席確認用beacon発信機の検出に利用します</string>
 	<key>UIBackgroundModes</key>

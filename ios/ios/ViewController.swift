@@ -371,7 +371,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
         self.attendBtn.layer.shadowOpacity = 0
         
         // キューを生成してサブスレッドで実行
-        DispatchQueue(label: "jp.classmethod.app.queue").async {
+        DispatchQueue(label: "jp.ac.ryukoku.sk2").async {
             
             print("beaconDetails: \(String(describing: self.beaconDetails))")
             
@@ -482,7 +482,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                 print("自動送信機能のチェック：\(appDelegate.postInterval)ごと")   //デバッグ
                 
                 // キューを生成してサブスレッドで実行
-                DispatchQueue(label: "jp.classmethod.app.queue").async {
+                DispatchQueue(label: "jp.ac.ryukoku.sk2").async {
                     
                     print("beaconDetails: \(String(describing: self.beaconDetails))")
                     
@@ -500,7 +500,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                         // データが正常に記録された場合の処理
                         if result == "success" {
                             // ウィンドウを表示
-                            self.showAlertAutoHidden(title : "通知", message: "出席を記録しました", time: 0.5)
+                            self.showAlertAutoHidden(title : "通知", message: "出席を自動記録しました", time: 0.5)
                             // バイブレーション
                             AudioServicesPlaySystemSound(1003);
                             AudioServicesDisposeSystemSoundID(1003);
@@ -508,7 +508,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                         // 正常に記録できなかった場合
                         } else {
                             // ウィンドウを表示
-                            self.showAlertAutoHidden(title : "通知", message: "ビーコン情報が取得できなかったため、出席を記録できませんでした", time: 1.0)
+                            self.showAlertAutoHidden(title : "通知", message: "ビーコン情報が取得できなかったため、出席を自動記録できませんでした", time: 1.0)
                             // バイブレーション
                             AudioServicesPlaySystemSound(1003);
                             AudioServicesDisposeSystemSoundID(1003);
