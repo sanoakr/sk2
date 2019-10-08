@@ -47,6 +47,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                 print("不明")
             case .unsupported:
                 print("非対応")
+        @unknown default:
+            print("unknown default")
         }
     }
     
@@ -630,7 +632,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 			// 許可がある場合はiBeacon検出を開始.
 			startMyMonitoring()
 			break
-		}
+        @unknown default:
+            print("unknown default")
+        }
 	}
 	
 	// startMyMonitoring()内のでstartMonitoringForRegionが正常に開始されると呼び出される
@@ -788,7 +792,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 					proximity = "0.Immediate"
                     beaconFlg = true
 					break
-				}
+                @unknown default:
+                    print("unknown default")
+                }
 				
 				// 変数に保存
 				beaconUuids.add(beaconUUID.uuidString)
@@ -1038,7 +1044,7 @@ class Connection3: NSObject, StreamDelegate {
 		self.outputStream = writeStream!.takeRetainedValue()
 		
 		let dict = [
-			kCFStreamSSLValidatesCertificateChain: kCFBooleanFalse,     // allow self-signed certificate
+            kCFStreamSSLValidatesCertificateChain: kCFBooleanFalse,     // allow self-signed certificate
 			kCFStreamSSLLevel: "kCFStreamSocketSecurityLevelNegotiatedSSL"    // don't understand, why there isn't a constant for version 1.2
 			] as CFDictionary
 		
