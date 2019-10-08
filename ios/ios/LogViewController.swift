@@ -8,6 +8,7 @@
 
 import UIKit
 
+@available(iOS 13.0, *)
 class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 	
 	// AppDelegateのインスタンスを取得
@@ -320,12 +321,20 @@ class MyCell: UITableViewCell {
 		super.init(style: style, reuseIdentifier: reuseIdentifier)
 		
 		labelMode = UILabel()
-		labelMode.backgroundColor = appDelegate.backgroundColor
+        if #available(iOS 13.0, *) {
+            labelMode.backgroundColor = appDelegate.backgroundColor
+        } else {
+            // Fallback on earlier versions
+        }
 		contentView.addSubview(labelMode)
 		
 		labelDate = UILabel()
 		labelDate.font = UIFont.boldSystemFont(ofSize: UIFont.labelFontSize)	//  ボールド
-		labelDate.backgroundColor = appDelegate.backgroundColor
+        if #available(iOS 13.0, *) {
+            labelDate.backgroundColor = appDelegate.backgroundColor
+        } else {
+            // Fallback on earlier versions
+        }
 		contentView.addSubview(labelDate)
 		
 		labelVal1 = UILabel()
@@ -363,6 +372,7 @@ class MyCell: UITableViewCell {
 // --------------------------------------------------------------------------------------------------------------------------
 // SSL Socketコネクション
 
+@available(iOS 13.0, *)
 class Connection2: NSObject, StreamDelegate {
 	
 	let ServerAddress: CFString = appDelegate.serverIp as CFString //IPアドレスを指定

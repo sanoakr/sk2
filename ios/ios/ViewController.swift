@@ -15,6 +15,7 @@ import Foundation
 import CoreData
 import CoreBluetooth    // for get bluetooth state
 
+@available(iOS 13.0, *)
 class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralManagerDelegate {
     
     // bluetoothの状況を取得
@@ -119,7 +120,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 		let user = myUserDefault.string(forKey: "user")
 //		let engName = myUserDefault.string(forKey: "engName")
 		let jpnName = myUserDefault.string(forKey: "jpnName")
-		//        let key = myUserDefault.string(forKey: "key")
+//        let key = myUserDefault.string(forKey: "key")
 		let userInfo = user! + " / " + jpnName!
 		let consent:Bool = UserDefaults.standard.bool(forKey: "consent")
 		
@@ -149,16 +150,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 		// userを生成
 		labelUser = UILabel(frame: CGRect(x:0, y:navigationBarHeight! + statusVar, width:self.view.frame.width, height:50))
 		labelUser.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
-		labelUser.backgroundColor = #colorLiteral(red: 0.9019607843, green: 0.9137254902, blue: 0.9176470588, alpha: 1)
+		labelUser.backgroundColor = appDelegate.ifUserInfoColor    // 背景色
 		labelUser.textAlignment = NSTextAlignment.left    // 左寄せ
 		labelUser.text = " \(userInfo)"
 		view.addSubview(labelUser)  // Viewに追加
 		
 		// --------------------------------------------------------------------------------------------------------------------------
 		// debugTextを生成
-		debugText = UITextView(frame: CGRect(x:10, y:navigationBarHeight! + 70, width: (self.view.frame.width - 20 ) / 2, height:160))
+		debugText = UITextView(frame: CGRect(x:0, y:navigationBarHeight! + 70, width: (self.view.frame.width / 2), height:140))
+        debugText.layer.borderWidth = 1.0
 		debugText.font = UIFont.systemFont(ofSize: 7.0)    //フォントサイズ
-		debugText.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0)    // 背景色
+		debugText.backgroundColor = appDelegate.ifDebugBackgroundColor    // 背景色
 		debugText.isEditable = false    // 編集不可
 		debugText.textAlignment = NSTextAlignment.left    // 左寄せ
 		
@@ -171,9 +173,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 	
 		// --------------------------------------------------------------------------------------------------------------------------
 		// debugText2を生成
-		debugText2 = UITextView(frame: CGRect(x:10 +  (self.view.frame.width - 20 ) / 2, y:navigationBarHeight! + 70, width: (self.view.frame.width - 20 ) / 2, height:160))
+		debugText2 = UITextView(frame: CGRect(x:(self.view.frame.width / 2), y:navigationBarHeight! + 70, width: (self.view.frame.width / 2), height:140))
+        debugText2.layer.borderWidth = 1.0
 		debugText2.font = UIFont.systemFont(ofSize: 7.0)    //フォントサイズ
-		debugText2.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)    // 背景色
+        debugText2.backgroundColor = appDelegate.ifDebugBackgroundColor    // 背景色
 		debugText2.isEditable = false    // 編集不可
 		debugText2.textAlignment = NSTextAlignment.left    // 左寄せ
 		
@@ -399,7 +402,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                 // 正常に記録できなかった場合
                 } else {
                     // ウィンドウを表示
-                    self.showAlertAutoHidden(title : "通知", message: "ビーコン情報が取得できなかったため、出席を記録できませんでした", time: 0.5)
+                    self.showAlertAutoHidden(title : "通知", message: "ビーコン情報が取得できなかったため、出席を記録できませんでした", time: 1.0)
                     // バイブレーション
                     AudioServicesPlaySystemSound(1003);
                     AudioServicesDisposeSystemSoundID(1003);
@@ -488,7 +491,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                     let key:String = self.myUserDefault.string(forKey: "key")!
                     
                     var result:String! = nil
-                    self.sendAttend(user: user, key: key, type: "M\(self.version)") { (resultVal) in
+                    self.sendAttend(user: user, key: key, type: "A\(self.version)") { (resultVal) in
                         result =  resultVal
                     }
                     
@@ -505,7 +508,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                         // 正常に記録できなかった場合
                         } else {
                             // ウィンドウを表示
-                            self.showAlertAutoHidden(title : "通知", message: "ビーコン情報が取得できなかったため、出席を記録できませんでした", time: 0.5)
+                            self.showAlertAutoHidden(title : "通知", message: "ビーコン情報が取得できなかったため、出席を記録できませんでした", time: 1.0)
                             // バイブレーション
                             AudioServicesPlaySystemSound(1003);
                             AudioServicesDisposeSystemSoundID(1003);
@@ -1021,8 +1024,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 // SSL Socketコネクション
 
 // AppDelegateのインスタンスを取得
+@available(iOS 13.0, *)
 let appDelegate: AppDelegate = UIApplication.shared.delegate as! AppDelegate
 
+@available(iOS 13.0, *)
 class Connection3: NSObject, StreamDelegate {
 	
 	let ServerAddress: CFString = appDelegate.serverIp as CFString //IPアドレスを指定

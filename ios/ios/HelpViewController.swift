@@ -9,6 +9,7 @@
 import UIKit
 import WebKit
 
+@available(iOS 13.0, *)
 class HelpViewController: UIViewController,UIWebViewDelegate {
 	
 	// AppDelegateのインスタンスを取得
