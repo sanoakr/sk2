@@ -26,7 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var serverPort2 = 4441
 	var helpUrl = "https://sk2.st.ryukoku.ac.jp/"
 	var uuidList = ["ebf59ccc-21f2-4558-9488-00f2b388e5e6"] //検知対象は1つのUUID。(OS等のバージョンで検出可能な上限数は20個程度が目安)
-	var debugUser = "testuser-skmt"
+	var debugUser = "testuser"
 	var iconSize = 60
 	var timeout = 5		// 処理のタイムアウト（秒）
 	var startHour = 7	// 出席取得　開始時間（時）
