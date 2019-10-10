@@ -60,7 +60,7 @@ class HelpViewController: UIViewController,UIWebViewDelegate {
 		let backButton = UIButton(frame: CGRect(x:0,y: Int(self.view.frame.height - safeAreaInsets! - 40),width: Int(self.view.frame.width),height:40))
 		
 		backButton.setTitle("閉じる", for: .normal)  //タイトル
-		backButton.backgroundColor = appDelegate.ifNormalColor
+        backButton.backgroundColor = appDelegate.setColor ( name : "ifNormalColor" )
 		backButton.addTarget(self, action: #selector(LogViewController.back(_:)), for: .touchUpInside)
 		view.addSubview(backButton)  // Viewに追加
 		

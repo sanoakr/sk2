@@ -52,7 +52,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		segment.frame = CGRect(x: 20, y: Int(barHeight + 55), width: Int(self.view.frame.width) - 40, height: 30)
 		
 		// 背景色を設定
-		segment.tintColor = appDelegate.ifNormalColor
+        segment.tintColor = appDelegate.setColor ( name : "ifNormalColor" )
 		
 		// ボタンを押した時の処理を設定
 		segment.addTarget(self, action: #selector(LogViewController.change(segment:)), for: UIControl.Event.valueChanged)
@@ -70,7 +70,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		// 戻るボタン
 		let backButton = UIButton(frame: CGRect(x:0,y: Int(self.view.frame.height - safeAreaInsets! - 40),width: Int(self.view.frame.width),height:40))
 		backButton.setTitle("閉じる", for: .normal)  //タイトル
-		backButton.backgroundColor = appDelegate.ifNormalColor
+        backButton.backgroundColor = appDelegate.setColor ( name : "ifNormalColor" )
 		backButton.addTarget(self, action: #selector(LogViewController.back(_:)), for: .touchUpInside)
 		view.addSubview(backButton)  // Viewに追加
 		
@@ -322,18 +322,18 @@ class MyCell: UITableViewCell {
 		
 		labelMode = UILabel()
         if #available(iOS 13.0, *) {
-            labelMode.backgroundColor = appDelegate.backgroundColor
+            labelMode.backgroundColor = appDelegate.setColor ( name : "backgroundColor" )
         } else {
-            // Fallback on earlier versions
+            labelMode.backgroundColor = UIColor.white
         }
 		contentView.addSubview(labelMode)
 		
 		labelDate = UILabel()
 		labelDate.font = UIFont.boldSystemFont(ofSize: UIFont.labelFontSize)	//  ボールド
         if #available(iOS 13.0, *) {
-            labelDate.backgroundColor = appDelegate.backgroundColor
+            labelDate.backgroundColor = appDelegate.setColor ( name : "backgroundColor" )
         } else {
-            // Fallback on earlier versions
+            labelDate.backgroundColor = UIColor.white
         }
 		contentView.addSubview(labelDate)
 		

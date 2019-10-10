@@ -24,7 +24,8 @@ class SplashViewController: UIViewController,UIWebViewDelegate {
 		super.viewDidLoad()
 		
 		// スプラッシュ画面を表示
-		self.view.backgroundColor = appDelegate.ifNormalColor // 背景色をセット
+//		self.view.backgroundColor = appDelegate.ifNormalColor // 背景色をセット
+        self.view.backgroundColor = appDelegate.setColor( name:"ifNormalColor" ) // 背景色をセット
 		navigationController?.setNavigationBarHidden(true, animated: false)
 		
 		// --------------------------------------------------------------------------------------------------------------------------

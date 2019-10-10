@@ -40,7 +40,8 @@ class LoginViewController: UIViewController {
 //			}
 //		}
 //
-		self.view.backgroundColor = appDelegate.backgroundColor  // 背景色をセット
+//		self.view.backgroundColor = appDelegate.backgroundColor  // 背景色をセット
+        self.view.backgroundColor = appDelegate.setColor( name: "backgroundColor" )
 		self.navigationItem.hidesBackButton = true	//　バックボタンを消す
 		
 		// --------------------------------------------------------------------------------------------------------------------------
@@ -52,7 +53,7 @@ class LoginViewController: UIViewController {
 		let titleView: UITextView = UITextView(frame: CGRect(x:10, y:100, width:self.view.frame.width - 20, height:100))
 		titleView.text = appDelegate.appTitle
 		titleView.font = UIFont.systemFont(ofSize: 20.0)    //フォントサイズ
-		titleView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0)    // 背景色
+//		titleView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0)    // 背景色
 		titleView.isEditable = false    // 編集不可
 		titleView.textAlignment = NSTextAlignment.center    // センター寄せ
 		view.addSubview(titleView)  // Viewに追加
@@ -68,7 +69,8 @@ class LoginViewController: UIViewController {
 		// useridFieldを生成
 		useridField = UITextField(frame: CGRect(x:20, y:230, width:self.view.frame.width - 40, height:30))
 //		useridField.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)    // 背景色
-        useridField.backgroundColor = appDelegate.ifUserInfoColor
+//        useridField.backgroundColor = appDelegate.ifUserInfoColor
+        useridField.backgroundColor = appDelegate.setColor( name: "ifUserInfoColor" )
 		useridField.borderStyle = .none
 		useridField.autocapitalizationType = .none
 		useridField.placeholder = "全学統合認証ID"
@@ -87,7 +89,8 @@ class LoginViewController: UIViewController {
 		passwordField.leftViewMode = UITextField.ViewMode.always
 		passwordField.placeholder = "パスワード"
 //		passwordField.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)    // 背景色
-        passwordField.backgroundColor = appDelegate.ifUserInfoColor
+//        passwordField.backgroundColor = appDelegate.ifUserInfoColor
+        passwordField.backgroundColor = appDelegate.setColor( name: "ifUserInfoColor" )
 		passwordField.borderStyle = .none
 		passwordField.layer.cornerRadius = 0
 		passwordField.layer.borderWidth  = 0
@@ -102,7 +105,8 @@ class LoginViewController: UIViewController {
 		// ログインボタン
 		let loginBtn = UIButton(frame: CGRect(x:20,y: 330,width: self.view.frame.width - 40, height:40))
 		loginBtn.setTitle("ログイン", for: .normal)  //タイトル
-		loginBtn.backgroundColor = appDelegate.ifNormalColor
+//		loginBtn.backgroundColor = appDelegate.ifNormalColor
+        loginBtn.backgroundColor = appDelegate.setColor( name: "ifNormalColor" )
 		loginBtn.addTarget(self, action: #selector(LoginViewController.login(_:)), for: .touchUpInside)
 		view.addSubview(loginBtn)  // Viewに追加
         

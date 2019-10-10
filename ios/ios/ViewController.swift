@@ -33,7 +33,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                 debugText2.text += String(describing: "Bluetoothの電源がOff\n")
             case .poweredOn:
                 print("Bluetoothの電源はOn")
-                self.view.backgroundColor = appDelegate.backgroundColor // 背景色をセット
+                self.view.backgroundColor = appDelegate.setColor( name: "backgroundColor" ) // 背景色をセット
                 // 無効化のメッセージを消す
                 labelMsg.text = ""
                 // 出席ボタンを有効化する
@@ -144,13 +144,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
         if(user == appDelegate.debugUser) {
             debugMode = 1
         }
-		self.view.backgroundColor = appDelegate.backgroundColor // 背景色をセット
+        self.view.backgroundColor = appDelegate.setColor ( name: "backgroundColor" ) // 背景色をセット
 		
 		// --------------------------------------------------------------------------------------------------------------------------
 		// userを生成
 		labelUser = UILabel(frame: CGRect(x:0, y:navigationBarHeight! + statusVar, width:self.view.frame.width, height:50))
 		labelUser.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
-		labelUser.backgroundColor = appDelegate.ifUserInfoColor    // 背景色
+        labelUser.backgroundColor = appDelegate.setColor ( name: "ifUserInfoColor" )    // 背景色
 		labelUser.textAlignment = NSTextAlignment.left    // 左寄せ
 		labelUser.text = " \(userInfo)"
 		view.addSubview(labelUser)  // Viewに追加
@@ -160,7 +160,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 		debugText = UITextView(frame: CGRect(x:0, y:navigationBarHeight! + 70, width: (self.view.frame.width / 2), height:140))
         debugText.layer.borderWidth = 1.0
 		debugText.font = UIFont.systemFont(ofSize: 7.0)    //フォントサイズ
-		debugText.backgroundColor = appDelegate.ifDebugBackgroundColor    // 背景色
+        debugText.backgroundColor = appDelegate.setColor ( name: "ifDebugBackgroundColor" )    // 背景色
 		debugText.isEditable = false    // 編集不可
 		debugText.textAlignment = NSTextAlignment.left    // 左寄せ
 		
@@ -176,7 +176,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 		debugText2 = UITextView(frame: CGRect(x:(self.view.frame.width / 2), y:navigationBarHeight! + 70, width: (self.view.frame.width / 2), height:140))
         debugText2.layer.borderWidth = 1.0
 		debugText2.font = UIFont.systemFont(ofSize: 7.0)    //フォントサイズ
-        debugText2.backgroundColor = appDelegate.ifDebugBackgroundColor    // 背景色
+        debugText2.backgroundColor = appDelegate.setColor ( name: "ifDebugBackgroundColor" )    // 背景色
 		debugText2.isEditable = false    // 編集不可
 		debugText2.textAlignment = NSTextAlignment.left    // 左寄せ
 		
@@ -203,7 +203,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 			SWautoSender.isOn = true    // SwitchをOnに設定
 		}
 		// 背景色を設定
-		SWautoSender.onTintColor = appDelegate.ifNormalColor
+        SWautoSender.onTintColor = appDelegate.setColor ( name: "ifNormalColor" )
 		
 		// SwitchのOn/Off切り替わりの際に、呼ばれるイベントを設定する.
 		SWautoSender.addTarget(self, action: #selector(ViewController.onClickSWautoSender(sender:)), for: UIControl.Event.valueChanged)
@@ -269,11 +269,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 		logViewBtn.setBackgroundImage(btnLogImageDefault!, for: .normal)
 		logViewBtn.setTitle("ログ", for: .normal)  //タイトル
 		logViewBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
-		logViewBtn.setTitleColor(appDelegate.ifNormalColor, for: .normal) // タイトルの色
+        logViewBtn.setTitleColor(appDelegate.setColor ( name : "ifNormalColor" ), for: .normal) // タイトルの色
 		logViewBtn.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: -90.0, right: 0.0)
 		logViewBtn.layer.cornerRadius = logViewBtn.frame.size.width * 0.5 //丸まり
 		logViewBtn.addTarget(self, action: #selector(ViewController.logView(_:)), for: .touchUpInside)
-		logViewBtn.layer.borderColor = appDelegate.ifNormalColor.cgColor
+        logViewBtn.layer.borderColor = appDelegate.setColor ( name : "ifNormalColor" ).cgColor
 		logViewBtn.layer.borderWidth = 1
 		view.addSubview(logViewBtn)  // Viewに追加
 		
@@ -289,11 +289,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 		helpViewBtn.setBackgroundImage(btnHelpImageDefault!, for: .normal)
 		helpViewBtn.setTitle("ヘルプ", for: .normal)  //タイトル
 		helpViewBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
-		helpViewBtn.setTitleColor(appDelegate.ifNormalColor, for: .normal) // タイトルの色
+        helpViewBtn.setTitleColor(appDelegate.setColor ( name : "ifNormalColor" ), for: .normal) // タイトルの色
 		helpViewBtn.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: -90.0, right: 0.0)
 		helpViewBtn.layer.cornerRadius = helpViewBtn.frame.size.width * 0.5 //丸まり
 		helpViewBtn.addTarget(self, action: #selector(ViewController.helpView(_:)), for: .touchUpInside)
-		helpViewBtn.layer.borderColor = appDelegate.ifNormalColor.cgColor
+        helpViewBtn.layer.borderColor = appDelegate.setColor ( name : "ifNormalColor" ).cgColor
 		helpViewBtn.layer.borderWidth = 1
 		view.addSubview(helpViewBtn)  // Viewに追加
 		
@@ -312,11 +312,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 		logoutBtn.setBackgroundImage(btnLogoutImageDefault!, for: .normal)
 		logoutBtn.setTitle("ログアウト", for: .normal)  //タイトル
 		logoutBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
-		logoutBtn.setTitleColor(appDelegate.ifNormalColor, for: .normal) // タイトルの色
+        logoutBtn.setTitleColor(appDelegate.setColor ( name : "ifNormalColor" ), for: .normal) // タイトルの色
 		logoutBtn.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: -90.0, right: 0.0)
 		logoutBtn.layer.cornerRadius = logoutBtn.frame.size.width * 0.5 //丸まり
 		logoutBtn.addTarget(self, action: #selector(ViewController.onClickLogout(sender:)), for: .touchUpInside)
-		logoutBtn.layer.borderColor = appDelegate.ifNormalColor.cgColor
+        logoutBtn.layer.borderColor = appDelegate.setColor ( name : "ifNormalColor" ).cgColor
 		logoutBtn.layer.borderWidth = 1
 //		logoutBtn.titleEdgeInsets = UIEdgeInsetsMake(0, -50, 0, 50);
 		view.addSubview(logoutBtn)  // Viewに追加
@@ -367,7 +367,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 	@objc func sendAttend(sender: UIButton) {
         
         // ボタンの動き
-        self.attendBtn.backgroundColor = self.appDelegate.ifOnDownColor //色
+        self.attendBtn.backgroundColor = appDelegate.setColor( name : "ifOnDownColor" ) //色
         self.attendBtn.layer.shadowOpacity = 0
         
         // キューを生成してサブスレッドで実行
@@ -447,21 +447,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 	// ヘルプの表示
 	@objc func helpView(_ sender: UIButton) {
 		let helpvc = HelpViewController()
-		helpvc.view.backgroundColor = appDelegate.backgroundColor // 背景色
+        helpvc.view.backgroundColor = appDelegate.setColor ( name : "backgroundColor" ) // 背景色
 		self.present(helpvc, animated: true, completion: nil)
 	}
 	
 	// ログの表示
 	@objc func logView(_ sender: UIButton) {
 		let logvc = LogViewController()
-		logvc.view.backgroundColor = appDelegate.backgroundColor // 背景色
+        logvc.view.backgroundColor = appDelegate.setColor ( name : "backgroundColor") // 背景色
 		self.present(logvc, animated: true, completion: nil)
 	}
 	
 	// ログインの表示
 	@objc func loginView() {
 		let loginvc = LoginViewController()
-		loginvc.view.backgroundColor = appDelegate.backgroundColor // 背景色
+        loginvc.view.backgroundColor = appDelegate.setColor ( name : "backgroundColor" ) // 背景色
 		self.present(loginvc, animated: true, completion: nil)
 	}
 	
@@ -550,7 +550,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 			})
 			
 			// 出席ボタンの表示を変更する
-			self.attendBtn.backgroundColor = self.appDelegate.ifNormalColor //色
+            self.attendBtn.backgroundColor = self.appDelegate.setColor ( name : "ifNormalColor" ) //色
 			self.attendBtn.layer.shadowOpacity = 0.3
 		})
 	}
@@ -996,7 +996,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 	// ボタンの表示変更
 	func btnAuto(){
 		UIView.animate(withDuration: 0.5, animations: { () -> Void in
-			self.attendBtn.backgroundColor = self.appDelegate.ifNormalColor
+            self.attendBtn.backgroundColor = self.appDelegate.setColor ( name : "ifNormalColor")
 			self.attendBtn.setTitle("出席\n（自動ON）", for: .normal)  //タイトル
 			self.attendBtn.isEnabled = true
 			self.attendBtn.layer.shadowOpacity = 0.3
@@ -1004,7 +1004,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 	}
 	func btnNormal(){
 		UIView.animate(withDuration: 0.5, animations: { () -> Void in
-			self.attendBtn.backgroundColor = self.appDelegate.ifNormalColor
+			self.attendBtn.backgroundColor = self.appDelegate.setColor ( name : "ifNormalColor")
 			self.attendBtn.setTitle("出席", for: .normal)  //タイトル
 			self.attendBtn.isEnabled = true
 			self.attendBtn.layer.shadowOpacity = 0.3
@@ -1012,7 +1012,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 	}
 	func btnDisable(){
 		UIView.animate(withDuration: 0.5, animations: { () -> Void in
-			self.attendBtn.backgroundColor = self.appDelegate.ifDisableColor
+            self.attendBtn.backgroundColor = self.appDelegate.setColor ( name : "ifDisableColor")
 			self.attendBtn.setTitle("利用不可", for: .normal)  //タイトル
 			self.attendBtn.isEnabled = false
 			self.attendBtn.layer.shadowOpacity = 0

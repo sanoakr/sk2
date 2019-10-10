@@ -21,7 +21,7 @@ class ConsentViewController: UIViewController,UIWebViewDelegate {
 		navigationController?.setNavigationBarHidden(true, animated: false)
 		
 		// 背景色をセット
-		self.view.backgroundColor = appDelegate.backgroundColor
+        self.view.backgroundColor = appDelegate.setColor ( name : "backgroundColor" )
 		
 		// Status Barの高さを取得
 		let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height
