@@ -116,8 +116,8 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		let safeAreaInsets = UIApplication.shared.keyWindow?.rootViewController?.view.safeAreaInsets.bottom
 		
 		// TableViewの生成(Status barの高さをずらして表示).
-//		let tableHeight = displayHeight - safeAreaInsets! - barHeight - 135
-        let tableHeight = displayHeight - safeAreaInsets! - barHeight - 96
+		let tableHeight = displayHeight - safeAreaInsets! - barHeight - 135
+//        let tableHeight = displayHeight - safeAreaInsets! - barHeight - 96
 		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 95, width: displayWidth, height: tableHeight))
 		
 		// セルの高さ
@@ -184,8 +184,8 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		let displayHeight: CGFloat = self.view.frame.height
 		
 		// TableViewの生成(Status barの高さをずらして表示).
-//		let tableHeight = displayHeight - safeAreaInsets! - barHeight - 135
-        let tableHeight = displayHeight - safeAreaInsets! - barHeight - 96
+		let tableHeight = displayHeight - safeAreaInsets! - barHeight - 135
+//        let tableHeight = displayHeight - safeAreaInsets! - barHeight - 96
 		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 95, width: displayWidth, height: tableHeight))
 
 		// セルの高さ

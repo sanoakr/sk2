@@ -53,7 +53,7 @@ class LoginViewController: UIViewController {
 		let titleView: UITextView = UITextView(frame: CGRect(x:10, y:100, width:self.view.frame.width - 20, height:100))
 		titleView.text = appDelegate.appTitle
 		titleView.font = UIFont.systemFont(ofSize: 20.0)    //フォントサイズ
-//		titleView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0)    // 背景色
+		titleView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0)    // 背景色
 		titleView.isEditable = false    // 編集不可
 		titleView.textAlignment = NSTextAlignment.center    // センター寄せ
 		view.addSubview(titleView)  // Viewに追加

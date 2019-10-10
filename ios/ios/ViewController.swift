@@ -448,6 +448,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 	@objc func helpView(_ sender: UIButton) {
 		let helpvc = HelpViewController()
         helpvc.view.backgroundColor = appDelegate.setColor ( name : "backgroundColor" ) // 背景色
+        helpvc.modalPresentationStyle = .fullScreen
 		self.present(helpvc, animated: true, completion: nil)
 	}
 	
@@ -455,13 +456,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 	@objc func logView(_ sender: UIButton) {
 		let logvc = LogViewController()
         logvc.view.backgroundColor = appDelegate.setColor ( name : "backgroundColor") // 背景色
+        logvc.modalPresentationStyle = .fullScreen
 		self.present(logvc, animated: true, completion: nil)
+//        self.navigationController?.pushViewController(logvc, animated: true)
 	}
 	
 	// ログインの表示
 	@objc func loginView() {
 		let loginvc = LoginViewController()
         loginvc.view.backgroundColor = appDelegate.setColor ( name : "backgroundColor" ) // 背景色
+        loginvc.modalPresentationStyle = .fullScreen
 		self.present(loginvc, animated: true, completion: nil)
 	}
 	
