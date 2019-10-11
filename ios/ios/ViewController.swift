@@ -30,15 +30,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                 labelMsg.text = "Bluetoothをオンにしてください"
                 // 出席ボタンを無効化する
                 btnDisable()
-                debugText2.text += String(describing: "Bluetoothの電源がOff\n")
+                debugText2.text += String(describing: "Bluetooth-Off\n")
+                debugText2.text += String(describing: "beaconFlg:\(beaconFlg)\n")
             case .poweredOn:
                 print("Bluetoothの電源はOn")
+                print("beaconFlg:\(beaconFlg)")
                 self.view.backgroundColor = appDelegate.setColor( name: "backgroundColor" ) // 背景色をセット
                 // 無効化のメッセージを消す
                 labelMsg.text = ""
-                // 出席ボタンを有効化する
-                btnNormal()
-                debugText2.text += String(describing: "Bluetoothの電源がOn\n")
+                if(beaconFlg == true) {
+                    // 出席ボタンを有効化する
+                    btnNormal()
+                } else {
+                    btnDisable()
+                }
+                debugText2.text += String(describing: "Bluetooth-On\n")
+                debugText2.text += String(describing: "beaconFlg:\(beaconFlg)\n")
                 centralManager.scanForPeripherals(withServices: nil, options:nil)
             case .resetting:
                 print("レスティング状態")
@@ -392,7 +399,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                 // データが正常に記録された場合の処理
                 if result == "success" {
                     // ウィンドウを表示
-                    self.showAlertAutoHidden(title : "通知", message: "出席を記録しました", time: 0.5)
+                    self.showAlertAutoHidden(title : "通知（手動）", message: "出席を記録しました", time: 0.5)
                     // バイブレーション
                     AudioServicesPlaySystemSound(1003);
                     AudioServicesDisposeSystemSoundID(1003);
@@ -402,10 +409,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                 // 正常に記録できなかった場合
                 } else {
                     // ウィンドウを表示
-                    self.showAlertAutoHidden(title : "通知", message: "ビーコン情報が取得できなかったため、出席を記録できませんでした", time: 1.0)
+                    self.showAlertAutoHidden(title : "通知（手動）", message: "ビーコン情報が取得できなかったため、出席を記録できませんでした", time: 1.0)
                     // バイブレーション
-                    AudioServicesPlaySystemSound(1003);
-                    AudioServicesDisposeSystemSoundID(1003);
+                    AudioServicesPlaySystemSound(1007);
+                    AudioServicesDisposeSystemSoundID(1007);
                 }
             }
         }
@@ -504,7 +511,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                         // データが正常に記録された場合の処理
                         if result == "success" {
                             // ウィンドウを表示
-                            self.showAlertAutoHidden(title : "通知", message: "出席を自動記録しました", time: 0.5)
+                            self.showAlertAutoHidden(title : "通知（自動）", message: "出席を自動記録しました", time: 0.5)
                             // バイブレーション
                             AudioServicesPlaySystemSound(1003);
                             AudioServicesDisposeSystemSoundID(1003);
@@ -512,10 +519,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                         // 正常に記録できなかった場合
                         } else {
                             // ウィンドウを表示
-                            self.showAlertAutoHidden(title : "通知", message: "ビーコン情報が取得できなかったため、出席を自動記録できませんでした", time: 1.0)
+                            self.showAlertAutoHidden(title : "通知（自動）", message: "ビーコン情報が取得できなかったため、出席を自動記録できませんでした", time: 1.0)
                             // バイブレーション
-                            AudioServicesPlaySystemSound(1003);
-                            AudioServicesDisposeSystemSoundID(1003);
+                            AudioServicesPlaySystemSound(1007);
+                            AudioServicesDisposeSystemSoundID(1007);
                         }
                     }
                 }
@@ -615,7 +622,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 			// 警告を表示し設定するように最速する
 			//
 			// UIAlertControllerを作成する.
-			let myAlert: UIAlertController = UIAlertController(title: "エラー", message: "位置情報サービスのが許可されていません", preferredStyle: .alert)
+			let myAlert: UIAlertController = UIAlertController(title: "エラー", message: "位置情報サービスが許可されていません", preferredStyle: .alert)
 			
 			// OKのアクションを作成する.
 			let myOkAction = UIAlertAction(title: "設定を開く", style: .default) { action in
@@ -851,7 +858,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 		manager.stopRangingBeacons(in: region as! CLBeaconRegion)
 	}
 	
-
+    // ----------------------------------------------------------------------------------------------------------------
+    // 出席データ送信
+    //
+    // - Parameters:
+    //   - user: アカウント
+    //   - key: キー
+    //   - type: タイプ（自動：Aとバージョン番号,手動：Mとバージョン番号）
+    //   - complete: 結果の返り値（success/fail/timeout）
     func sendAttend(user: String, key: String, type: String, complete:@escaping (String) -> ()) {
             
             var resultVal:String = ""
@@ -863,32 +877,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
             // Grand Central Dispatch（GCD）を用いて非同期処理を行う
             DispatchQueue.global().async {
                 // iBeaconの状態をチェック
-                var beaconStatus = 0
+                var beaconStatus = "notfind"
                 var cnt = 0
-                repeat {
-                    if(self.beaconFlg == true) {
-                        beaconStatus = 1
-                    } else {
-                        beaconStatus = 0
-                    }
-                    print(Date())
-                    print(beaconStatus)
-                    sleep(1)
-                    cnt = cnt+1
-                    
-                    // 10カウント（10秒）経過してもbeaconを受信できない場合は処理しない
-                    if(cnt > 10) {
-                        beaconStatus = 2
-                    }
-                } while(beaconStatus == 0)  //処理し続ける条件
                 
-                // メイン処理を実行
-                DispatchQueue.main.async {
+                // リピート開始
+                repeat {
                     
-                    print("beaconStatus: \(beaconStatus)")
-                    
-                    // beaconStatusが1のときのみ処理を行う
-                    if( beaconStatus == 1 ) {
+                    // ビーコンが見つかった場合は送信処理を行う
+                    if(self.beaconDetails.count >= 1) {
+//                    if(self.beaconFlg == true) {
+                        beaconStatus = "find"
+                        
                         // iBeaconの検出数が3以上ある場合
                         if(self.beaconDetails.count > 2) {
                             for i in stride(from: 0, to: 3, by: 1) {
@@ -918,7 +917,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 
                         // 値がカラの場合はエラー
                         if(retVal.isEmpty) {
+                            print("エラー；返り値がかカラのです")
                             resultVal = "fail"
+                            
                         } else {
                             let result:String = retVal["response"] as! String;
 
@@ -929,16 +930,28 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                                 resultVal = "fail"
                             }
                         }
+                        
+                    // ビーコンが見つからなかった場合はカウントアップしてやり直す
                     } else {
-                        resultVal = "fail"
+                        beaconStatus = "notfind"
                     }
-                    complete(resultVal)
-                }
+                    print("\(cnt):\(Date())")
+                    print("beaconStatus:\(beaconStatus)")
+                    sleep(1)
+                    cnt = cnt+1
+                    
+                    // 10カウント（10秒）経過してもbeaconを受信できない場合は処理しない
+                    if(cnt > 10) {
+                        beaconStatus = "notfound"
+                        resultVal = "timeout"
+                    }
+                } while(beaconStatus == "notfind")  //処理し続ける条件
+                
+                print("beaconStatus:\(beaconStatus)")
+                print("resultVal:\(resultVal)")
+                complete(resultVal)
+                
             }
-            
-//            print("resultVal: \(resultVal)")
-            print("--------------------- sendAttend end ---------------------")
-
         }
 	
 	// ローカルログの保存
