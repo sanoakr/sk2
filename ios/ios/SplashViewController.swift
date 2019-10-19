@@ -9,6 +9,7 @@
 import UIKit
 import WebKit
 
+@available(iOS 13.0, *)
 class SplashViewController: UIViewController,UIWebViewDelegate {
 	
 	// UL
@@ -23,7 +24,8 @@ class SplashViewController: UIViewController,UIWebViewDelegate {
 		super.viewDidLoad()
 		
 		// スプラッシュ画面を表示
-		self.view.backgroundColor = appDelegate.ifNormalColor // 背景色をセット
+//		self.view.backgroundColor = appDelegate.ifNormalColor // 背景色をセット
+        self.view.backgroundColor = appDelegate.setColor( name:"ifNormalColor" ) // 背景色をセット
 		navigationController?.setNavigationBarHidden(true, animated: false)
 		
 		// --------------------------------------------------------------------------------------------------------------------------
@@ -32,7 +34,7 @@ class SplashViewController: UIViewController,UIWebViewDelegate {
 		labelTitle.font = UIFont.systemFont(ofSize: 20.0)    //フォントサイズ
 		labelTitle.textAlignment = NSTextAlignment.center    // センター寄せ
 		labelTitle.text = appDelegate.appTitle
-		labelTitle.textColor = UIColor.white
+//		labelTitle.textColor = UIColor.white
 		view.addSubview(labelTitle)  // Viewに追加
 		
 		// UserDefaultの生成.

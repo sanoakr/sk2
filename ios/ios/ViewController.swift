@@ -13,9 +13,54 @@ import CoreLocation
 import AudioToolbox
 import Foundation
 import CoreData
+import CoreBluetooth    // for get bluetooth state
 
-class ViewController: UIViewController, CLLocationManagerDelegate {
-	
+@available(iOS 13.0, *)
+class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralManagerDelegate {
+    
+    // bluetoothの状況を取得
+    func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        
+        switch (central.state) {
+            case .poweredOff:
+                print("Bluetoothの電源がOff")
+                // 背景色を変える
+                self.view.backgroundColor = UIColor(red: 0.33, green: 0.33, blue: 0.33, alpha: 1)    //#ecf0f1
+                // 無効化のメッセージを表示する
+                labelMsg.text = "Bluetoothをオンにしてください"
+                // 出席ボタンを無効化する
+                btnDisable()
+                debugText2.text += String(describing: "Bluetooth-Off\n")
+                debugText2.text += String(describing: "beaconFlg:\(beaconFlg)\n")
+            case .poweredOn:
+                print("Bluetoothの電源はOn")
+                print("beaconFlg:\(beaconFlg)")
+                self.view.backgroundColor = appDelegate.setColor( name: "backgroundColor" ) // 背景色をセット
+                // 無効化のメッセージを消す
+                labelMsg.text = ""
+                if(beaconFlg == true) {
+                    // 出席ボタンを有効化する
+                    btnNormal()
+                } else {
+                    btnDisable()
+                }
+                debugText2.text += String(describing: "Bluetooth-On\n")
+                debugText2.text += String(describing: "beaconFlg:\(beaconFlg)\n")
+                centralManager.scanForPeripherals(withServices: nil, options:nil)
+            case .resetting:
+                print("レスティング状態")
+            case .unauthorized:
+                print("非認証状態")
+            case .unknown:
+                print("不明")
+            case .unsupported:
+                print("非対応")
+        @unknown default:
+            print("unknown default")
+        }
+    }
+    
+
 	// AppDelegateのインスタンスを取得
 	let appDelegate: AppDelegate = UIApplication.shared.delegate as! AppDelegate
 	
@@ -35,6 +80,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	var labelAuto : UILabel!
 	var labelBeacon : UILabel!
     var labelVersion : UILabel!
+    var labelMsg : UILabel!
 	
 	// iBeacon
 	var myLocationManager : CLLocationManager!
@@ -55,9 +101,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	// UserDefaultの生成
 	let myUserDefault:UserDefaults = UserDefaults()
 	
+    var centralManager: CBCentralManager!
+    
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		
+        
+        //CBCentralManagerを初期化
+        centralManager = CBCentralManager(delegate: self, queue: nil)
+
+        
 		// デバイスの固有ID取得
 //		print("DeviceID: \(String(describing: UIDevice.current.identifierForVendor))")
 		
@@ -74,7 +127,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		let user = myUserDefault.string(forKey: "user")
 //		let engName = myUserDefault.string(forKey: "engName")
 		let jpnName = myUserDefault.string(forKey: "jpnName")
-		//        let key = myUserDefault.string(forKey: "key")
+//        let key = myUserDefault.string(forKey: "key")
 		let userInfo = user! + " / " + jpnName!
 		let consent:Bool = UserDefaults.standard.bool(forKey: "consent")
 		
@@ -95,25 +148,26 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// 検証用ユーザーの場合はdebugモードにする
 		// リリースまでは全員debugモードにする
 //        debugMode = 1
-        if(user == appDelegate.debugUser) {
+        if((user?.hasPrefix(appDelegate.debugUser))!) {
             debugMode = 1
         }
-		self.view.backgroundColor = appDelegate.backgroundColor // 背景色をセット
+        self.view.backgroundColor = appDelegate.setColor ( name: "backgroundColor" ) // 背景色をセット
 		
 		// --------------------------------------------------------------------------------------------------------------------------
 		// userを生成
 		labelUser = UILabel(frame: CGRect(x:0, y:navigationBarHeight! + statusVar, width:self.view.frame.width, height:50))
 		labelUser.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
-		labelUser.backgroundColor = #colorLiteral(red: 0.9019607843, green: 0.9137254902, blue: 0.9176470588, alpha: 1)
+        labelUser.backgroundColor = appDelegate.setColor ( name: "ifUserInfoColor" )    // 背景色
 		labelUser.textAlignment = NSTextAlignment.left    // 左寄せ
 		labelUser.text = " \(userInfo)"
 		view.addSubview(labelUser)  // Viewに追加
 		
 		// --------------------------------------------------------------------------------------------------------------------------
 		// debugTextを生成
-		debugText = UITextView(frame: CGRect(x:10, y:navigationBarHeight! + 70, width: (self.view.frame.width - 20 ) / 2, height:160))
+		debugText = UITextView(frame: CGRect(x:0, y:navigationBarHeight! + 70, width: (self.view.frame.width / 2), height:140))
+        debugText.layer.borderWidth = 1.0
 		debugText.font = UIFont.systemFont(ofSize: 7.0)    //フォントサイズ
-		debugText.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 0)    // 背景色
+        debugText.backgroundColor = appDelegate.setColor ( name: "ifDebugBackgroundColor" )    // 背景色
 		debugText.isEditable = false    // 編集不可
 		debugText.textAlignment = NSTextAlignment.left    // 左寄せ
 		
@@ -126,9 +180,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	
 		// --------------------------------------------------------------------------------------------------------------------------
 		// debugText2を生成
-		debugText2 = UITextView(frame: CGRect(x:10 +  (self.view.frame.width - 20 ) / 2, y:navigationBarHeight! + 70, width: (self.view.frame.width - 20 ) / 2, height:160))
+		debugText2 = UITextView(frame: CGRect(x:(self.view.frame.width / 2), y:navigationBarHeight! + 70, width: (self.view.frame.width / 2), height:140))
+        debugText2.layer.borderWidth = 1.0
 		debugText2.font = UIFont.systemFont(ofSize: 7.0)    //フォントサイズ
-		debugText2.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)    // 背景色
+        debugText2.backgroundColor = appDelegate.setColor ( name: "ifDebugBackgroundColor" )    // 背景色
 		debugText2.isEditable = false    // 編集不可
 		debugText2.textAlignment = NSTextAlignment.left    // 左寄せ
 		
@@ -155,7 +210,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			SWautoSender.isOn = true    // SwitchをOnに設定
 		}
 		// 背景色を設定
-		SWautoSender.onTintColor = appDelegate.ifNormalColor
+        SWautoSender.onTintColor = appDelegate.setColor ( name: "ifNormalColor" )
 		
 		// SwitchのOn/Off切り替わりの際に、呼ばれるイベントを設定する.
 		SWautoSender.addTarget(self, action: #selector(ViewController.onClickSWautoSender(sender:)), for: UIControl.Event.valueChanged)
@@ -193,6 +248,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		btnDisable()
 		view.addSubview(attendBtn)  // Viewに追加
 		
+        // --------------------------------------------------------------------------------------------------------------------------
+        //   メッセージラベル
+        labelMsg = UILabel(frame: CGRect(
+                        x:0,
+                        y: Int(self.view.frame.height - 160),
+                        width:Int(self.view.frame.width),
+                        height:30
+        ))
+//        labelMsg.layer.borderWidth = 2.0    // 枠線の幅
+//        labelMsg.layer.borderColor = UIColor.red.cgColor    // 枠線の色
+        labelMsg.font = UIFont.systemFont(ofSize: 14.0)    //フォントサイズ
+        labelMsg.textAlignment = NSTextAlignment.center    // センター寄せ
+        labelMsg.text = ""
+        view.addSubview(labelMsg)  // Viewに追加
+        
 		// --------------------------------------------------------------------------------------------------------------------------
 		// ログボタンを設置
 		let logViewBtn = UIButton(
@@ -206,11 +276,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		logViewBtn.setBackgroundImage(btnLogImageDefault!, for: .normal)
 		logViewBtn.setTitle("ログ", for: .normal)  //タイトル
 		logViewBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
-		logViewBtn.setTitleColor(appDelegate.ifNormalColor, for: .normal) // タイトルの色
+        logViewBtn.setTitleColor(appDelegate.setColor ( name : "ifNormalColor" ), for: .normal) // タイトルの色
 		logViewBtn.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: -90.0, right: 0.0)
 		logViewBtn.layer.cornerRadius = logViewBtn.frame.size.width * 0.5 //丸まり
 		logViewBtn.addTarget(self, action: #selector(ViewController.logView(_:)), for: .touchUpInside)
-		logViewBtn.layer.borderColor = appDelegate.ifNormalColor.cgColor
+        logViewBtn.layer.borderColor = appDelegate.setColor ( name : "ifNormalColor" ).cgColor
 		logViewBtn.layer.borderWidth = 1
 		view.addSubview(logViewBtn)  // Viewに追加
 		
@@ -226,11 +296,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		helpViewBtn.setBackgroundImage(btnHelpImageDefault!, for: .normal)
 		helpViewBtn.setTitle("ヘルプ", for: .normal)  //タイトル
 		helpViewBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
-		helpViewBtn.setTitleColor(appDelegate.ifNormalColor, for: .normal) // タイトルの色
+        helpViewBtn.setTitleColor(appDelegate.setColor ( name : "ifNormalColor" ), for: .normal) // タイトルの色
 		helpViewBtn.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: -90.0, right: 0.0)
 		helpViewBtn.layer.cornerRadius = helpViewBtn.frame.size.width * 0.5 //丸まり
 		helpViewBtn.addTarget(self, action: #selector(ViewController.helpView(_:)), for: .touchUpInside)
-		helpViewBtn.layer.borderColor = appDelegate.ifNormalColor.cgColor
+        helpViewBtn.layer.borderColor = appDelegate.setColor ( name : "ifNormalColor" ).cgColor
 		helpViewBtn.layer.borderWidth = 1
 		view.addSubview(helpViewBtn)  // Viewに追加
 		
@@ -249,11 +319,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		logoutBtn.setBackgroundImage(btnLogoutImageDefault!, for: .normal)
 		logoutBtn.setTitle("ログアウト", for: .normal)  //タイトル
 		logoutBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)
-		logoutBtn.setTitleColor(appDelegate.ifNormalColor, for: .normal) // タイトルの色
+        logoutBtn.setTitleColor(appDelegate.setColor ( name : "ifNormalColor" ), for: .normal) // タイトルの色
 		logoutBtn.titleEdgeInsets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: -90.0, right: 0.0)
 		logoutBtn.layer.cornerRadius = logoutBtn.frame.size.width * 0.5 //丸まり
 		logoutBtn.addTarget(self, action: #selector(ViewController.onClickLogout(sender:)), for: .touchUpInside)
-		logoutBtn.layer.borderColor = appDelegate.ifNormalColor.cgColor
+        logoutBtn.layer.borderColor = appDelegate.setColor ( name : "ifNormalColor" ).cgColor
 		logoutBtn.layer.borderWidth = 1
 //		logoutBtn.titleEdgeInsets = UIEdgeInsetsMake(0, -50, 0, 50);
 		view.addSubview(logoutBtn)  // Viewに追加
@@ -302,31 +372,50 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	
 	// 出席ボタンイベント　ボタン押下
 	@objc func sendAttend(sender: UIButton) {
-		// ボタンの動き
-		attendBtn.backgroundColor = appDelegate.ifOnDownColor //色
-		attendBtn.layer.shadowOpacity = 0
-		
-		print("beaconDetails: \(String(describing: beaconDetails))")
-		
-		// 登録されているUserDefaultから設定値を呼び出す
-		let user:String = myUserDefault.string(forKey: "user")!
-		let key:String = myUserDefault.string(forKey: "key")!
-		
-		// データ送信
-		let result = sendAttend(user: user, key: key, type: "M\(version)")
-		
-		// データが正常に記録された場合の処理
-		if result == "success" {
-			
-			// ウィンドウを表示
-			showAlertAutoHidden(title : "出席を記録しました", message: "", time: 0.5)
-			
-			// バイブレーション
-			AudioServicesPlaySystemSound(1003);
-			AudioServicesDisposeSystemSoundID(1003);
-			
-			print("sendAttend: success")
-		}
+        
+        // ボタンの動き
+        self.attendBtn.backgroundColor = appDelegate.setColor( name : "ifOnDownColor" ) //色
+        self.attendBtn.layer.shadowOpacity = 0
+        
+        // キューを生成してサブスレッドで実行
+        DispatchQueue(label: "jp.ac.ryukoku.sk2").async {
+            
+            print("beaconDetails: \(String(describing: self.beaconDetails))")
+            
+            // 登録されているUserDefaultから設定値を呼び出す
+            let user:String = self.myUserDefault.string(forKey: "user")!
+            let key:String = self.myUserDefault.string(forKey: "key")!
+            
+            var result:String! = nil
+//            let result = sendAttend(user: user, key: key, type: "M\(self.version)")
+            self.sendAttend(user: user, key: key, type: "M\(self.version)") { (resultVal) in
+                result =  resultVal
+//                print("resultValは: \(resultVal)")
+            }
+            
+            self.appDelegate.wait( { return result == nil } ) {
+//                print("result: \(String(describing: result))")
+
+                // データが正常に記録された場合の処理
+                if result == "success" {
+                    // ウィンドウを表示
+                    self.showAlertAutoHidden(title : "通知（手動）", message: "出席を記録しました", time: 0.5)
+                    // バイブレーション
+                    AudioServicesPlaySystemSound(1003);
+                    AudioServicesDisposeSystemSoundID(1003);
+
+//                    print("sendAttend: success")
+                    
+                // 正常に記録できなかった場合
+                } else {
+                    // ウィンドウを表示
+                    self.showAlertAutoHidden(title : "通知（手動）", message: "ビーコン情報が取得できなかったため、出席を記録できませんでした", time: 1.0)
+                    // バイブレーション
+                    AudioServicesPlaySystemSound(1007);
+                    AudioServicesDisposeSystemSoundID(1007);
+                }
+            }
+        }
 	}
 	
 	// 自動送信機能のトグルスイッチ
@@ -365,21 +454,25 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	// ヘルプの表示
 	@objc func helpView(_ sender: UIButton) {
 		let helpvc = HelpViewController()
-		helpvc.view.backgroundColor = appDelegate.backgroundColor // 背景色
+        helpvc.view.backgroundColor = appDelegate.setColor ( name : "backgroundColor" ) // 背景色
+        helpvc.modalPresentationStyle = .fullScreen
 		self.present(helpvc, animated: true, completion: nil)
 	}
 	
 	// ログの表示
 	@objc func logView(_ sender: UIButton) {
 		let logvc = LogViewController()
-		logvc.view.backgroundColor = appDelegate.backgroundColor // 背景色
+        logvc.view.backgroundColor = appDelegate.setColor ( name : "backgroundColor") // 背景色
+        logvc.modalPresentationStyle = .fullScreen
 		self.present(logvc, animated: true, completion: nil)
+//        self.navigationController?.pushViewController(logvc, animated: true)
 	}
 	
 	// ログインの表示
 	@objc func loginView() {
 		let loginvc = LoginViewController()
-		loginvc.view.backgroundColor = appDelegate.backgroundColor // 背景色
+        loginvc.view.backgroundColor = appDelegate.setColor ( name : "backgroundColor" ) // 背景色
+        loginvc.modalPresentationStyle = .fullScreen
 		self.present(loginvc, animated: true, completion: nil)
 	}
 	
@@ -394,21 +487,46 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		// 自動送信がオンの場合
 		if(autoSender == 1) {
 			
-			// 登録されているUserDefaultから設定値を呼び出す
-			let user:String = myUserDefault.string(forKey: "user")!
-			let key:String = myUserDefault.string(forKey: "key")!
-			
-			print("自動送信機能のチェック：\(appDelegate.postInterval)ごと")   //デバッグ
-			
-			// データ送信
-			let result = sendAttend(user: user, key: key, type: "A\(version)")
-			// データが正常に記録された場合の処理
-			if result == "success" {
-				// バイブレーション
-				AudioServicesPlaySystemSound(1003);
-				AudioServicesDisposeSystemSoundID(1003);
-				print("Attendance data was sent to the server.")
-			}
+            // 圏外かどうか判定
+            if(beaconFlg == true) {
+                
+                print("自動送信機能のチェック：\(appDelegate.postInterval)ごと")   //デバッグ
+                
+                // キューを生成してサブスレッドで実行
+                DispatchQueue(label: "jp.ac.ryukoku.sk2").async {
+                    
+                    print("beaconDetails: \(String(describing: self.beaconDetails))")
+                    
+                    // 登録されているUserDefaultから設定値を呼び出す
+                    let user:String = self.myUserDefault.string(forKey: "user")!
+                    let key:String = self.myUserDefault.string(forKey: "key")!
+                    
+                    var result:String! = nil
+                    self.sendAttend(user: user, key: key, type: "A\(self.version)") { (resultVal) in
+                        result =  resultVal
+                    }
+                    
+                    self.appDelegate.wait( { return result == nil } ) {
+
+                        // データが正常に記録された場合の処理
+                        if result == "success" {
+                            // ウィンドウを表示
+                            self.showAlertAutoHidden(title : "通知（自動）", message: "出席を自動記録しました", time: 0.5)
+                            // バイブレーション
+                            AudioServicesPlaySystemSound(1003);
+                            AudioServicesDisposeSystemSoundID(1003);
+
+                        // 正常に記録できなかった場合
+                        } else {
+                            // ウィンドウを表示
+                            self.showAlertAutoHidden(title : "通知（自動）", message: "ビーコン情報が取得できなかったため、出席を自動記録できませんでした", time: 1.0)
+                            // バイブレーション
+                            AudioServicesPlaySystemSound(1007);
+                            AudioServicesDisposeSystemSoundID(1007);
+                        }
+                    }
+                }
+            }
 		}
 	}
 	
@@ -443,7 +561,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			})
 			
 			// 出席ボタンの表示を変更する
-			self.attendBtn.backgroundColor = self.appDelegate.ifNormalColor //色
+            self.attendBtn.backgroundColor = self.appDelegate.setColor ( name : "ifNormalColor" ) //色
 			self.attendBtn.layer.shadowOpacity = 0.3
 		})
 	}
@@ -504,7 +622,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			// 警告を表示し設定するように最速する
 			//
 			// UIAlertControllerを作成する.
-			let myAlert: UIAlertController = UIAlertController(title: "エラー", message: "位置情報サービスのが許可されていません", preferredStyle: .alert)
+			let myAlert: UIAlertController = UIAlertController(title: "エラー", message: "位置情報サービスが許可されていません", preferredStyle: .alert)
 			
 			// OKのアクションを作成する.
 			let myOkAction = UIAlertAction(title: "設定を開く", style: .default) { action in
@@ -528,7 +646,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 			// 許可がある場合はiBeacon検出を開始.
 			startMyMonitoring()
 			break
-		}
+        @unknown default:
+            print("unknown default")
+        }
 	}
 	
 	// startMyMonitoring()内のでstartMonitoringForRegionが正常に開始されると呼び出される
@@ -666,23 +786,29 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 				case CLProximity.unknown :
 //					print("Proximity: Unknown");
 					proximity = "3.Unknown"
+                    beaconFlg = false
 					break
 					
 				case CLProximity.far:
 //					print("Proximity: Far");
 					proximity = "2.Far"
+                    beaconFlg = true
 					break
 					
 				case CLProximity.near:
 //					print("Proximity: Near");
 					proximity = "1.Near"
+                    beaconFlg = true
 					break
 					
 				case CLProximity.immediate:
 //					print("Proximity: Immediate");
 					proximity = "0.Immediate"
+                    beaconFlg = true
 					break
-				}
+                @unknown default:
+                    print("unknown default")
+                }
 				
 				// 変数に保存
 				beaconUuids.add(beaconUUID.uuidString)
@@ -732,92 +858,101 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 		manager.stopRangingBeacons(in: region as! CLBeaconRegion)
 	}
 	
-	
-	func sendAttend(user: String, key: String, type: String) -> String{
-		
-        let resultVal:String
-		let now = appDelegate.currentTime()
-        var sendtext = "\(key),\(type),\(now)"
-		
-		print("--------------------- sendAttend begin ---------------------")
-		
-//        var testData:Array = self.beaconDetails
-//        print("data1:\(testData)")
-//
-//        for i in 0..<5 {
-//            sleep(1)
-//            testData = testData + self.beaconDetails
-//            print("data\(i):\(testData)")
-//        }
-        
-//        // iBeacon値の正確性を高めるためscanを10回分蓄積する
-//        // キューを生成してサブスレッドで実行
-//        DispatchQueue(label: "jp.classmethod.app.queue").async {
-//            var testData:Array = self.beaconDetails
-//            print("data1:\(testData)")
-//
-//            for i in 0..<5 {
-//                sleep(1)
-//                testData = testData + self.beaconDetails
-//                print("data\(i):\(testData)")
-//            }
-//
-//            // メインスレッドで実行
-//            DispatchQueue.main.sync {
-//                print("finish")
-//
-//
-//
-//            }
-//        }
-//        print("--------------------- sendAttend end ---------------------")
-//        return "resultVal"
-        
-        // iBeaconの検出数が3以上ある場合
-        if(beaconDetails.count > 2) {
-            for i in stride(from: 0, to: 3, by: 1) {
-                sendtext += ",\(beaconDetails[i])"
-                print("\(i)回目のループの値は\(beaconDetails[i])")
-            }
-        } else {
-            // 検出したiBeaconの値を入れる
-            for value in beaconDetails {
-                sendtext += ",\(value)"
-            }
-            // 不足分をカラの値に入れる
-            for _ in stride(from: 0, to: (3 - beaconDetails.count), by: 1) {
-                sendtext += ",,,"
+    // ----------------------------------------------------------------------------------------------------------------
+    // 出席データ送信
+    //
+    // - Parameters:
+    //   - user: アカウント
+    //   - key: キー
+    //   - type: タイプ（自動：Aとバージョン番号,手動：Mとバージョン番号）
+    //   - complete: 結果の返り値（success/fail/timeout）
+    func sendAttend(user: String, key: String, type: String, complete:@escaping (String) -> ()) {
+            
+            var resultVal:String = ""
+            let now = appDelegate.currentTime()
+            var sendtext = "\(key),\(type),\(now)"
+            
+            print("--------------------- sendAttend begin ---------------------")
+            
+            // Grand Central Dispatch（GCD）を用いて非同期処理を行う
+            DispatchQueue.global().async {
+                // iBeaconの状態をチェック
+                var beaconStatus = "notfind"
+                var cnt = 0
+                
+                // リピート開始
+                repeat {
+                    
+                    // ビーコンが見つかった場合は送信処理を行う
+                    if(self.beaconDetails.count >= 1) {
+//                    if(self.beaconFlg == true) {
+                        beaconStatus = "find"
+                        
+                        // iBeaconの検出数が3以上ある場合
+                        if(self.beaconDetails.count > 2) {
+                            for i in stride(from: 0, to: 3, by: 1) {
+                                sendtext += ",\(self.beaconDetails[i])"
+                                print("\(i)回目のループの値は\(self.beaconDetails[i])")
+                            }
+                        } else {
+                            // 検出したiBeaconの値を入れる
+                            for value in self.beaconDetails {
+                                sendtext += ",\(value)"
+                            }
+                            // 不足分をカラの値に入れる
+                            for _ in stride(from: 0, to: (3 - self.beaconDetails.count), by: 1) {
+                                sendtext += ",,,"
+                            }
+                        }
+                        print("sendtext:\(sendtext)")
+
+                        // socket通信
+                        self.Connection.connect()
+
+                        // ローカルログへ保存
+                        self.saveLocalLog(sendtext: sendtext)
+
+                        sendtext = "\(user)," + sendtext
+                        let retVal = self.Connection.sendCommand(command: sendtext)
+
+                        // 値がカラの場合はエラー
+                        if(retVal.isEmpty) {
+                            print("エラー；返り値がかカラのです")
+                            resultVal = "fail"
+                            
+                        } else {
+                            let result:String = retVal["response"] as! String;
+
+                            // 出席が正常に記録された場合の処理
+                            if result == "success" {
+                                resultVal = "success"
+                            } else {
+                                resultVal = "fail"
+                            }
+                        }
+                        
+                    // ビーコンが見つからなかった場合はカウントアップしてやり直す
+                    } else {
+                        beaconStatus = "notfind"
+                    }
+                    print("\(cnt):\(Date())")
+                    print("beaconStatus:\(beaconStatus)")
+                    sleep(1)
+                    cnt = cnt+1
+                    
+                    // 10カウント（10秒）経過してもbeaconを受信できない場合は処理しない
+                    if(cnt > 10) {
+                        beaconStatus = "notfound"
+                        resultVal = "timeout"
+                    }
+                } while(beaconStatus == "notfind")  //処理し続ける条件
+                
+                print("beaconStatus:\(beaconStatus)")
+                print("resultVal:\(resultVal)")
+                complete(resultVal)
+                
             }
         }
-        print("sendtext:\(sendtext)")
-
-        // socket通信
-        Connection.connect()
-
-        // ローカルログへ保存
-        saveLocalLog(sendtext: sendtext)
-
-        sendtext = "\(user)," + sendtext
-        let retVal = Connection.sendCommand(command: sendtext)
-
-        // 値がカラの場合はエラー
-        if(retVal.isEmpty) {
-            resultVal = "fail"
-        } else {
-            let result:String = retVal["response"] as! String;
-
-            // 出席が正常に記録された場合の処理
-            if result == "success" {
-                resultVal = "success"
-            } else {
-                resultVal = "fail"
-            }
-        }
-        
-        print("--------------------- sendAttend end ---------------------")
-
-        return resultVal
-	}
 	
 	// ローカルログの保存
 	@objc internal func saveLocalLog(sendtext: String) {
@@ -878,7 +1013,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	// ボタンの表示変更
 	func btnAuto(){
 		UIView.animate(withDuration: 0.5, animations: { () -> Void in
-			self.attendBtn.backgroundColor = self.appDelegate.ifNormalColor
+            self.attendBtn.backgroundColor = self.appDelegate.setColor ( name : "ifNormalColor")
 			self.attendBtn.setTitle("出席\n（自動ON）", for: .normal)  //タイトル
 			self.attendBtn.isEnabled = true
 			self.attendBtn.layer.shadowOpacity = 0.3
@@ -886,7 +1021,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	}
 	func btnNormal(){
 		UIView.animate(withDuration: 0.5, animations: { () -> Void in
-			self.attendBtn.backgroundColor = self.appDelegate.ifNormalColor
+			self.attendBtn.backgroundColor = self.appDelegate.setColor ( name : "ifNormalColor")
 			self.attendBtn.setTitle("出席", for: .normal)  //タイトル
 			self.attendBtn.isEnabled = true
 			self.attendBtn.layer.shadowOpacity = 0.3
@@ -894,7 +1029,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 	}
 	func btnDisable(){
 		UIView.animate(withDuration: 0.5, animations: { () -> Void in
-			self.attendBtn.backgroundColor = self.appDelegate.ifDisableColor
+            self.attendBtn.backgroundColor = self.appDelegate.setColor ( name : "ifDisableColor")
 			self.attendBtn.setTitle("利用不可", for: .normal)  //タイトル
 			self.attendBtn.isEnabled = false
 			self.attendBtn.layer.shadowOpacity = 0
@@ -906,8 +1041,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 // SSL Socketコネクション
 
 // AppDelegateのインスタンスを取得
+@available(iOS 13.0, *)
 let appDelegate: AppDelegate = UIApplication.shared.delegate as! AppDelegate
 
+@available(iOS 13.0, *)
 class Connection3: NSObject, StreamDelegate {
 	
 	let ServerAddress: CFString = appDelegate.serverIp as CFString //IPアドレスを指定
@@ -929,7 +1066,7 @@ class Connection3: NSObject, StreamDelegate {
 		self.outputStream = writeStream!.takeRetainedValue()
 		
 		let dict = [
-			kCFStreamSSLValidatesCertificateChain: kCFBooleanFalse,     // allow self-signed certificate
+            kCFStreamSSLValidatesCertificateChain: kCFBooleanFalse,     // allow self-signed certificate
 			kCFStreamSSLLevel: "kCFStreamSocketSecurityLevelNegotiatedSSL"    // don't understand, why there isn't a constant for version 1.2
 			] as CFDictionary
 		

@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 
+@available(iOS 13.0, *)
 class LoginViewController: UIViewController {
 	
 	// AppDelegateのインスタンスを取得
@@ -39,7 +40,8 @@ class LoginViewController: UIViewController {
 //			}
 //		}
 //
-		self.view.backgroundColor = appDelegate.backgroundColor  // 背景色をセット
+//		self.view.backgroundColor = appDelegate.backgroundColor  // 背景色をセット
+        self.view.backgroundColor = appDelegate.setColor( name: "backgroundColor" )
 		self.navigationItem.hidesBackButton = true	//　バックボタンを消す
 		
 		// --------------------------------------------------------------------------------------------------------------------------
@@ -61,16 +63,18 @@ class LoginViewController: UIViewController {
 		let userLabel: UILabel = UILabel(frame: CGRect(x:20, y:200, width:self.view.frame.width - 40, height:30))
 		userLabel.text = "全学統合認証ID / パスワード"
 		userLabel.font = UIFont.systemFont(ofSize: 15.0)  //フォントサイズ
-		userLabel.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0)  // 背景色
+//		userLabel.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0)  // 背景色
 		view.addSubview(userLabel)  // TextViewをViewに追加
 		
 		// useridFieldを生成
 		useridField = UITextField(frame: CGRect(x:20, y:230, width:self.view.frame.width - 40, height:30))
-		useridField.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)    // 背景色
+//		useridField.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)    // 背景色
+//        useridField.backgroundColor = appDelegate.ifUserInfoColor
+        useridField.backgroundColor = appDelegate.setColor( name: "ifUserInfoColor" )
 		useridField.borderStyle = .none
 		useridField.autocapitalizationType = .none
 		useridField.placeholder = "全学統合認証ID"
-		useridField.bounds.insetBy(dx: 10, dy: 10)
+//		useridField.bounds.insetBy(dx: 10, dy: 10)
 		useridField.layer.cornerRadius = 0
 		useridField.layer.borderWidth  = 0
 		useridField.layer.masksToBounds = true
@@ -84,7 +88,9 @@ class LoginViewController: UIViewController {
 		passwordField = UITextField(frame: CGRect(x:20, y:265, width:self.view.frame.width - 40, height:30))
 		passwordField.leftViewMode = UITextField.ViewMode.always
 		passwordField.placeholder = "パスワード"
-		passwordField.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)    // 背景色
+//		passwordField.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)    // 背景色
+//        passwordField.backgroundColor = appDelegate.ifUserInfoColor
+        passwordField.backgroundColor = appDelegate.setColor( name: "ifUserInfoColor" )
 		passwordField.borderStyle = .none
 		passwordField.layer.cornerRadius = 0
 		passwordField.layer.borderWidth  = 0
@@ -99,7 +105,8 @@ class LoginViewController: UIViewController {
 		// ログインボタン
 		let loginBtn = UIButton(frame: CGRect(x:20,y: 330,width: self.view.frame.width - 40, height:40))
 		loginBtn.setTitle("ログイン", for: .normal)  //タイトル
-		loginBtn.backgroundColor = appDelegate.ifNormalColor
+//		loginBtn.backgroundColor = appDelegate.ifNormalColor
+        loginBtn.backgroundColor = appDelegate.setColor( name: "ifNormalColor" )
 		loginBtn.addTarget(self, action: #selector(LoginViewController.login(_:)), for: .touchUpInside)
 		view.addSubview(loginBtn)  // Viewに追加
         
@@ -184,8 +191,7 @@ class LoginViewController: UIViewController {
 			
 			// トップ画面に遷移
 			let modalViewController = ViewController()
-			let navigationController = UINavigationController(rootViewController: modalViewController)
-			self.present(navigationController, animated: true , completion: nil)
+            self.navigationController?.pushViewController(modalViewController, animated: false)
 			
 		} else if result == "timeout" {
             
@@ -230,6 +236,7 @@ class LoginViewController: UIViewController {
 	}
 }
 
+@available(iOS 13.0, *)
 class ServerAuth: NSObject, StreamDelegate {
 	
 	let ServerAddress: CFString = appDelegate.serverIp as CFString //IPアドレスを指定
@@ -267,7 +274,7 @@ class ServerAuth: NSObject, StreamDelegate {
 		self.outputStream = writeStream!.takeRetainedValue()
 		
 		let dict = [
-			kCFStreamSSLValidatesCertificateChain: kCFBooleanFalse,     // allow self-signed certificate
+            kCFStreamSSLValidatesCertificateChain: kCFBooleanFalse,     // allow self-signed certificate
 			kCFStreamSSLLevel: "kCFStreamSocketSecurityLevelNegotiatedSSL"    // don't understand, why there isn't a constant for version 1.2
 			] as CFDictionary
 		

@@ -8,6 +8,7 @@
 
 import UIKit
 
+@available(iOS 13.0, *)
 class ConsentViewController: UIViewController,UIWebViewDelegate {
 	
 	// AppDelegateのインスタンスを取得
@@ -20,7 +21,7 @@ class ConsentViewController: UIViewController,UIWebViewDelegate {
 		navigationController?.setNavigationBarHidden(true, animated: false)
 		
 		// 背景色をセット
-		self.view.backgroundColor = appDelegate.backgroundColor
+        self.view.backgroundColor = appDelegate.setColor ( name : "backgroundColor" )
 		
 		// Status Barの高さを取得
 		let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height
@@ -48,7 +49,6 @@ class ConsentViewController: UIViewController,UIWebViewDelegate {
 		let myTextView: UITextView = UITextView(frame: CGRect(x:10, y:barHeight + 35, width:displayWidth - 20, height:(displayHeight - navigationBarHeight - barHeight - toolbarHeight) ))	// TextView生成
 		myTextView.text = appDelegate.consentText	// 表示コンテンツ
 		myTextView.font = UIFont.systemFont(ofSize: 14.0)	// フォントの設定
-		myTextView.textColor = UIColor.black	// フォントの色の設定
 		myTextView.dataDetectorTypes = UIDataDetectorTypes.all	// リンク、日付などを自動的に検出してリンクに変換
 		myTextView.isEditable = false	// テキストを編集不可
 		self.view.addSubview(myTextView)	// TextViewをViewに追加

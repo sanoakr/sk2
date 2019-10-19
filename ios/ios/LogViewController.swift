@@ -8,10 +8,7 @@
 
 import UIKit
 
-@available(iOS 11.0, *)
-@available(iOS 11.0, *)
-@available(iOS 11.0, *)
-@available(iOS 11.0, *)
+@available(iOS 13.0, *)
 class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 	
 	// AppDelegateのインスタンスを取得
@@ -55,7 +52,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		segment.frame = CGRect(x: 20, y: Int(barHeight + 55), width: Int(self.view.frame.width) - 40, height: 30)
 		
 		// 背景色を設定
-		segment.tintColor = appDelegate.ifNormalColor
+        segment.tintColor = appDelegate.setColor ( name : "ifNormalColor" )
 		
 		// ボタンを押した時の処理を設定
 		segment.addTarget(self, action: #selector(LogViewController.change(segment:)), for: UIControl.Event.valueChanged)
@@ -73,7 +70,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		// 戻るボタン
 		let backButton = UIButton(frame: CGRect(x:0,y: Int(self.view.frame.height - safeAreaInsets! - 40),width: Int(self.view.frame.width),height:40))
 		backButton.setTitle("閉じる", for: .normal)  //タイトル
-		backButton.backgroundColor = appDelegate.ifNormalColor
+        backButton.backgroundColor = appDelegate.setColor ( name : "ifNormalColor" )
 		backButton.addTarget(self, action: #selector(LogViewController.back(_:)), for: .touchUpInside)
 		view.addSubview(backButton)  // Viewに追加
 		
@@ -98,8 +95,9 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		
 		// socket通信
 		let sendtext = "\(userName),\(key)"
-		let tmp = Connection.sendCommand(command: sendtext)
-		
+        _ = Connection.sendCommand(command: sendtext)
+        let tmp = Connection.sendCommand(command: "end")
+
 		// keysを昇順でソートする
 		let retval = tmp.sorted(){ $0.0 < $1.0 }
 		
@@ -120,6 +118,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		
 		// TableViewの生成(Status barの高さをずらして表示).
 		let tableHeight = displayHeight - safeAreaInsets! - barHeight - 135
+//        let tableHeight = displayHeight - safeAreaInsets! - barHeight - 96
 		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 95, width: displayWidth, height: tableHeight))
 		
 		// セルの高さ
@@ -187,6 +186,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		
 		// TableViewの生成(Status barの高さをずらして表示).
 		let tableHeight = displayHeight - safeAreaInsets! - barHeight - 135
+//        let tableHeight = displayHeight - safeAreaInsets! - barHeight - 96
 		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 95, width: displayWidth, height: tableHeight))
 
 		// セルの高さ
@@ -322,12 +322,20 @@ class MyCell: UITableViewCell {
 		super.init(style: style, reuseIdentifier: reuseIdentifier)
 		
 		labelMode = UILabel()
-		labelMode.backgroundColor = appDelegate.backgroundColor
+        if #available(iOS 13.0, *) {
+            labelMode.backgroundColor = appDelegate.setColor ( name : "backgroundColor" )
+        } else {
+            labelMode.backgroundColor = UIColor.white
+        }
 		contentView.addSubview(labelMode)
 		
 		labelDate = UILabel()
 		labelDate.font = UIFont.boldSystemFont(ofSize: UIFont.labelFontSize)	//  ボールド
-		labelDate.backgroundColor = appDelegate.backgroundColor
+        if #available(iOS 13.0, *) {
+            labelDate.backgroundColor = appDelegate.setColor ( name : "backgroundColor" )
+        } else {
+            labelDate.backgroundColor = UIColor.white
+        }
 		contentView.addSubview(labelDate)
 		
 		labelVal1 = UILabel()
@@ -365,6 +373,7 @@ class MyCell: UITableViewCell {
 // --------------------------------------------------------------------------------------------------------------------------
 // SSL Socketコネクション
 
+@available(iOS 13.0, *)
 class Connection2: NSObject, StreamDelegate {
 	
 	let ServerAddress: CFString = appDelegate.serverIp as CFString //IPアドレスを指定
@@ -386,7 +395,7 @@ class Connection2: NSObject, StreamDelegate {
 		self.outputStream = writeStream!.takeRetainedValue()
 		
 		let dict = [
-			kCFStreamSSLValidatesCertificateChain: kCFBooleanFalse,     // allow self-signed certificate
+            kCFStreamSSLValidatesCertificateChain: kCFBooleanFalse,     // allow self-signed certificate
 			kCFStreamSSLLevel: "kCFStreamSocketSecurityLevelNegotiatedSSL"    // don't understand, why there isn't a constant for version 1.2
 			] as CFDictionary
 		
@@ -420,72 +429,62 @@ class Connection2: NSObject, StreamDelegate {
 		
 		// 返り値を定義
 		var retval = Dictionary<Int, String>()
-		var countCommand = command.data(using: String.Encoding.utf8, allowLossyConversion: false)!
-		let commandLength = countCommand.count
-		let bytes : String = countCommand.withUnsafeMutableBytes{
+        
+		var ccommand = command.data(using: String.Encoding.utf8, allowLossyConversion: false)!
+		let commandLength = ccommand.count
+		let text : String = ccommand.withUnsafeMutableBytes{
 			bytes in return String(bytesNoCopy: bytes, length: commandLength, encoding: String.Encoding.utf8, freeWhenDone: false)!
 		}
 		
-		// エラー処理
-		var timeout = 5 * 100000 // タイムアウト値は5秒
-		while !self.outputStream.hasSpaceAvailable {
-			usleep(1000) // wait until the socket is ready
-			timeout -= 100
-			if timeout < 0 {
-				print("time out")
-				retval[0] = "Error: time out."
-				self.inputStream.close()
-				self.inputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
-				self.outputStream.close()
-				self.outputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
-				return retval // disconnectStream will be called.
-			} else if self.outputStream.streamError != nil {
-				print("disconnect Stream")
-				retval[0] = "Error: disconnect Stream."
-				self.inputStream.close()
-				self.inputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
-				self.outputStream.close()
-				self.outputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
-				return retval
-			}
-		}
-		
-		print("write")
-		// コマンドをサーバーに送信
-		self.outputStream.write( command, maxLength: bytes.utf8.count)
-		
-		
-		print("Send: \(command)")
-		
-		self.outputStream.close()
-		self.outputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
-		
-		//        while(!inputStream.hasBytesAvailable){}   //不要かどうか確認中（2018/08/19）
-		let bufferSize = 2048
-		var buffer = Array<UInt8>(repeating: 0, count: bufferSize)
-		let bytesRead = inputStream.read(&buffer, maxLength: bufferSize)
-		if (bytesRead >= 0) {
-			//            let read = String(bytes: buffer, encoding: String.Encoding.utf8)!
-			let read = NSString(bytes: &buffer, length: bytesRead, encoding: String.Encoding.utf8.rawValue)!
-			print("Receive:\n\(read)")   //デバッグ
-			
-			// ログがない場合
-			if read.contains("Error") {
-				retval[0] = "Error: Log not found."
-				
-				// ログを配列に格納
-			} else {
-				let splitRead = read.components(separatedBy: "\n")
-				var num = 0
-				for str in splitRead {
-					retval[num] = str
-					num = num + 1
-				}
-			}
-		}
-		self.inputStream.close()
-		self.inputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
-		
+        
+        // "end"を受信したら接続切断
+        if (String(describing: command) == "end") {
+            
+            self.outputStream.close()
+            self.outputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
+            
+            let read = NSMutableData()
+            
+            // inputStreamからバイトデータを読み込む
+            var bytesRead = 1
+            
+            while(bytesRead > 0) {
+                          
+                let bufferSize = 4096
+                var buffer = Array<UInt8>(repeating: 0, count: bufferSize)
+                bytesRead = inputStream.read(&buffer, maxLength: bufferSize)
+                // データが断片化する可能性があるのでキューにためておく
+                read.append(NSData(bytes: UnsafePointer(buffer), length: bytesRead) as Data)
+                
+//                sleep(UInt32(1))    //デバッグ
+                print("bytesRead: \(bytesRead)")   // デバッグ
+                print("hasBytesAvailable: \(inputStream.hasBytesAvailable)")   // デバッグ
+                
+                let readVal: String = String(data: read as Data, encoding: .utf8)!
+
+                // ログがない場合
+                if readVal.contains("Error") {
+                    retval[0] = "Error: Log not found."
+    
+                    // ログを配列に格納
+                } else {
+                    let splitRead = readVal.components(separatedBy: "\n")
+                    var num = 0
+                    for str in splitRead {
+                        retval[num] = str
+                        num = num + 1
+                    }
+                }
+                
+            }
+            
+        } else {
+            // UnsafePointerを使うとうまくいかない場合がある（最初にダミーコマンドを送る必要があった）
+            // self.outputStream.write(UnsafePointer(command), maxLength: text.utf8.count)
+            self.outputStream.write( command, maxLength: text.utf8.count)
+            print("Send: \(text)")
+        }
+        
 		return retval
 	}
 }
