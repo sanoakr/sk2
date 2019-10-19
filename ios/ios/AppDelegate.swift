@@ -388,23 +388,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         switch name {
         case "backgroundColor":
-            if #available(iOS 13.0, *) {
+            //if #available(iOS 13.0, *) {
                 color = UIColor.systemGray6
-            } else {
-                color = UIColor(red: 0.93, green: 0.94, blue: 0.95, alpha: 1)    //#ecf0f1
-            }
+            //} else {
+            //    color = UIColor(red: 0.93, green: 0.94, blue: 0.95, alpha: 1)    //#ecf0f1
+            //}
         case "ifDebugBackgroundColor":
-            if #available(iOS 13.0, *) {
+            //if #available(iOS 13.0, *) {
                 color = UIColor.systemGray2
-            } else {
-                color = UIColor(red: 0.68, green: 0.68, blue: 0.70, alpha: 1)    //#ecf0f1
-            }
+            //} else {
+            //    color = UIColor(red: 0.68, green: 0.68, blue: 0.70, alpha: 1)    //#ecf0f1
+            //}
         case "ifUserInfoColor":
-            if #available(iOS 13.0, *) {
+            //if #available(iOS 13.0, *) {
                 color = UIColor.systemGray5
-            } else {
-                color = UIColor(red: 0.90, green: 0.90, blue: 0.92, alpha: 1)    //#ecf0f1
-            }
+            //} else {
+            //    color = UIColor(red: 0.90, green: 0.90, blue: 0.92, alpha: 1)    //#ecf0f1
+            //}
         case "ifNormalColor":
             color = UIColor(red: 0.20, green: 0.60, blue: 0.86, alpha: 1)        //#3498db
         case "ifActiveColor":

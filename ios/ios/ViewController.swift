@@ -14,10 +14,10 @@ import AudioToolbox
 import Foundation
 import CoreData
 import CoreBluetooth    // for get bluetooth state
+import WatchConnectivity
 
 @available(iOS 13.0, *)
 class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralManagerDelegate {
-    
     // bluetoothの状況を取得
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         
@@ -100,17 +100,20 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
     
 	// UserDefaultの生成
 	let myUserDefault:UserDefaults = UserDefaults()
-	
     var centralManager: CBCentralManager!
+
+    // WCSession
+    var wcsession: WCSession?
     
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		
+
+        // WCSession
+        wcActivate(session: &wcsession)
         
         //CBCentralManagerを初期化
         centralManager = CBCentralManager(delegate: self, queue: nil)
 
-        
 		// デバイスの固有ID取得
 //		print("DeviceID: \(String(describing: UIDevice.current.identifierForVendor))")
 		
@@ -388,7 +391,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
             
             var result:String! = nil
 //            let result = sendAttend(user: user, key: key, type: "M\(self.version)")
-            self.sendAttend(user: user, key: key, type: "M\(self.version)") { (resultVal) in
+            self.sendAttend(user: user, key: key, type: "M\(self.version)") { (resultVal, _) in
                 result =  resultVal
 //                print("resultValは: \(resultVal)")
             }
@@ -502,7 +505,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                     let key:String = self.myUserDefault.string(forKey: "key")!
                     
                     var result:String! = nil
-                    self.sendAttend(user: user, key: key, type: "A\(self.version)") { (resultVal) in
+                    self.sendAttend(user: user, key: key, type: "A\(self.version)") { (resultVal, _) in
                         result =  resultVal
                     }
                     
@@ -866,7 +869,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
     //   - key: キー
     //   - type: タイプ（自動：Aとバージョン番号,手動：Mとバージョン番号）
     //   - complete: 結果の返り値（success/fail/timeout）
-    func sendAttend(user: String, key: String, type: String, complete:@escaping (String) -> ()) {
+    func sendAttend(user: String, key: String, type: String, complete:@escaping (String, String) -> ()) {
             
             var resultVal:String = ""
             let now = appDelegate.currentTime()
@@ -949,7 +952,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                 
                 print("beaconStatus:\(beaconStatus)")
                 print("resultVal:\(resultVal)")
-                complete(resultVal)
+                complete(resultVal, sendtext)
                 
             }
         }
@@ -1066,7 +1069,7 @@ class Connection3: NSObject, StreamDelegate {
 		self.outputStream = writeStream!.takeRetainedValue()
 		
 		let dict = [
-            kCFStreamSSLValidatesCertificateChain: kCFBooleanFalse,     // allow self-signed certificate
+            kCFStreamSSLValidatesCertificateChain: kCFBooleanFalse as Any,     // allow self-signed certificate
 			kCFStreamSSLLevel: "kCFStreamSocketSecurityLevelNegotiatedSSL"    // don't understand, why there isn't a constant for version 1.2
 			] as CFDictionary
 		
@@ -1101,12 +1104,14 @@ class Connection3: NSObject, StreamDelegate {
 		
 		// 返り値を定義
 		var retval = Dictionary<String, String>()
-		var countCommand = command.data(using: String.Encoding.utf8, allowLossyConversion: false)!
+        let sendBytes = command.utf8.count
+        /*
+        var countCommand = command.data(using: String.Encoding.utf8, allowLossyConversion: false)!
 		let commandLength = countCommand.count
 		let bytes : String = countCommand.withUnsafeMutableBytes{
 			bytes in return String(bytesNoCopy: bytes, length: commandLength, encoding: String.Encoding.utf8, freeWhenDone: false)!
 		}
-		
+		*/
 		// エラー処理
 		var timeout = appDelegate.timeout * 100000 // タイムアウト値は5秒
 		while !self.outputStream.hasSpaceAvailable {
@@ -1125,8 +1130,9 @@ class Connection3: NSObject, StreamDelegate {
 			}
 		}
 		
-		// コマンドをサーバーに送信
-		self.outputStream.write( command, maxLength: bytes.utf8.count)
+		// コマンドをサーバーに
+        self.outputStream.write( command, maxLength: sendBytes)
+        //self.outputStream.write( command, maxLength: bytes.utf8.count)
 		
 		print("Send: \(command)")
 		
@@ -1155,4 +1161,51 @@ class Connection3: NSObject, StreamDelegate {
 // Helper function inserted by Swift 4.2 migrator.
 fileprivate func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any]) -> [UIApplication.OpenExternalURLOptionsKey: Any] {
 	return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
+}
+
+
+@available(iOS 13.0, *)
+extension ViewController: WCSessionDelegate {
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+    }
+    func sessionDidBecomeInactive(_ session: WCSession) {
+    }
+    func sessionDidDeactivate(_ session: WCSession) {
+    }
+    
+    // WCSession Activate
+    func wcActivate(session: inout WCSession?) -> Void {
+        if (WCSession.isSupported()) {
+            session = WCSession.default
+            if let session_t = session {
+                session_t.delegate = self
+                session_t.activate()
+            }
+        }
+    }
+    
+    // reply Handler
+    func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void){
+        let msgString = message["msg"] as? String
+        print(msgString ?? "no_data")
+        
+        if msgString == "attend" {
+            // 登録されているUserDefaultから設定値を呼び出す
+            let user:String = self.myUserDefault.string(forKey: "user")!
+            let key:String = self.myUserDefault.string(forKey: "key")!
+
+            var result:String! = nil
+            var data:String! = nil
+            // let result = sendAttend(user: user, key: key, type: "M\(self.version)")
+            self.sendAttend(user: user, key: key, type: "Mw\(self.version)") { (resultVal, dataVal) in
+                            result =  resultVal
+                            data = dataVal
+            }
+            if result == "success" {
+                replyHandler(["reply" : data ?? "no data"])
+            } else {
+                replyHandler(["reply" : result ?? "unknown error"])
+            }
+        }
+    }
 }

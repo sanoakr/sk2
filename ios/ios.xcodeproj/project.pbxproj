@@ -7,6 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		21512923235ADAFC009FB4BC /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 21512921235ADAFC009FB4BC /* Interface.storyboard */; };
+		21512925235ADAFD009FB4BC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 21512924235ADAFD009FB4BC /* Assets.xcassets */; };
+		2151292C235ADAFD009FB4BC /* sk2watch Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 2151292B235ADAFD009FB4BC /* sk2watch Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		21512931235ADAFD009FB4BC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21512930235ADAFD009FB4BC /* ContentView.swift */; };
+		21512933235ADAFD009FB4BC /* HostingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21512932235ADAFD009FB4BC /* HostingController.swift */; };
+		21512935235ADAFD009FB4BC /* ExtensionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21512934235ADAFD009FB4BC /* ExtensionDelegate.swift */; };
+		21512937235ADAFD009FB4BC /* NotificationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21512936235ADAFD009FB4BC /* NotificationController.swift */; };
+		21512939235ADAFD009FB4BC /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21512938235ADAFD009FB4BC /* NotificationView.swift */; };
+		2151293B235ADAFE009FB4BC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2151293A235ADAFE009FB4BC /* Assets.xcassets */; };
+		2151293E235ADAFE009FB4BC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2151293D235ADAFE009FB4BC /* Preview Assets.xcassets */; };
+		21512943235ADAFE009FB4BC /* sk2watch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 2151291F235ADAFC009FB4BC /* sk2watch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		D6096AF021415A9A003069E9 /* sk2.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D6096AEE21415A9A003069E9 /* sk2.xcdatamodeld */; };
 		D66428D0212C154C0089C04E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66428CF212C154C0089C04E /* AppDelegate.swift */; };
 		D66428D2212C154C0089C04E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66428D1212C154C0089C04E /* ViewController.swift */; };
@@ -28,6 +39,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		2151292D235ADAFD009FB4BC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D66428C4212C154C0089C04E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2151292A235ADAFD009FB4BC;
+			remoteInfo = "sk2watch Extension";
+		};
+		21512941235ADAFE009FB4BC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D66428C4212C154C0089C04E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2151291E235ADAFC009FB4BC;
+			remoteInfo = sk2watch;
+		};
 		D66428E1212C154D0089C04E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D66428C4212C154C0089C04E /* Project object */;
@@ -44,7 +69,46 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		21512944235ADAFE009FB4BC /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				21512943235ADAFE009FB4BC /* sk2watch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		21512947235ADAFE009FB4BC /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				2151292C235ADAFD009FB4BC /* sk2watch Extension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		2151291F235ADAFC009FB4BC /* sk2watch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = sk2watch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		21512922235ADAFC009FB4BC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
+		21512924235ADAFD009FB4BC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		21512926235ADAFD009FB4BC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2151292B235ADAFD009FB4BC /* sk2watch Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "sk2watch Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		21512930235ADAFD009FB4BC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		21512932235ADAFD009FB4BC /* HostingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HostingController.swift; sourceTree = "<group>"; };
+		21512934235ADAFD009FB4BC /* ExtensionDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionDelegate.swift; sourceTree = "<group>"; };
+		21512936235ADAFD009FB4BC /* NotificationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationController.swift; sourceTree = "<group>"; };
+		21512938235ADAFD009FB4BC /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
+		2151293A235ADAFE009FB4BC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2151293D235ADAFE009FB4BC /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		2151293F235ADAFE009FB4BC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		21512940235ADAFE009FB4BC /* PushNotificationPayload.apns */ = {isa = PBXFileReference; lastKnownFileType = text; path = PushNotificationPayload.apns; sourceTree = "<group>"; };
 		D6096AEF21415A9A003069E9 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		D66428CC212C154C0089C04E /* ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D66428CF212C154C0089C04E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -73,6 +137,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		21512928235ADAFD009FB4BC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D66428C9212C154C0089C04E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -97,12 +168,48 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		21512920235ADAFC009FB4BC /* sk2watch */ = {
+			isa = PBXGroup;
+			children = (
+				21512921235ADAFC009FB4BC /* Interface.storyboard */,
+				21512924235ADAFD009FB4BC /* Assets.xcassets */,
+				21512926235ADAFD009FB4BC /* Info.plist */,
+			);
+			path = sk2watch;
+			sourceTree = "<group>";
+		};
+		2151292F235ADAFD009FB4BC /* sk2watch Extension */ = {
+			isa = PBXGroup;
+			children = (
+				21512930235ADAFD009FB4BC /* ContentView.swift */,
+				21512932235ADAFD009FB4BC /* HostingController.swift */,
+				21512934235ADAFD009FB4BC /* ExtensionDelegate.swift */,
+				21512936235ADAFD009FB4BC /* NotificationController.swift */,
+				21512938235ADAFD009FB4BC /* NotificationView.swift */,
+				2151293A235ADAFE009FB4BC /* Assets.xcassets */,
+				2151293F235ADAFE009FB4BC /* Info.plist */,
+				21512940235ADAFE009FB4BC /* PushNotificationPayload.apns */,
+				2151293C235ADAFE009FB4BC /* Preview Content */,
+			);
+			path = "sk2watch Extension";
+			sourceTree = "<group>";
+		};
+		2151293C235ADAFE009FB4BC /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				2151293D235ADAFE009FB4BC /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
 		D66428C3212C154C0089C04E = {
 			isa = PBXGroup;
 			children = (
 				D66428CE212C154C0089C04E /* ios */,
 				D66428E3212C154D0089C04E /* iosTests */,
 				D66428EE212C154D0089C04E /* iosUITests */,
+				21512920235ADAFC009FB4BC /* sk2watch */,
+				2151292F235ADAFD009FB4BC /* sk2watch Extension */,
 				D66428CD212C154C0089C04E /* Products */,
 				D68AE17C2158C97E00955F53 /* Frameworks */,
 			);
@@ -114,6 +221,8 @@
 				D66428CC212C154C0089C04E /* ios.app */,
 				D66428E0212C154D0089C04E /* iosTests.xctest */,
 				D66428EB212C154D0089C04E /* iosUITests.xctest */,
+				2151291F235ADAFC009FB4BC /* sk2watch.app */,
+				2151292B235ADAFD009FB4BC /* sk2watch Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -179,6 +288,40 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		2151291E235ADAFC009FB4BC /* sk2watch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2151294B235ADAFE009FB4BC /* Build configuration list for PBXNativeTarget "sk2watch" */;
+			buildPhases = (
+				2151291D235ADAFC009FB4BC /* Resources */,
+				21512947235ADAFE009FB4BC /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2151292E235ADAFD009FB4BC /* PBXTargetDependency */,
+			);
+			name = sk2watch;
+			productName = sk2watch;
+			productReference = 2151291F235ADAFC009FB4BC /* sk2watch.app */;
+			productType = "com.apple.product-type.application.watchapp2";
+		};
+		2151292A235ADAFD009FB4BC /* sk2watch Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2151294A235ADAFE009FB4BC /* Build configuration list for PBXNativeTarget "sk2watch Extension" */;
+			buildPhases = (
+				21512927235ADAFD009FB4BC /* Sources */,
+				21512928235ADAFD009FB4BC /* Frameworks */,
+				21512929235ADAFD009FB4BC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "sk2watch Extension";
+			productName = "sk2watch Extension";
+			productReference = 2151292B235ADAFD009FB4BC /* sk2watch Extension.appex */;
+			productType = "com.apple.product-type.watchkit2-extension";
+		};
 		D66428CB212C154C0089C04E /* ios */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D66428F4212C154D0089C04E /* Build configuration list for PBXNativeTarget "ios" */;
@@ -186,10 +329,12 @@
 				D66428C8212C154C0089C04E /* Sources */,
 				D66428C9212C154C0089C04E /* Frameworks */,
 				D66428CA212C154C0089C04E /* Resources */,
+				21512944235ADAFE009FB4BC /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				21512942235ADAFE009FB4BC /* PBXTargetDependency */,
 			);
 			name = ios;
 			productName = ios;
@@ -238,10 +383,16 @@
 		D66428C4212C154C0089C04E /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0940;
+				LastSwiftUpdateCheck = 1100;
 				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = "関本達生";
 				TargetAttributes = {
+					2151291E235ADAFC009FB4BC = {
+						CreatedOnToolsVersion = 11.0;
+					};
+					2151292A235ADAFD009FB4BC = {
+						CreatedOnToolsVersion = 11.0;
+					};
 					D66428CB212C154C0089C04E = {
 						CreatedOnToolsVersion = 9.4.1;
 						LastSwiftMigration = 1100;
@@ -287,11 +438,31 @@
 				D66428CB212C154C0089C04E /* ios */,
 				D66428DF212C154D0089C04E /* iosTests */,
 				D66428EA212C154D0089C04E /* iosUITests */,
+				2151291E235ADAFC009FB4BC /* sk2watch */,
+				2151292A235ADAFD009FB4BC /* sk2watch Extension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		2151291D235ADAFC009FB4BC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				21512925235ADAFD009FB4BC /* Assets.xcassets in Resources */,
+				21512923235ADAFC009FB4BC /* Interface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		21512929235ADAFD009FB4BC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2151293E235ADAFE009FB4BC /* Preview Assets.xcassets in Resources */,
+				2151293B235ADAFE009FB4BC /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D66428CA212C154C0089C04E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -323,6 +494,18 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		21512927235ADAFD009FB4BC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				21512933235ADAFD009FB4BC /* HostingController.swift in Sources */,
+				21512931235ADAFD009FB4BC /* ContentView.swift in Sources */,
+				21512937235ADAFD009FB4BC /* NotificationController.swift in Sources */,
+				21512935235ADAFD009FB4BC /* ExtensionDelegate.swift in Sources */,
+				21512939235ADAFD009FB4BC /* NotificationView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D66428C8212C154C0089C04E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -358,6 +541,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		2151292E235ADAFD009FB4BC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2151292A235ADAFD009FB4BC /* sk2watch Extension */;
+			targetProxy = 2151292D235ADAFD009FB4BC /* PBXContainerItemProxy */;
+		};
+		21512942235ADAFE009FB4BC /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2151291E235ADAFC009FB4BC /* sk2watch */;
+			targetProxy = 21512941235ADAFE009FB4BC /* PBXContainerItemProxy */;
+		};
 		D66428E2212C154D0089C04E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = D66428CB212C154C0089C04E /* ios */;
@@ -371,6 +564,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		21512921235ADAFC009FB4BC /* Interface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				21512922235ADAFC009FB4BC /* Base */,
+			);
+			name = Interface.storyboard;
+			sourceTree = "<group>";
+		};
 		D66428D3212C154C0089C04E /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -390,6 +591,98 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		21512945235ADAFE009FB4BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2NL9698ZUX;
+				IBSC_MODULE = sk2watch_Extension;
+				INFOPLIST_FILE = sk2watch/Info.plist;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.ac.ryukoku.sk2.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 6.0;
+			};
+			name = Debug;
+		};
+		21512946235ADAFE009FB4BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2NL9698ZUX;
+				IBSC_MODULE = sk2watch_Extension;
+				INFOPLIST_FILE = sk2watch/Info.plist;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.ac.ryukoku.sk2.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 6.0;
+			};
+			name = Release;
+		};
+		21512948235ADAFE009FB4BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"sk2watch Extension/Preview Content\"";
+				DEVELOPMENT_TEAM = 2NL9698ZUX;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = "sk2watch Extension/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.ac.ryukoku.sk2.watchkitapp.watchkitextension;
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 6.0;
+			};
+			name = Debug;
+		};
+		21512949235ADAFE009FB4BC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"sk2watch Extension/Preview Content\"";
+				DEVELOPMENT_TEAM = 2NL9698ZUX;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = "sk2watch Extension/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = jp.ac.ryukoku.sk2.watchkitapp.watchkitextension;
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 6.0;
+			};
+			name = Release;
+		};
 		D66428F2212C154D0089C04E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -627,6 +920,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		2151294A235ADAFE009FB4BC /* Build configuration list for PBXNativeTarget "sk2watch Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				21512948235ADAFE009FB4BC /* Debug */,
+				21512949235ADAFE009FB4BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2151294B235ADAFE009FB4BC /* Build configuration list for PBXNativeTarget "sk2watch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				21512945235ADAFE009FB4BC /* Debug */,
+				21512946235ADAFE009FB4BC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		D66428C7212C154C0089C04E /* Build configuration list for PBXProject "ios" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

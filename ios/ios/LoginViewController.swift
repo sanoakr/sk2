@@ -274,7 +274,7 @@ class ServerAuth: NSObject, StreamDelegate {
 		self.outputStream = writeStream!.takeRetainedValue()
 		
 		let dict = [
-            kCFStreamSSLValidatesCertificateChain: kCFBooleanFalse,     // allow self-signed certificate
+            kCFStreamSSLValidatesCertificateChain: kCFBooleanFalse as Any,     // allow self-signed certificate
 			kCFStreamSSLLevel: "kCFStreamSocketSecurityLevelNegotiatedSSL"    // don't understand, why there isn't a constant for version 1.2
 			] as CFDictionary
 		
@@ -307,11 +307,12 @@ class ServerAuth: NSObject, StreamDelegate {
 	func sendCommand(command: String) -> Dictionary<String, Any> {
 		
 		var retval = Dictionary<String, Any>()
-		
+        let sendSize = command.utf8.count
+        /*
 		var ccommand = command.data(using: String.Encoding.utf8, allowLossyConversion: false)!
 		let commandLength = ccommand.count
 		let text : String = ccommand.withUnsafeMutableBytes{ bytes in return String(bytesNoCopy: bytes, length: commandLength, encoding: String.Encoding.utf8, freeWhenDone: false)!}
-		
+		*/
         // "end"を受信したら接続切断
 		if (String(describing: command) == "end") {
 			
@@ -400,8 +401,10 @@ class ServerAuth: NSObject, StreamDelegate {
 		} else {
 			// UnsafePointerを使うとうまくいかない場合がある（最初にダミーコマンドを送る必要があった）
 			// self.outputStream.write(UnsafePointer(command), maxLength: text.utf8.count)
-			self.outputStream.write( command, maxLength: text.utf8.count)
-			print("Send: \(text)")
+            self.outputStream.write( command, maxLength: sendSize)
+            //self.outputStream.write( command, maxLength: text.utf8.count)
+			print("Send: \(command) (\(sendSize) bytes)")
+            //print("Send: \(text)")
 		}
 		
 		return retval
