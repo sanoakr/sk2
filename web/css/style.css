@@ -774,8 +774,9 @@
 	}
 
 	ul.contact li a img {
-			width: auto;
-			height: 50px;
+			max-width: 100%;
+			height: auto;
+			/*width: auto;*/
 			/*vertical-align: bottom;*/
 		}
 
