@@ -3,23 +3,54 @@ $lifetime=3*60; // 3min
 session_start();
 setcookie(session_name(),session_id(),time()+$lifetime);
 ?>
-
 <?php require(dirname(__FILE__) . '/search-util.php'); ?>
-<?php require(dirname(__FILE__) . '/search-header.php'); ?>
 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja">
+<head>
+    <title>sk2 自動出欠ログ検索フォーム</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="search.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+    <script src="js/choice_select.js"></script>
+</head>
+
+<?php require(dirname(__FILE__) . '/search-vals.php'); ?>
 <?php require(dirname(__FILE__) . '/search-init.php'); ?>
 <?php require(dirname(__FILE__) . '/search-jsonroom.php'); ?>
+
+<?php
+$msg_id = <<< EOF
+<p>
+検索パターンのワイルドカードは *、任意の1文字は _ です。<br>
+例：「*」 = 「全ユーザー」、「T*」 = 「理工学部生」、「_19*」 = 「全ての学部の2019年度入学生」
+</p>
+EOF;
+$msg_room = <<< EOF
+<p>
+プライバシー保護のため、上記で選択された「建物」「フロア」「教室」のうち、もっとも指定範囲が広いレベルで検索出力されます。<br>
+検索結果に教室名まで表示するためには、選択した全てのリスト上で「建物」「フロア」「教室」の全て指定して下さい。<br>
+ボタンビーコンでは、発信種別「S(ingle Click)」「L(ong Click)」「D(ouble Click)」が記録・選択可能です。
+固定・携帯ビーコンの発信種別は「S」のみが利用可能です（「L」「D」の選択も可能ですが、記録情報は存在しません）。
+</p>
+EOF;
+$msg_type = <<< EOF
+<p>
+M =「手動送信」、A =「自動送信」<br>
+</p>
+EOF;
+?>
 
 <?php
 //////////////////////////////
 echo "<form action='search.php' method ='post'>";
 echo '<div class="item"><h3>学籍番号</h3>';
 echo '<p><input type="text" name="' . $fid . '" value=' . $$fid . '></p>';
-echo <<< EOF
-<p>検索パターンのワイルドカードは *、任意の1文字は _ です。<br>
-例：「*」 = 「全ユーザー」、「T*」 = 「理工学部生」、「_19*」 = 「全ての学部の2019年度入学生」</p>
-</div>
-EOF;
+echo $msg_id;
+echo '</div>';
 
 echo '<div class="item"><h3>教室</h3><p>';
 makeRoomSelector([$fbuild0, $ffloor0, $froom0], [$build_arr, $floor_arr, $room_arr], 0, $$fbuild0);
@@ -41,12 +72,8 @@ echo '/>OR ';
 makeRoomSelector([$fbuild2, $ffloor2, $froom2], [$build_arr, $floor_arr, $room_arr], 0, $$fbuild2);
 makeRoomSelector([$fbuild2, $ffloor2, $froom2], [$build_arr, $floor_arr, $room_arr], 1, $$ffloor2);
 makeRoomSelector([$fbuild2, $ffloor2, $froom2], [$build_arr, $floor_arr, $room_arr], 2, $$froom2);
-echo "</p>";
-echo "プライバシー保護のため、上記で選択された「建物」「フロア」「教室」のうち、もっとも指定範囲が広いレベルで検索出力されます。<br>";
-echo "検索結果に教室名まで表示するためには、選択した全てのリスト上で「建物」「フロア」「教室」の全て指定して下さい。<br>";
-echo "ボタンビーコンでは、発信種別「S(ingle Click)」「L(ong Click)」「D(ouble Click)」が記録・選択可能です。";
-echo "固定・携帯ビーコンの発信種別は「S」のみが利用可能です（「L」「D」の選択も可能ですが、記録情報は存在しません）。";
-echo "</div>";
+echo $msg_room;
+echo '</div>';
 
 //foreach ($uq_room_arr as $k => $v) {
 //    foreach ($v as $k2 => $v2) {
@@ -57,11 +84,9 @@ echo "</div>";
 echo '<div class="item"><h3>送信タイプ</h3><p>';
 makeTypeSelector($ftype, $$ftype);
 //makeSelector($link, $dbtbl, $ftype, $$ftype);
-echo <<< EOF
-</p>
-<p>M =「手動送信」、A =「自動送信」<br>
-</p></div>
-EOF;
+echo '</p>';
+echo $msg_type;
+echo '</div>';
 
 echo '<div class="item"><h3>日付</h3><p>';
 echo '<p><input type="text" id="datefrom" name="' . $date_from . '" value="' . $$date_from . '">';
