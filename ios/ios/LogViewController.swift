@@ -18,7 +18,9 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 	let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height
 	let safeAreaInsets = UIApplication.shared.keyWindow?.rootViewController?.view.safeAreaInsets.bottom
 	
-	var Connection = Connection2()
+//	var Connection = Connection2()
+    
+    var serverConnection = Connection()
 	
 	// Tableで使用する配列を設定する
 	private var myItems: Array<Any> = []
@@ -82,7 +84,10 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 	}
 	
 	@objc func showServerLog() {
-		Connection.connect()
+        let serverAddress: CFString = appDelegate.serverIp as CFString //IPアドレスを指定
+        let serverPort: UInt32 = UInt32(appDelegate.serverPort2) //開放するポートを指定
+        
+        serverConnection.connect(serverAddress: serverAddress, serverPort: serverPort)
 		
 		// セルを削除
 		myItems.removeAll()
@@ -95,54 +100,73 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		
 		// socket通信
 		let sendtext = "\(userName),\(key)"
-        _ = Connection.sendCommand(command: sendtext)
-        let tmp = Connection.sendCommand(command: "end")
-
-		// keysを昇順でソートする
-		let retval = tmp.sorted(){ $0.0 < $1.0 }
-		
-		//配列を初期化
-		myItems = Array()
-		
-		// ログデータを取得しTableViewに渡す
-		for (_, value) in retval {
-			myItems += ["\(value)"]
-		}
-		
-//		print("myItems:\n\(myItems)")  //デバッグ
-		
-		// Viewの高さと幅を取得する.
-		let displayWidth: CGFloat = self.view.frame.width
-		let displayHeight: CGFloat = self.view.frame.height
-		let safeAreaInsets = UIApplication.shared.keyWindow?.rootViewController?.view.safeAreaInsets.bottom
-		
-		// TableViewの生成(Status barの高さをずらして表示).
-		let tableHeight = displayHeight - safeAreaInsets! - barHeight - 135
+        _ = serverConnection.sendCommand(command: sendtext)
+        let tmp = serverConnection.sendCommand(command: "end")
+        
+        
+        if(tmp["status"] as! String == "succeed") {
+            
+            var retval = Dictionary<Int, Any>()
+            var num = 0
+            let tmp_decoded: String = String(data: tmp["value"] as! Data, encoding: .utf8)!
+            let splitRead = tmp_decoded.components(separatedBy: "\n")
+            
+            // 取得したvalueを配列に格納
+            for str in splitRead {
+                retval[num] = str
+                num = num + 1
+            }
+            
+            // keysを昇順でソートする
+            let retval_sorted = retval.sorted(){ $0.0 < $1.0 }
+            
+            //配列を初期化
+            myItems = Array()
+            
+            // ログデータを取得しTableViewに渡す
+            for (_, value) in retval_sorted {
+                myItems += ["\(value)"]
+            }
+        } else {
+            //配列を初期化
+            myItems = Array()
+            myItems.append(",,エラー：ログの取得に失敗しました,,,,,,,,,")
+        }
+                
+//        print("myItems:\n\(myItems)")  //デバッグ
+        
+        // Viewの高さと幅を取得する.
+        let displayWidth: CGFloat = self.view.frame.width
+        let displayHeight: CGFloat = self.view.frame.height
+        let safeAreaInsets = UIApplication.shared.keyWindow?.rootViewController?.view.safeAreaInsets.bottom
+        
+        // TableViewの生成(Status barの高さをずらして表示).
+        let tableHeight = displayHeight - safeAreaInsets! - barHeight - 135
 //        let tableHeight = displayHeight - safeAreaInsets! - barHeight - 96
-		myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 95, width: displayWidth, height: tableHeight))
-		
-		// セルの高さ
-		myTableView.rowHeight = 120
-		
-		// Cell名の登録をおこなう.
-		myTableView.register(MyCell.self, forCellReuseIdentifier: NSStringFromClass(MyCell.self))
-		
-		// DataSourceを自身に設定する.
-		myTableView.dataSource = self
-		
-		// Delegateを自身に設定する.
-		myTableView.delegate = self
+        myTableView = UITableView(frame: CGRect(x: 0, y: barHeight + 95, width: displayWidth, height: tableHeight))
+        
+        // セルの高さ
+        myTableView.rowHeight = 120
+        
+        // Cell名の登録をおこなう.
+        myTableView.register(MyCell.self, forCellReuseIdentifier: NSStringFromClass(MyCell.self))
+        
+        // DataSourceを自身に設定する.
+        myTableView.dataSource = self
+        
+        // Delegateを自身に設定する.
+        myTableView.delegate = self
 
-		// リフレッシュ
-		// UIRefreshControlのインスタンス作成
-		let refresh = UIRefreshControl()
-		myTableView.refreshControl = refresh
-		
-		// リフレッシュしたときの処理内容を設定
-		refresh.addTarget(self, action: #selector(LogViewController.serverLogRefresh(sender:)), for: .valueChanged)
-		
-		// Viewに追加する.
-		self.view.addSubview(myTableView)
+        // リフレッシュ
+        // UIRefreshControlのインスタンス作成
+        let refresh = UIRefreshControl()
+        myTableView.refreshControl = refresh
+        
+        // リフレッシュしたときの処理内容を設定
+        refresh.addTarget(self, action: #selector(LogViewController.serverLogRefresh(sender:)), for: .valueChanged)
+        
+        // Viewに追加する.
+        self.view.addSubview(myTableView)
 	}
 	
 	//サーバーログをリフレッシュ
@@ -311,6 +335,7 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 	}
 }
 
+@available(iOS 13.0, *)
 class MyCell: UITableViewCell {
 	var labelMode: UILabel!
 	var labelDate: UILabel!
@@ -321,21 +346,16 @@ class MyCell: UITableViewCell {
 	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
 		super.init(style: style, reuseIdentifier: reuseIdentifier)
 		
+        // AppDelegateのインスタンスを取得
+        let appDelegate: AppDelegate = UIApplication.shared.delegate as! AppDelegate
+        
 		labelMode = UILabel()
-        if #available(iOS 13.0, *) {
-            labelMode.backgroundColor = appDelegate.setColor ( name : "backgroundColor" )
-        } else {
-            labelMode.backgroundColor = UIColor.white
-        }
+        labelMode.backgroundColor = appDelegate.setColor ( name : "cellBackgroundColor" )
 		contentView.addSubview(labelMode)
 		
 		labelDate = UILabel()
 		labelDate.font = UIFont.boldSystemFont(ofSize: UIFont.labelFontSize)	//  ボールド
-        if #available(iOS 13.0, *) {
-            labelDate.backgroundColor = appDelegate.setColor ( name : "backgroundColor" )
-        } else {
-            labelDate.backgroundColor = UIColor.white
-        }
+        labelDate.backgroundColor = appDelegate.setColor ( name : "cellBackgroundColor" )
 		contentView.addSubview(labelDate)
 		
 		labelVal1 = UILabel()
@@ -366,125 +386,5 @@ class MyCell: UITableViewCell {
 		labelVal1.frame = CGRect(x: 20, y: 50, width: frame.width, height: 20)
 		labelVal2.frame = CGRect(x: 20, y: 70, width: frame.width, height: 20)
 		labelVal3.frame = CGRect(x: 20, y: 90, width: frame.width, height: 20)
-	}
-	
-}
-
-// --------------------------------------------------------------------------------------------------------------------------
-// SSL Socketコネクション
-
-@available(iOS 13.0, *)
-class Connection2: NSObject, StreamDelegate {
-	
-	let ServerAddress: CFString = appDelegate.serverIp as CFString //IPアドレスを指定
-	let serverPort: UInt32 = UInt32(appDelegate.serverPort2) //開放するポートを指定
-	
-	private var inputStream : InputStream!
-	private var outputStream: OutputStream!
-	
-	// サーバーとの接続を確立する
-	func connect(){
-		print("connecting.....")
-		
-		var readStream : Unmanaged<CFReadStream>?
-		var writeStream: Unmanaged<CFWriteStream>?
-		
-		CFStreamCreatePairWithSocketToHost(nil, self.ServerAddress, self.serverPort, &readStream, &writeStream)
-		
-		self.inputStream  = readStream!.takeRetainedValue()
-		self.outputStream = writeStream!.takeRetainedValue()
-		
-		let dict = [
-            kCFStreamSSLValidatesCertificateChain: kCFBooleanFalse,     // allow self-signed certificate
-			kCFStreamSSLLevel: "kCFStreamSocketSecurityLevelNegotiatedSSL"    // don't understand, why there isn't a constant for version 1.2
-			] as CFDictionary
-		
-		_ = CFReadStreamSetProperty(inputStream, CFStreamPropertyKey(kCFStreamPropertySSLSettings), dict)
-		_ = CFWriteStreamSetProperty(outputStream, CFStreamPropertyKey(kCFStreamPropertySSLSettings), dict)
-		
-		//        if sslSetRead == false || sslSetWrite == false {
-		//            throw ConnectionError.sslConfigurationFailed
-		//        }
-		
-		self.inputStream.delegate  = self
-		self.outputStream.delegate = self
-		
-		self.inputStream.schedule(in: RunLoop.current, forMode: RunLoop.Mode.default)
-		self.outputStream.schedule(in: RunLoop.current, forMode: RunLoop.Mode.default)
-		
-		self.inputStream.open()
-		self.outputStream.open()
-		
-		print("connect success!!")
-	}
-	
-	// inputStream/outputStreamに何かしらのイベントが起きたら起動してくれる関数
-	// 今回の場合では、同期型なのでoutputStreamの時しか起動してくれない
-	func stream(_ stream:Stream, handle eventCode : Stream.Event){
-		print(stream)
-	}
-	
-	// サーバーにコマンド文字列を送信する関数
-	func sendCommand(command: String) -> Dictionary<Int, Any> {
-		
-		// 返り値を定義
-		var retval = Dictionary<Int, String>()
-        
-		var ccommand = command.data(using: String.Encoding.utf8, allowLossyConversion: false)!
-		let commandLength = ccommand.count
-		let text : String = ccommand.withUnsafeMutableBytes{
-			bytes in return String(bytesNoCopy: bytes, length: commandLength, encoding: String.Encoding.utf8, freeWhenDone: false)!
-		}
-		
-        
-        // "end"を受信したら接続切断
-        if (String(describing: command) == "end") {
-            
-            self.outputStream.close()
-            self.outputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
-            
-            let read = NSMutableData()
-            
-            // inputStreamからバイトデータを読み込む
-            var bytesRead = 1
-            
-            while(bytesRead > 0) {
-                          
-                let bufferSize = 4096
-                var buffer = Array<UInt8>(repeating: 0, count: bufferSize)
-                bytesRead = inputStream.read(&buffer, maxLength: bufferSize)
-                // データが断片化する可能性があるのでキューにためておく
-                read.append(NSData(bytes: UnsafePointer(buffer), length: bytesRead) as Data)
-                
-//                sleep(UInt32(1))    //デバッグ
-                print("bytesRead: \(bytesRead)")   // デバッグ
-                print("hasBytesAvailable: \(inputStream.hasBytesAvailable)")   // デバッグ
-                
-                let readVal: String = String(data: read as Data, encoding: .utf8)!
-
-                // ログがない場合
-                if readVal.contains("Error") {
-                    retval[0] = "Error: Log not found."
-    
-                    // ログを配列に格納
-                } else {
-                    let splitRead = readVal.components(separatedBy: "\n")
-                    var num = 0
-                    for str in splitRead {
-                        retval[num] = str
-                        num = num + 1
-                    }
-                }
-                
-            }
-            
-        } else {
-            // UnsafePointerを使うとうまくいかない場合がある（最初にダミーコマンドを送る必要があった）
-            // self.outputStream.write(UnsafePointer(command), maxLength: text.utf8.count)
-            self.outputStream.write( command, maxLength: text.utf8.count)
-            print("Send: \(text)")
-        }
-        
-		return retval
 	}
 }

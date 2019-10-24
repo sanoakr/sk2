@@ -64,7 +64,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 	// AppDelegateのインスタンスを取得
 	let appDelegate: AppDelegate = UIApplication.shared.delegate as! AppDelegate
 	
-	var Connection = Connection3()
+//	var Connection = Connection3()
+    var ServerConnection = Connection()
+    
 	var timerPostInterval = Timer()
 	var timerScanInterval = Timer()
 	var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0)
@@ -144,10 +146,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 //		for (key, value) in UserDefaults.standard.dictionaryRepresentation().sorted(by: { $0.0 < $1.0 }) {
 //			print("- \(key) => \(value)")
 //		}
-		
-		// 検証用ユーザーの場合はdebugモードにする
-		// リリースまでは全員debugモードにする
-//        debugMode = 1
+        
+        // --------------------------------------------------------------------------------------------------------------------------
+        // ユーザー名が"testuser"で始まる場合はデバッグモードで動かす
         if((user?.hasPrefix(appDelegate.debugUser))!) {
             debugMode = 1
         }
@@ -171,12 +172,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 		debugText.isEditable = false    // 編集不可
 		debugText.textAlignment = NSTextAlignment.left    // 左寄せ
 		
-		// デバッグモードの場合
-		if(debugMode == 1) {
-			view.addSubview(debugText)
-		} else {
-			debugText.removeFromSuperview()
-		}
 	
 		// --------------------------------------------------------------------------------------------------------------------------
 		// debugText2を生成
@@ -187,12 +182,14 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 		debugText2.isEditable = false    // 編集不可
 		debugText2.textAlignment = NSTextAlignment.left    // 左寄せ
 		
-		// デバッグモードの場合
-		if(debugMode == 1) {
-			view.addSubview(debugText2)
-		} else {
-			debugText2.removeFromSuperview()
-		}
+        // デバッグモードの場合
+        if(debugMode == 1) {
+            view.addSubview(debugText)
+            view.addSubview(debugText2)
+        } else {
+            debugText.removeFromSuperview()
+            debugText2.removeFromSuperview()
+        }
 		
 		// 自動送信機能をN分ごとに実行
 		self.timerPostInterval = Timer.scheduledTimer(timeInterval: TimeInterval(appDelegate.postInterval), target: self, selector: #selector(ViewController.autoUpdate(timer:)), userInfo: nil, repeats: true)
@@ -343,7 +340,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 		myLocationManager = CLLocationManager()
 		myLocationManager.delegate = self
 		
-		// 取得精度の設定.
+		// 取得精度の設定.（最高精度）
 		myLocationManager.desiredAccuracy = kCLLocationAccuracyBest
 		
 		// 取得頻度の設定.(1mごとに位置情報取得)
@@ -364,8 +361,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 		beaconUuids = NSMutableArray()
 		beaconDetails = Array<String>()
 		
+        print("iBeacon 監視開始")
 	}
 	
+    // memory warningが発生したときに呼び出される（自動生成されたコード）
 	override func didReceiveMemoryWarning() {
 		super.didReceiveMemoryWarning()
 	}
@@ -597,11 +596,41 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 			
 			// iBeaconのモニタリング開始
 			myLocationManager.startMonitoring(for: myBeaconRegion)
-			
+            
+			print("モニタリングを開始しました")
 			print("myBeaconRegion:\(String(describing: myBeaconRegion))")
 		}
 	}
 	
+    /// モニタリング停止
+    private func stopMyMonitoring() {
+        
+        let UUIDList = appDelegate.uuidList
+        // UUIDListのUUIDを設定して、反応するようにする
+        for i in 0 ..< UUIDList.count {
+            // BeaconのUUIDを設定.
+            let uuid: NSUUID! = NSUUID(uuidString: "\(UUIDList[i].lowercased())")
+            
+            // BeaconのIfentifierを設定.
+            let identifierStr: String = "ru-ibeacon\(i)"
+            
+            // リージョンを作成.
+            myBeaconRegion = CLBeaconRegion(proximityUUID: uuid as UUID, identifier: identifierStr)
+            
+//            myLocationManager.monitoring = false
+//            if !myLocationManager.isMonitoring() {
+//                // 既に監視停止済の場合は以降の処理を実施しない
+//                return
+//            }
+            
+            myLocationManager.stopMonitoring(for: myBeaconRegion)
+            myLocationManager.stopRangingBeacons(in: myBeaconRegion)
+            
+            
+            print("モニタリングを停止しました 対象：\(String(describing: myBeaconRegion))")
+        }
+    }
+    
 	// 認証のステータスがかわったら呼び出される.
 	func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
 		
@@ -697,6 +726,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 						btnNormal() //通常送信ボタンの表示
 					}
 					
+                    //メッセージ表示
+                    labelMsg.text = "利用可能です"
+
 					// すでに入っている場合は、そのままiBeaconのRangingをスタートさせる
 					// Delegateで呼び出される
 					// iBeaconがなくなったら、Rangingを停止する
@@ -704,6 +736,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 				} else {
 					print("iBeacon存在：検知対象時間外")
 					debugText2.text += String(describing: "iBeacon存在：検知対象時間外\n")
+                    
+                    //メッセージ表示
+                    labelMsg.text = "現在は利用時間外です"
+                    
 					beaconFlg = false
 					btnDisable()
 				}
@@ -712,6 +748,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 			case .outside:
 				print("iBeaconが圏外")
 				debugText2.text += String(describing: "iBeaconが圏外\n")
+                
+                //メッセージ表示
+                labelMsg.text = "ビーコン圏外です"
+                
 				beaconFlg = false
 				btnDisable()
 				break;
@@ -719,6 +759,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 			case .unknown:
 				print("iBeaconが圏外もしくは不明な状態")
 				debugText2.text += String(describing: "iBeaconが圏外もしくは不明な状態\n")
+                
+                //メッセージ表示
+                labelMsg.text = "ビーコン圏外、もしくは不明な状態です"
+                
 				beaconFlg = false
 				btnDisable()
 				break;
@@ -730,7 +774,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 	// 現在取得しているiBeacon情報一覧が取得
 	// iBeaconを検出していなくても1秒ごとに呼ばれる
 	func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion)  {
-		
+//        print("locationManagerが呼ばれました")
 		// 配列の初期化
 		beaconUuids = NSMutableArray()
 		beaconDetails = Array<String>()
@@ -907,24 +951,30 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                         print("sendtext:\(sendtext)")
 
                         // socket通信
-                        self.Connection.connect()
+                        
+                        // 認証サーバーに問い合わせ
+                        let serverAddress: CFString = self.appDelegate.serverIp as CFString //IPアドレスを指定
+                        let serverPort: UInt32 = UInt32(self.appDelegate.serverPort) //開放するポートを指定
+                    
+                        self.ServerConnection.connect(serverAddress: serverAddress, serverPort: serverPort)
 
                         // ローカルログへ保存
                         self.saveLocalLog(sendtext: sendtext)
 
                         sendtext = "\(user)," + sendtext
-                        let retVal = self.Connection.sendCommand(command: sendtext)
-
-                        // 値がカラの場合はエラー
-                        if(retVal.isEmpty) {
-                            print("エラー；返り値がかカラのです")
-                            resultVal = "fail"
+                        
+//                        let retVal = self.ServerConnection.sendCommand(command: sendtext)
+                        _ = self.ServerConnection.sendCommand(command: sendtext)
+                        let retVal = self.ServerConnection.sendCommand(command: "end")
+                        
+                        // サーバー接続の結果が成功した場合
+                        if( retVal["status"] as! String == "succeed") {
+                            // 受信したバイトデータを文字列に変換
+                            let readVal_decoded: String = String(data: retVal["value"] as! Data, encoding: .utf8)!
+                            print("---------------------> \(readVal_decoded)")  // デバッグ
                             
-                        } else {
-                            let result:String = retVal["response"] as! String;
-
-                            // 出席が正常に記録された場合の処理
-                            if result == "success" {
+                            //出席データ送信に成功
+                            if( readVal_decoded == "success") {
                                 resultVal = "success"
                             } else {
                                 resultVal = "fail"
@@ -1034,121 +1084,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 			self.attendBtn.isEnabled = false
 			self.attendBtn.layer.shadowOpacity = 0
 		})
-	}
-}
-
-// --------------------------------------------------------------------------------------------------------------------------
-// SSL Socketコネクション
-
-// AppDelegateのインスタンスを取得
-@available(iOS 13.0, *)
-let appDelegate: AppDelegate = UIApplication.shared.delegate as! AppDelegate
-
-@available(iOS 13.0, *)
-class Connection3: NSObject, StreamDelegate {
-	
-	let ServerAddress: CFString = appDelegate.serverIp as CFString //IPアドレスを指定
-	let serverPort: UInt32 = UInt32(appDelegate.serverPort) //開放するポートを指定
-	
-	private var inputStream : InputStream!
-	private var outputStream: OutputStream!
-	
-	// サーバーとの接続を確立する
-	func connect(){
-		print("connecting.....")
-		
-		var readStream : Unmanaged<CFReadStream>?
-		var writeStream: Unmanaged<CFWriteStream>?
-		
-		CFStreamCreatePairWithSocketToHost(nil, self.ServerAddress, self.serverPort, &readStream, &writeStream)
-		
-		self.inputStream  = readStream!.takeRetainedValue()
-		self.outputStream = writeStream!.takeRetainedValue()
-		
-		let dict = [
-            kCFStreamSSLValidatesCertificateChain: kCFBooleanFalse,     // allow self-signed certificate
-			kCFStreamSSLLevel: "kCFStreamSocketSecurityLevelNegotiatedSSL"    // don't understand, why there isn't a constant for version 1.2
-			] as CFDictionary
-		
-		_ = CFReadStreamSetProperty(inputStream, CFStreamPropertyKey(kCFStreamPropertySSLSettings), dict)
-		_ = CFWriteStreamSetProperty(outputStream, CFStreamPropertyKey(kCFStreamPropertySSLSettings), dict)
-		
-		//        if sslSetRead == false || sslSetWrite == false {
-		//            throw ConnectionError.sslConfigurationFailed
-		//        }
-		
-		self.inputStream.delegate  = self
-		self.outputStream.delegate = self
-		
-		self.inputStream.schedule(in: RunLoop.current, forMode: RunLoop.Mode.default)
-		self.outputStream.schedule(in: RunLoop.current, forMode: RunLoop.Mode.default)
-		
-		self.inputStream.open()
-		self.outputStream.open()
-		
-		print("connect success!!")
-	}
-	
-	// inputStream/outputStreamに何かしらのイベントが起きたら起動してくれる関数
-	// 今回の場合では、同期型なのでoutputStreamの時しか起動してくれない
-	
-	func stream(_ stream:Stream, handle eventCode : Stream.Event){
-		print("stream: \(stream)")
-	}
-	
-	// サーバーにコマンド文字列を送信する関数
-	func sendCommand(command: String) -> Dictionary<String, Any> {
-		
-		// 返り値を定義
-		var retval = Dictionary<String, String>()
-		var countCommand = command.data(using: String.Encoding.utf8, allowLossyConversion: false)!
-		let commandLength = countCommand.count
-		let bytes : String = countCommand.withUnsafeMutableBytes{
-			bytes in return String(bytesNoCopy: bytes, length: commandLength, encoding: String.Encoding.utf8, freeWhenDone: false)!
-		}
-		
-		// エラー処理
-		var timeout = appDelegate.timeout * 100000 // タイムアウト値は5秒
-		while !self.outputStream.hasSpaceAvailable {
-			usleep(1000) // wait until the socket is ready
-			timeout -= 100
-			
-			if (timeout < 0 || self.outputStream.streamError != nil) {
-				print("time out")
-				retval["response"] = "fail"
-				
-				self.inputStream.close()
-				self.inputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
-				self.outputStream.close()
-				self.outputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
-				return retval // disconnectStream will be called.
-			}
-		}
-		
-		// コマンドをサーバーに送信
-		self.outputStream.write( command, maxLength: bytes.utf8.count)
-		
-		print("Send: \(command)")
-		
-		self.outputStream.close()
-		self.outputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
-		
-		//        while(!inputStream.hasBytesAvailable){}   //不要かどうか確認中（2018/08/19）
-		let bufferSize = 1024
-		var buffer = Array<UInt8>(repeating: 0, count: bufferSize)
-		let bytesRead = inputStream.read(&buffer, maxLength: bufferSize)
-		
-		if (bytesRead >= 0) {
-			let read = NSString(bytes: &buffer, length: bytesRead, encoding: String.Encoding.utf8.rawValue)!
-			//            let read = String(bytes: buffer, encoding: String.Encoding.utf8)!
-			retval["response"] = read as String
-			print("Receive: \(retval["response"]!)")   //デバッグ
-		}
-		
-		self.inputStream.close()
-		self.inputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
-		
-		return retval
 	}
 }
 

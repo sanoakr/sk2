@@ -18,7 +18,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var navigationController: UINavigationController?
 	var ActivityIndicator: UIActivityIndicatorView?
 	
-	// アプリ設定
+    // --------------------------------------------------------------------------------------------------------------------------
+    //
+    // アプリ内の設定値
+    //
+    
 	var appTitle = "龍大理工学部出欠システム sk2"
 	var timeLimit = 10368000 // 認証後の有効期限（秒/120日）
 	var serverIp = "133.83.30.65"
@@ -34,7 +38,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	var maxLocalLog = 10	// ローカルログの保持回数
 	var postInterval:Int = 600 // 自動送信の間隔（秒） default:600
 	var consentText = "龍谷大学（以下「本学」）理工学部（以下「当学部」）は、当学部が提供するスマートフォン用アプリケーション「理工出席」（以下「本アプリ」）および本アプリによって提供するサービス（以下「本サービス」）を通じて利用者の位置情報をご提供いただきます。当学部は、本サービスの円滑な提供を実施させていただくために、本学が定めた龍谷大学プライバシーポリシーに基づき、本プライバシーポリシーを定め、利用者の情報の保護に努めます。\n\nなお、利用者が本アプリによる情報提供を希望されない場合は、利用者自身の判断により、位置情報の提供を拒否することができます。この場合、本アプリおよび本サービスを利用になれない場合があります。\n\n1. 本アプリにより本学部が取得する情報と利用目的\n\n当学部は、本アプリおよび本サービスの提供等にあたり、次の利用目的の達成に必要な範囲で下記に記載する情報をアプリケーション経由で自動的に取得および利用者の操作によって取得し、取扱います。\n\n　1. 本アプリの認証時に当学部サーバに通知される全学統合認証ID\n　　・利用目的\n　　　本サービス提供の際に利用者を識別するため\n　　・取得方法\n　　　利用者によるログイン操作または、本アプリによる自動取得\n　2. 利用端末のBluetooth機能を利用した、本学キャンパスおよび関連施設に限定した位置情報及び、その取得時刻\n　　・利用目的\n　　　本サービス提供の際、位置情報を確認し、利用者の講義等への出欠情報を取得するため\n　　　利用者の位置情報を利用者個人が特定されないかたちで、本学の運営・教育・研究に利用するため\n　　・取得方法\n　　　利用者による取得送信操作及び本アプリによる定期的な自動取得\n　　　※ 位置情報は本アプリの起動後、利用者が出席情報の送信ボタンを押下したタイミングまたは、本アプリの自動送信機能をオンにした場合およそ10分間に1回、本学キャンパスおよびその関連施設内で、授業実施時間に限り取得します。\n\n2. 本学部が取得する情報の加工および第三者提供\n\n　・当学部は、前条において取得した情報を、本サービスの提供に係る当学部のシステムへ取得・蓄積・転送し、前条の利用目的に利用します。\n　・当学部は、前項の規定に関わらず、本アプリが取得する情報を次の各号のいずれかに該当すると認める場合は、本人の権利利益に最大限の配慮を払いつつ、個人情報を第三者に提供する場合があります。\n\n　　1. 本人から同意を得た場合。\n　　2. 法令に基づく場合。\n　　3. 人の生命、身体又は財産の保護のために必要がある場合であって、本人の同意を得ることが困難である場合。\n　　4. 公衆衛生の向上又は児童の健全な育成の推進のために特に必要がある場合であって、本人の同意を得ることが困難である場合。\n　　5. 国の機関若しくは地方公共団体又はその委託を受けた者が、法令の定める事務を遂行することに協力する必要がある場合であって、本人の同意を得ることによりその遂行に支障を及ぼすおそれがある場合。\n　　6. 取得した位置情報等を、本学部が利用者本人を特定できる情報を含まない、総体的かつ統計的なデータに加工した場合。\n\n3. 本学部が取得する情報の取得・蓄積・利用に関する同意\n\n利用者は本アプリをインストールする際に本プライバシーポリシーを確認頂き、本アプリおよび本サービスに関する内容を理解した上でご利用ください。\n\n4. 本学部が取得する情報の取得停止等\n\n　　1. 本サービスでは、第1条に定める規定に基づき、取得した利用者情報の内容に関し、本学部の教学上の利用者本人に資する必要性がなくなった後に、照会・訂正・削除等を申請することができます。\n　　2. 本アプリおよび本サービスは、利用者が、本アプリが利用端末から削除（アンインストール）された場合、利用者情報は全て端末より直ちに削除されます。\n\n5. 本学部が取得する情報の取り扱いに関する問い合わせ窓口\n\n本アプリおよび本サービスにおける本学部が取得する情報の取扱いに関して、ご意見・ご要望がございましたら、下記窓口までご連絡ください。\n\n　・窓口名称：龍谷大学理工学部教務課\n　・お問い合わせ方法：\n　　　・電話：077-543-7730\n　　　・電子メール： rikou@ad.ryukoku.ac.jp\n　・受付時間：平日午前9時～午後5時\n\n6. 本プライバシーポリシーの変更\n\n　　1. 本学部は、法令の変更等に伴い、本プライバシーポリシーを変更することがあります。\n　　2. 本学部は、本アプリのバージョンアップに伴って、本学部が取得する情報の取得項目の変更や追加、利用目的の変更、第三者提供等について変更がある場合には、本アプリ内で通知し、重要なものについてはインストール前もしくはインストール時にあらためて同意を取得させていただきます。"
-
+    //
+    // --------------------------------------------------------------------------------------------------------------------------
+    
 	// background処理
 	var backgroundTaskID : UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0)
 	
@@ -60,8 +66,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
 //        print("============ userDefaults begin ============")
 //        print(UserDefaults.standard.dictionaryRepresentation())
-//        print("============ userDefaults  end  ============")
-//        
+//        print("============ userDefaults  end  ============") 
         
 		let splash: SplashViewController = SplashViewController()
         let setVersion = UserDefaults().string(forKey: "currentVersion")
@@ -97,7 +102,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 // 認証維持期間を過ぎている場合
 				if(term > timeLimit) {
 					print("時間切れ")
-                    appDelegate.message = "timeOver"
+                    self.message = "timeOver"
 					let login: LoginViewController = LoginViewController()
 					navigationController = UINavigationController(rootViewController: login)
 					myUserDefault.set(nil, forKey: "timestamp")
@@ -105,7 +110,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 // 保存されているバージョンとアプリのバージョンが違う場合
                 } else if( (setVersion != nil) && setVersion != currentVersion) {
                     print("バージョン違い")
-                    appDelegate.message = "versionMismatch"
+                    self.message = "versionMismatch"
                     let login: LoginViewController = LoginViewController()
                     navigationController = UINavigationController(rootViewController: login)
                 }
@@ -254,13 +259,23 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		}
 	}
 	
-	// ----------------------------------------------------------------------------------------------------------------
-	// 現在時刻取得
+    
+    // --------------------------------------------------------------------------------------------------------------------------
+    //
+    // 以下に共通関数をまとめる
+    //
+    
+    
+    // --------------------------------------------------------------------------------------------------------------------------
+    // 現在時刻取得
+    //
+    // - Parameters: none
+    //
 	func currentTime() -> String {
 		
 		let dateFormatter = DateFormatter()
 		dateFormatter.locale = Locale(identifier: "ja_JP")
-		dateFormatter.dateFormat = "yyyy-MM-dd HH-mm-ss"
+		dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
 		
 		let date = Date()
 		
@@ -272,10 +287,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	// --------------------------------------------------------------------------------------------------------------------------
 	// iBeaconのmajor,minor値を元にローカルDBからAP名を取得
+    //
+    // - Parameters:
+    //   - major: BLEのメジャー値
+    //   - minor: BLEのマイナー値
+    //
 	func getBeaconName( major:String, minor:String) -> String {
 		
 		// データベースからデータを抽出
-		let context = appDelegate.persistentContainer.viewContext
+		let context = self.persistentContainer.viewContext
 		let request = NSFetchRequest<NSManagedObject>(entityName: "IBeacon")
 		//属性nameが検索文字列と一致するデータをフェッチ対象にする。
 		request.predicate = NSPredicate(format:"major = %@ and minor = %@", major, minor)
@@ -294,11 +314,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	// --------------------------------------------------------------------------------------------------------------------------
 	// ローカルDBのデータをすべて削除
+    //
+    // - Parameters: none
+    //
 	func deleteDbAll() -> Bool {
 		
 		// データの削除
 		//let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-		let context = appDelegate.persistentContainer.viewContext
+		let context = self.persistentContainer.viewContext
 		do {
 		let fetchRequest: NSFetchRequest<IBeacon> = IBeacon.fetchRequest()
 		let data = try context.fetch(fetchRequest)
@@ -321,8 +344,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	// --------------------------------------------------------------------------------------------------------------------------
 	// ローカルDBのオブジェクトの書込
+    //
+    // - Parameters:
+    //   - name: ビーコン名
+    //   - notes: メモ
+    //   - major: BLEのメジャー値
+    //   - minor: BLEのマイナー値
+    //
 	func putApData( name:String, notes:String, major:Int, minor:Int) -> Bool {
-		let context = appDelegate.persistentContainer.viewContext
+		let context = self.persistentContainer.viewContext
 		let IBeacon = NSEntityDescription.insertNewObject(forEntityName: "IBeacon", into: context)
 		IBeacon.setValue(notes, forKey: "name")
 //        IBeacon.setValue(notes, forKey: "notes")
@@ -337,8 +367,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	// --------------------------------------------------------------------------------------------------------------------------
 	// ローカルDBからオブジェクトの読込
-	func getApData() -> Bool {
-		let context = appDelegate.persistentContainer.viewContext
+    //
+    // - Parameters: none
+    //
+    func getApData() -> Bool {
+		let context = self.persistentContainer.viewContext
 		let request = NSFetchRequest<NSManagedObject>(entityName: "IBeacon")
 		let models = try! context.fetch(request)
 		print("-- model count: \(models.count)")
@@ -353,11 +386,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	}
     
     // --------------------------------------------------------------------------------------------------------------------------
-    // 条件をクリアするまで待ちます
+    // 条件をクリアするまで待つ
     //
     // - Parameters:
     //   - waitContinuation: 待機条件
     //   - compleation: 通過後の処理
+    //
     func wait(_ waitContinuation: @escaping (()->Bool), compleation: @escaping (()->Void)) {
         var wait = waitContinuation()
         // 0.01秒周期で待機条件をクリアするまで待ちます。
@@ -378,52 +412,196 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-    // ----------------------------------------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------------------------------------------------
     // カラー設定（iOS13対応版）
     //
     // - Parameters:
     //   - name: カラー指定
+    //
     func setColor( name:String ) -> UIColor {
         let color:UIColor
         
-        switch name {
-        case "backgroundColor":
-            if #available(iOS 13.0, *) {
-                color = UIColor.systemGray6
-            } else {
-                color = UIColor(red: 0.93, green: 0.94, blue: 0.95, alpha: 1)    //#ecf0f1
+        if #available(iOS 13.0, *) {
+            switch name {
+                case "backgroundColor":
+                    color = UIColor.systemGray6
+                case "ifDebugBackgroundColor":
+                    color = UIColor.systemGray2
+                case "ifUserInfoColor":
+                    color = UIColor.systemGray5
+                case "cellBackgroundColor":
+                    color = UIColor.systemGray6
+                case "ifNormalColor":
+                    color = UIColor(red: 0.20, green: 0.60, blue: 0.86, alpha: 1)        //#3498db
+                case "ifActiveColor":
+                    color = UIColor(red: 0.10, green: 0.74, blue: 0.61, alpha: 1)        //#1abc9c
+                case "ifOnDownColor":
+                    color = UIColor(red: 0.16, green: 0.50, blue: 0.73, alpha: 1)        //#2980b9
+                case "ifDisableColor":
+                    color = UIColor(red: 0.74, green: 0.76, blue: 0.78, alpha: 1)        //#bdc3c7
+                default:
+                    color = UIColor(red: 0.20, green: 0.60, blue: 0.86, alpha: 1)        //#3498db
             }
-        case "ifDebugBackgroundColor":
-            if #available(iOS 13.0, *) {
-                color = UIColor.systemGray2
-            } else {
-                color = UIColor(red: 0.68, green: 0.68, blue: 0.70, alpha: 1)    //#ecf0f1
+        } else {
+            switch name {
+                case "backgroundColor":
+                    color = UIColor(red: 0.93, green: 0.94, blue: 0.95, alpha: 1)    //#ecf0f1
+                case "ifDebugBackgroundColor":
+                    color = UIColor(red: 0.68, green: 0.68, blue: 0.70, alpha: 1)    //#ecf0f1
+                case "ifUserInfoColor":
+                    color = UIColor(red: 0.90, green: 0.90, blue: 0.92, alpha: 1)    //#ecf0f1
+                case "cellBackgroundColor":
+                    color = UIColor(red: 0.93, green: 0.94, blue: 0.95, alpha: 1)    //#ecf0f1
+                case "ifNormalColor":
+                    color = UIColor(red: 0.20, green: 0.60, blue: 0.86, alpha: 1)        //#3498db
+                case "ifActiveColor":
+                    color = UIColor(red: 0.10, green: 0.74, blue: 0.61, alpha: 1)        //#1abc9c
+                case "ifOnDownColor":
+                    color = UIColor(red: 0.16, green: 0.50, blue: 0.73, alpha: 1)        //#2980b9
+                case "ifDisableColor":
+                    color = UIColor(red: 0.74, green: 0.76, blue: 0.78, alpha: 1)        //#bdc3c7
+                default:
+                    color = UIColor(red: 0.20, green: 0.60, blue: 0.86, alpha: 1)        //#3498db
             }
-        case "ifUserInfoColor":
-            if #available(iOS 13.0, *) {
-                color = UIColor.systemGray5
-            } else {
-                color = UIColor(red: 0.90, green: 0.90, blue: 0.92, alpha: 1)    //#ecf0f1
-            }
-        case "ifNormalColor":
-            color = UIColor(red: 0.20, green: 0.60, blue: 0.86, alpha: 1)        //#3498db
-        case "ifActiveColor":
-            color = UIColor(red: 0.10, green: 0.74, blue: 0.61, alpha: 1)        //#1abc9c
-        case "ifOnDownColor":
-            color = UIColor(red: 0.16, green: 0.50, blue: 0.73, alpha: 1)        //#2980b9
-        case "ifDisableColor":
-            color = UIColor(red: 0.74, green: 0.76, blue: 0.78, alpha: 1)        //#bdc3c7
-        default:
-            color = UIColor(red: 0.20, green: 0.60, blue: 0.86, alpha: 1)        //#3498db
         }
-        
+
         return color
     }
-	
+    // --------------------------------------------------------------------------------------------------------------------------
+
 }
 
 
 // Helper function inserted by Swift 4.2 migrator.
 fileprivate func convertToUIBackgroundTaskIdentifier(_ input: Int) -> UIBackgroundTaskIdentifier {
 	return UIBackgroundTaskIdentifier(rawValue: input)
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------------
+// SSL Socketコネクション
+
+@available(iOS 13.0, *)
+
+class Connection: NSObject, StreamDelegate {
+    
+    // AppDelegateのインスタンスを取得
+    let appDelegate: AppDelegate = UIApplication.shared.delegate as! AppDelegate
+    
+    private var inputStream : InputStream!
+    private var outputStream: OutputStream!
+    
+    // サーバーとの接続を確立する
+    func connect(serverAddress:CFString, serverPort:UInt32){
+        
+        print("connecting.....")
+        
+        var readStream : Unmanaged<CFReadStream>?
+        var writeStream: Unmanaged<CFWriteStream>?
+        
+        CFStreamCreatePairWithSocketToHost(nil, serverAddress, serverPort, &readStream, &writeStream)
+        
+        self.inputStream  = readStream!.takeRetainedValue()
+        self.outputStream = writeStream!.takeRetainedValue()
+        
+        let dict = [
+            kCFStreamSSLValidatesCertificateChain: kCFBooleanFalse as Any,     // allow self-signed certificate
+            kCFStreamSSLLevel: "kCFStreamSocketSecurityLevelNegotiatedSSL"    // don't understand, why there isn't a constant for version 1.2
+            ] as CFDictionary
+        
+        _ = CFReadStreamSetProperty(inputStream, CFStreamPropertyKey(kCFStreamPropertySSLSettings), dict)
+        _ = CFWriteStreamSetProperty(outputStream, CFStreamPropertyKey(kCFStreamPropertySSLSettings), dict)
+        
+        //        if sslSetRead == false || sslSetWrite == false {
+        //            throw ConnectionError.sslConfigurationFailed
+        //        }
+        
+        self.inputStream.delegate  = self
+        self.outputStream.delegate = self
+        
+        self.inputStream.schedule(in: RunLoop.current, forMode: RunLoop.Mode.default)
+        self.outputStream.schedule(in: RunLoop.current, forMode: RunLoop.Mode.default)
+        
+        self.inputStream.open()
+        self.outputStream.open()
+        
+        print("connect success!!")
+    }
+    
+//    // inputStream/outputStreamに何かしらのイベントが起きたら起動してくれる関数
+//    // 今回の場合では、同期型なのでoutputStreamの時しか起動してくれない
+//    func stream(_ stream:Stream, handle eventCode : Stream.Event){
+//        print(stream)
+//    }
+    
+    // サーバーにコマンド文字列を送信する関数
+    //
+    // - Parameters:
+    //   - command: サーバーに送信するコマンド
+    //   - 返り値: retval["status"] -> fail or succeed
+    //   - 返り値: retval["value"] -> サーバーから受け取った値
+    //
+    
+    func sendCommand(command: String) -> Dictionary<String, Any> {
+        
+        // 返り値を定義
+        var retval = Dictionary<String, Any>()
+        retval["status"] = ""
+        retval["value"] = ""
+        
+        // エラー処理
+        var timer = appDelegate.timeout * 100000 // タイムアウト値は5秒
+        while !self.outputStream.hasSpaceAvailable {
+            usleep(1000) // wait until the socket is ready
+            timer -= 100
+
+            if (timer < 0 || self.outputStream.streamError != nil) {
+                print("time out")
+                retval["status"] = "fail"
+
+                self.inputStream.close()
+                self.inputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
+                self.outputStream.close()
+                self.outputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
+                return retval // disconnectStream will be called.
+            }
+        }
+        
+        // "end"を受信したら接続切断
+        if (String(describing: command) == "end") {
+            print("sent end")
+            self.outputStream.close()
+            self.outputStream.remove(from: RunLoop.current, forMode: RunLoop.Mode.default)
+            
+            let read = NSMutableData()
+            
+            // inputStreamからバイトデータを読み込む
+            var bytesRead = 1
+            
+            while(bytesRead > 0) {
+ 
+                let bufferSize = 4096
+                var buffer = Array<UInt8>(repeating: 0, count: bufferSize)
+                bytesRead = inputStream.read(&buffer, maxLength: bufferSize)
+                // データが断片化する可能性があるのでキューにためておく
+                read.append(NSData(bytes: UnsafePointer(buffer), length: bytesRead) as Data)
+
+//                sleep(UInt32(1))    //デバッグ
+//                print("bytesRead: \(bytesRead)")   // デバッグ
+//                print("hasBytesAvailable: \(inputStream.hasBytesAvailable)")   // デバッグ
+                
+                retval["status"] = "succeed"
+                retval["value"] = read
+                
+            }
+            
+        } else {
+            // UnsafePointerを使うとうまくいかない場合がある（最初にダミーコマンドを送る必要があった）
+            // self.outputStream.write(UnsafePointer(command), maxLength: text.utf8.count)
+            self.outputStream.write( command, maxLength: command.utf8.count)
+            print("Send: \(command)")
+        }
+
+        return retval
+    }
 }
