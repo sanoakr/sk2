@@ -18,10 +18,10 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 	let barHeight: CGFloat = UIApplication.shared.statusBarFrame.size.height
 	let safeAreaInsets = UIApplication.shared.keyWindow?.rootViewController?.view.safeAreaInsets.bottom
 	
-//	var Connection = Connection2()
-    
     var serverConnection = Connection()
 	
+    var scrolling = false
+    
 	// Tableで使用する配列を設定する
 	private var myItems: Array<Any> = []
 	private var myTableView: UITableView!
@@ -255,13 +255,16 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		switch segment.selectedSegmentIndex {
 			
 		case 0:
-			print("サーバーログ")
-			showServerLog()
+            self.appDelegate.wait( { return self.scrolling == true } ) {
+                print("サーバーログ")
+                self.showServerLog()
+            }
 
 		case 1:
-			print("ローカルログ")
-			showLocalLog()
-			
+            self.appDelegate.wait( { return self.scrolling == true } ) {
+                print("ローカルログ")
+                self.showLocalLog()
+            }
 		default:
 			print("デフォルト")
 		}
@@ -279,52 +282,73 @@ class LogViewController: UIViewController, UITableViewDelegate, UITableViewDataS
 		return myItems.count
 	}
 	
+    // スクロール中に呼ばれる
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//        print("scrollViewDidScroll")
+        scrolling = true
+//        print(scrolling)
+    }
+    // 指が画面から離れ、慣性のスクロールになる瞬間に呼ばれる
+    func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
+//        print("scrollViewWillBeginDragging")
+        scrolling = true
+//        print(scrolling)
+    }
+    // 指が画面から離れ、慣性のスクロールが完全に止まる瞬間に呼ばれる
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+//        print("scrollViewWillBeginDragging")
+        scrolling = false
+//        print(scrolling)
+    }
+    
 	// Cellに値を設定する
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		// 再利用するCellを取得する.
-		let cell = tableView.dequeueReusableCell(withIdentifier: NSStringFromClass(MyCell.self), for: indexPath) as! MyCell
-		
-		// 値を取得してカンマで分割
-		let splitRead = (myItems[indexPath.row] as AnyObject).components(separatedBy: ",")
-		
-		// 配列数をチェック
-		if( splitRead.count == 12 ) {
-			
-			// AP名を取得
-			var ap1 = "-"
-			if( !splitRead[3].isEmpty && !splitRead[4].isEmpty ) {
-				ap1 = appDelegate.getBeaconName( major: splitRead[3], minor: splitRead[4])
-			}
-			
-			var ap2 = "-"
-			if( !splitRead[6].isEmpty && !splitRead[7].isEmpty ) {
-				ap2 = appDelegate.getBeaconName( major: splitRead[6], minor: splitRead[7])
-			}
+        
+        // 再利用するCellを取得する.
+        let cell = tableView.dequeueReusableCell(withIdentifier: NSStringFromClass(MyCell.self), for: indexPath) as! MyCell
+        
+        // 値を取得してカンマで分割
+        let splitRead = (myItems[indexPath.row] as AnyObject).components(separatedBy: ",")
+//            print(splitRead)
+        
+        // 配列数をチェック
+        if( splitRead.count == 12 ) {
+            
+            // AP名を取得
+            var ap1 = "-"
+            if( !splitRead[3].isEmpty && !splitRead[4].isEmpty ) {
+                ap1 = appDelegate.getBeaconName( major: splitRead[3], minor: splitRead[4])
+            }
+            
+            var ap2 = "-"
+            if( !splitRead[6].isEmpty && !splitRead[7].isEmpty ) {
+                ap2 = appDelegate.getBeaconName( major: splitRead[6], minor: splitRead[7])
+            }
 
-			var ap3 = "-"
-			if( !splitRead[9].isEmpty && !splitRead[10].isEmpty ) {
-				ap3 = appDelegate.getBeaconName( major: splitRead[9], minor: splitRead[10])
-			}
-			
-			cell.labelDate.text = " \(splitRead[2])"
+            var ap3 = "-"
+            if( !splitRead[9].isEmpty && !splitRead[10].isEmpty ) {
+                ap3 = appDelegate.getBeaconName( major: splitRead[9], minor: splitRead[10])
+            }
+            
+            cell.labelDate.text = " \(splitRead[2])"
             cell.labelMode.text = String(splitRead[1].prefix(1))
-			cell.labelVal1.text = "ap:\(String(describing: ap1)) major:\(splitRead[3]) minor:\(splitRead[4]) RSSI:\(splitRead[5])"
-			cell.labelVal2.text = "ap:\(String(describing: ap2)) major:\(splitRead[6]) minor:\(splitRead[7]) RSSI:\(splitRead[8])"
-			cell.labelVal3.text = "ap:\(String(describing: ap3)) major:\(splitRead[9]) minor:\(splitRead[10]) RSSI:\(splitRead[11])"
-			
-		} else {
-			if myItems.count == 1 {
-				cell.labelDate.text = " 値がありません"
-				cell.labelVal1.text = "major: minor: rssi: "
-				cell.labelVal2.text = "major: minor: rssi: "
-				cell.labelVal3.text = "major: minor: rssi: "
-			} else {
-				cell.labelDate.text = " 値が不正です"
-				cell.labelVal1.text = "major: minor: rssi: "
-				cell.labelVal2.text = "major: minor: rssi: "
-				cell.labelVal3.text = "major: minor: rssi: "
-			}
-		}
+            cell.labelVal1.text = "ap:\(String(describing: ap1)) major:\(splitRead[3]) minor:\(splitRead[4]) RSSI:\(splitRead[5])"
+            cell.labelVal2.text = "ap:\(String(describing: ap2)) major:\(splitRead[6]) minor:\(splitRead[7]) RSSI:\(splitRead[8])"
+            cell.labelVal3.text = "ap:\(String(describing: ap3)) major:\(splitRead[9]) minor:\(splitRead[10]) RSSI:\(splitRead[11])"
+            
+        } else {
+            if myItems.count == 1 {
+                cell.labelDate.text = " 値がありません"
+                cell.labelVal1.text = "major: minor: rssi: "
+                cell.labelVal2.text = "major: minor: rssi: "
+                cell.labelVal3.text = "major: minor: rssi: "
+            } else {
+                cell.labelDate.text = " 値が不正です"
+                cell.labelVal1.text = "major: minor: rssi: "
+                cell.labelVal2.text = "major: minor: rssi: "
+                cell.labelVal3.text = "major: minor: rssi: "
+            }
+        }
 		return cell
 	}
 	
