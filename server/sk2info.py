@@ -73,8 +73,8 @@ class AsyncClient(asyncio.Protocol):
                     #        s_message = s_message.replace(m, room_map[m])
                     logger.info("Get history {} ".format(user))
                 else:
-                    s_message = "Error"
-                    logger.info("Some Error {} ".format(user))
+                    s_message = "Data Open Error"
+                    logger.info("File Open Error {}: {} ".format(user, filename))
             else:
                 s_message = "Wrong key."
                 logger.info("Key fail {} ".format(user))
