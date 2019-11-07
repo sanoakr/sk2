@@ -505,8 +505,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                     let key:String = self.myUserDefault.string(forKey: "key")!
                     
                     var result:String! = nil
-                    self.sendAttend(user: user, key: key, type: "A\(self.version)") { (resultVal, _) in
+                    //var data:String! = nil
+                    self.sendAttend(user: user, key: key, type: "A\(self.version)") { (resultVal, dataVal) in
                         result =  resultVal
+                        //data = dataVal
                     }
                     
                     self.appDelegate.wait( { return result == nil } ) {
@@ -518,7 +520,30 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                             // バイブレーション
                             AudioServicesPlaySystemSound(1003);
                             AudioServicesDisposeSystemSoundID(1003);
+/*
+                            // Notification 通知
+                            let content = UNMutableNotificationContent()
+                            content.sound = UNNotificationSound.default
+                            content.title = "理工出席sk2"
+                            content.subtitle = "送信通知"
+                            
+                            let items = data.components(separatedBy: ",")
+                            let room0 = self.appDelegate.getBeaconName(major:items[4], minor:items[5])
+                            let room1 = self.appDelegate.getBeaconName(major:items[7], minor:items[8])
+                            let room2 = self.appDelegate.getBeaconName(major:items[10], minor:items[11])
+                            content.body = "\(items[0]): \(items[3]) \(room0),\(room1),\(room2)"
 
+                            let timer = 5 // 5秒後に通知
+                            // ローカル通知リクエストを作成
+                            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(timer), repeats: false)
+                            let identifier = NSUUID().uuidString
+                            let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+                            UNUserNotificationCenter.current().add(request){ (error : Error?) in
+                                if let error = error {
+                                    print(error.localizedDescription)
+                                }
+                            }
+ */
                         // 正常に記録できなかった場合
                         } else {
                             // ウィンドウを表示
@@ -672,7 +697,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 		dateFormatter.dateFormat = "HH"
 		
 		let date = Date()
-		let dateString = dateFormatter.string(from: date)
+        _ = dateFormatter.string(from: date)
 		
 //		print("dateString:\(Int(dateString)!)")
 		
@@ -689,7 +714,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 				
 				// 検知対象時間かどうかを判定
 				//if(Int(dateString)! > appDelegate.startHour && Int(dateString)! < appDelegate.stopHour ) {
-                if (true) {
+                if (true) { // for testing through the midnight
 					print("iBeacon存在：検知対象時間内");
 					debugText2.text += String(describing: "iBeacon存在：検知対象時間内\n")
 					beaconFlg = true
@@ -953,8 +978,33 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
                 
                 print("beaconStatus:\(beaconStatus)")
                 print("resultVal:\(resultVal)")
-                complete(resultVal, sendtext)
                 
+                // Notification 通知
+                if resultVal == "success" {
+                    let content = UNMutableNotificationContent()
+                    content.sound = UNNotificationSound.default
+                    content.title = "理工出席sk2"
+                    content.subtitle = "送信通知"
+                
+                    let items = sendtext.components(separatedBy: ",")
+                    let room0 = self.appDelegate.getBeaconName(major:items[4], minor:items[5])
+                    let room1 = self.appDelegate.getBeaconName(major:items[7], minor:items[8])
+                    let room2 = self.appDelegate.getBeaconName(major:items[10], minor:items[11])
+                    content.body = "\(items[0]): \(items[3]) \(room0),\(room1),\(room2)"
+
+                    let timer = 5 // 5秒後に通知
+                    // ローカル通知リクエストを作成
+                    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: TimeInterval(timer), repeats: false)
+                    let identifier = NSUUID().uuidString
+                    let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+                    UNUserNotificationCenter.current().add(request){ (error : Error?) in
+                        if let error = error {
+                            print(error.localizedDescription)
+                        }
+                    }
+                }
+
+                complete(resultVal, sendtext)
             }
         }
 	
@@ -1189,7 +1239,7 @@ extension ViewController: WCSessionDelegate {
     func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void){
         let msgString = message["msg"] as? String
         print(msgString ?? "no_data")
-        
+
         if msgString == "attend" {
             // 登録されているUserDefaultから設定値を呼び出す
             let user:String = self.myUserDefault.string(forKey: "user")!
@@ -1198,16 +1248,18 @@ extension ViewController: WCSessionDelegate {
             // let result = sendAttend(user: user, key: key, type: "M\(self.version)")
             self.sendAttend(user: user, key: key, type: "Mw\(self.version)") { (resultVal, dataVal) in
                 if resultVal == "success" {
+                    /*
                     let items = dataVal.components(separatedBy: ",")
                     let room0 = self.appDelegate.getBeaconName(major:items[4], minor:items[5])
                     let room1 = self.appDelegate.getBeaconName(major:items[7], minor:items[8])
                     let room2 = self.appDelegate.getBeaconName(major:items[10], minor:items[11])
                     replyHandler(["reply" : "\(items[0]): \(items[3]) \(room0),\(room1),\(room2)"])
+                    */
+                    replyHandler(["reply" : "OK"])
                 } else {
                     replyHandler(["reply" : "error"])
                 }
             }
-            
         }
     }
 }

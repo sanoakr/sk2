@@ -12,9 +12,9 @@ import WatchConnectivity
 struct ContentView: View {
     @State private var btState = true
     @State private var btText = "理工出席"
-    @State private var sentText = "Sent Data"
+    @ObservedObject var obVals = ObservableValues()
 
-    func setText(text: String) { self.sentText = text }
+    //func setText(text: String) { self.sentText = text }
     
     var body: some View {
         VStack {
@@ -41,7 +41,7 @@ struct ContentView: View {
                 .clipShape(Circle())
                 .overlay(Circle().stroke(Color.gray, lineWidth: 1))
             
-            Text(sentText)
+            Text(obVals.info)
                 .fixedSize(horizontal: false, vertical: true)
                 .lineLimit(nil)
                 .font(.footnote)
@@ -49,8 +49,15 @@ struct ContentView: View {
         }
 }
 
+class ObservableValues: ObservableObject {
+    @Published var info = "info"
+    func setInfo(text: String) { info = text }
+}
+
+#if DEBUG
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
     }
 }
+#endif

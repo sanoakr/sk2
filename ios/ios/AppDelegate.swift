@@ -66,6 +66,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		let splash: SplashViewController = SplashViewController()
         let setVersion = UserDefaults().string(forKey: "currentVersion")
         
+        // Notification Center を取得
+        let center = UNUserNotificationCenter.current()
+        
 		navigationController = UINavigationController(rootViewController: splash)
 
 		if(user == nil || key == nil) {
@@ -116,6 +119,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 				let consent: ConsentViewController = ConsentViewController()
 				navigationController = UINavigationController(rootViewController: consent)
 			}
+            
+            // 通知を仮許可
+            center.delegate = self
+            var options: UNAuthorizationOptions
+            //if #available(iOS 12.0, *) {
+                options = [.alert, .sound, .provisional] // Class が 13.0 avaiable だし
+            //} else {
+            //    options = [.alert, .sound]
+            //}
+            center.requestAuthorization(options: options) { granted, error in
+                if granted {
+                    DispatchQueue.main.async {
+                        UIApplication.shared.registerForRemoteNotifications()
+                    }
+                }
+            }
 		}
 		
 		self.window = UIWindow(frame: UIScreen.main.bounds)
@@ -124,7 +143,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		return true
 	}
-	
+    
 	// バックグラウンド遷移移行直前に呼ばれる
 	func applicationWillResignActive(_ application: UIApplication) {
 		// Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
@@ -426,4 +445,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 // Helper function inserted by Swift 4.2 migrator.
 fileprivate func convertToUIBackgroundTaskIdentifier(_ input: Int) -> UIBackgroundTaskIdentifier {
 	return UIBackgroundTaskIdentifier(rawValue: input)
+}
+
+
+// for Notification Center
+@available(iOS 13.0, *)
+extension AppDelegate: UNUserNotificationCenterDelegate{
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        // アプリ起動中でもアラートと音で通知
+        completionHandler([.alert, .sound])
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        completionHandler()     
+    }
 }
