@@ -12,10 +12,9 @@ import SwiftUI
 import WatchConnectivity
 
 class HostingController: WKHostingController<ContentView> {
-    
     // WCSession
     var wcsession: WCSession?
-    
+
     override var body: ContentView {
         wcActivate(session: &wcsession)
         return ContentView()
@@ -38,9 +37,9 @@ extension HostingController: WCSessionDelegate {
     }
     // reply Handler
     func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void){
-        let obj0 = message["msg0"] as? String
-        print(obj0 ?? "no_data") // testが出力される
-
+        let obj0 = message["reply"] as? String
+        print(obj0 ?? "no_data")
+        self.body.setText(text: obj0 ?? "No data")
         replyHandler(["reply" : "OK"])
     }
 }

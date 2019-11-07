@@ -13,6 +13,8 @@ struct ContentView: View {
     @State private var btState = true
     @State private var btText = "理工出席"
     @State private var sentText = "Sent Data"
+
+    func setText(text: String) { self.sentText = text }
     
     var body: some View {
         VStack {
@@ -20,8 +22,10 @@ struct ContentView: View {
                 self.btState = !self.btState
                 if self.btState {
                     self.btText = "理工出席"
+                    //self.sentText = "A"
                 } else {
                     self.btText = "sk2"
+                    //self.sentText = "B"
                 }
                 let message = ["msg": "attend"]
                 WCSession.default.sendMessage(message,

@@ -688,7 +688,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 			case .inside: // リージョン内にiBeaconが存在いる
 				
 				// 検知対象時間かどうかを判定
-				if(Int(dateString)! > appDelegate.startHour && Int(dateString)! < appDelegate.stopHour ) {
+				//if(Int(dateString)! > appDelegate.startHour && Int(dateString)! < appDelegate.stopHour ) {
+                if (true) {
 					print("iBeacon存在：検知対象時間内");
 					debugText2.text += String(describing: "iBeacon存在：検知対象時間内\n")
 					beaconFlg = true
@@ -1194,18 +1195,19 @@ extension ViewController: WCSessionDelegate {
             let user:String = self.myUserDefault.string(forKey: "user")!
             let key:String = self.myUserDefault.string(forKey: "key")!
 
-            var result:String! = nil
-            var data:String! = nil
             // let result = sendAttend(user: user, key: key, type: "M\(self.version)")
             self.sendAttend(user: user, key: key, type: "Mw\(self.version)") { (resultVal, dataVal) in
-                            result =  resultVal
-                            data = dataVal
+                if resultVal == "success" {
+                    let items = dataVal.components(separatedBy: ",")
+                    let room0 = self.appDelegate.getBeaconName(major:items[4], minor:items[5])
+                    let room1 = self.appDelegate.getBeaconName(major:items[7], minor:items[8])
+                    let room2 = self.appDelegate.getBeaconName(major:items[10], minor:items[11])
+                    replyHandler(["reply" : "\(items[0]): \(items[3]) \(room0),\(room1),\(room2)"])
+                } else {
+                    replyHandler(["reply" : "error"])
+                }
             }
-            if result == "success" {
-                replyHandler(["reply" : data ?? "no data"])
-            } else {
-                replyHandler(["reply" : result ?? "unknown error"])
-            }
+            
         }
     }
 }
