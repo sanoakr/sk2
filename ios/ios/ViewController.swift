@@ -713,8 +713,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 			case .inside: // リージョン内にiBeaconが存在いる
 				
 				// 検知対象時間かどうかを判定
-				//if(Int(dateString)! > appDelegate.startHour && Int(dateString)! < appDelegate.stopHour ) {
-                if (true) { // for testing through the midnight
+				if(Int(dateString)! > appDelegate.startHour && Int(dateString)! < appDelegate.stopHour ) {
+                //if (true) { // for testing through the midnight
 					print("iBeacon存在：検知対象時間内");
 					debugText2.text += String(describing: "iBeacon存在：検知対象時間内\n")
 					beaconFlg = true
