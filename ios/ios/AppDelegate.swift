@@ -279,7 +279,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		let dateFormatter = DateFormatter()
 		dateFormatter.locale = Locale(identifier: "ja_JP")
-		dateFormatter.dateFormat = "yyyy-MM-dd HH-mm-ss"
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        //dateFormatter.dateFormat = "yyyy-MM-dd HH-mm-ss"
 		
 		let date = Date()
 		
