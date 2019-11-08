@@ -40,13 +40,14 @@ struct ContentView: View {
                 .frame(width: 100, height: 100)
                 .clipShape(Circle())
                 .overlay(Circle().stroke(Color.gray, lineWidth: 1))
-            
+            /*
             Text(obVals.info)
                 .fixedSize(horizontal: false, vertical: true)
                 .lineLimit(nil)
                 .font(.footnote)
-            }
+            */
         }
+    }
 }
 
 class ObservableValues: ObservableObject {

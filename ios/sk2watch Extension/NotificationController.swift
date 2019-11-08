@@ -11,9 +11,10 @@ import SwiftUI
 import UserNotifications
 
 class NotificationController: WKUserNotificationHostingController<NotificationView> {
-
+    var info: String!
+    
     override var body: NotificationView {
-        return NotificationView()
+        return NotificationView(info: info ?? "no data")
     }
 
     override func willActivate() {
@@ -27,8 +28,7 @@ class NotificationController: WKUserNotificationHostingController<NotificationVi
     }
 
     override func didReceive(_ notification: UNNotification) {
-        // This method is called when a notification needs to be presented.
-        // Implement it if you use a dynamic notification interface.
-        // Populate your dynamic notification interface as quickly as possible.
+        info = notification.request.content.body
+        print(info ?? "no data")
     }
 }
