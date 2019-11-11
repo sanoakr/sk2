@@ -697,7 +697,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 		dateFormatter.dateFormat = "HH"
 		
 		let date = Date()
-        _ = dateFormatter.string(from: date)
+        let dateString = dateFormatter.string(from: date)
 		
 //		print("dateString:\(Int(dateString)!)")
 		
@@ -714,7 +714,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, CBCentralMana
 				
 				// 検知対象時間かどうかを判定
 				if(Int(dateString)! > appDelegate.startHour && Int(dateString)! < appDelegate.stopHour ) {
-                //if (true) { // for testing through the midnight
 					print("iBeacon存在：検知対象時間内");
 					debugText2.text += String(describing: "iBeacon存在：検知対象時間内\n")
 					beaconFlg = true
