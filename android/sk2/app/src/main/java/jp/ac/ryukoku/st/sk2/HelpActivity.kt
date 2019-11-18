@@ -48,6 +48,8 @@ class HelpActivityUi: AnkoComponent<HelpActivity> {
             }
             /** ////////////////////////////////////////////////////////////////////////////// **/            ////////////////////////////////////////
             webView {
+                settings.loadWithOverviewMode = true
+                settings.useWideViewPort = true
                 loadUrl(SERVER_HELP_URI) // sk2 のヘルプページの URI
             }.lparams {
                 below(TITLE)
