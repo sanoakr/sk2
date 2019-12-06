@@ -92,13 +92,15 @@ function makeWdSelector($link, $tbl, $key, $warray, $init = 0)
     }
     echo "</select>\n";
 }*/
-function makeHpCheckbox($key, $parray, $pfrom, $pto, $init = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'])
+function makeHpCheckbox($key, $parray, $pfrom, $pto, $init = ['0','1','2','3','4','5','6','7','8','9','10','11'])
 {
     echo '<label><input id="hpCheckAll" type="checkbox" value=""';
     if (count($init) >= count($parray)) {
         echo ' checked="checked"';
     }
     echo '>全て</label>';
+    echo count($init) . ' ';
+    echo count($parray) . ' ';
     for ($i = 0; $i < count($parray); $i++) {
         echo '<label><input name="' . $key . '[]"type="checkbox" value="' . $i;
         if (in_array($i, $init)) {
