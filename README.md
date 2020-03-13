@@ -17,7 +17,7 @@
 ## sk2 サーバ ##
 
 * 認証サーバ、出席データ登録用サーバ (sk2.py)
-* sk2.st.ryukoku.ac.jp:4440 (133.83.80.65:4440)
+* sk2.st.ryukoku.ac.jp:4440 (133.83.30.65:4440)
 * 送信データに改行を含んじゃダメ、送信データは(utf-8)バイト列で
 * byted utf-8 text csv
 
@@ -64,7 +64,7 @@
 | 1 | 全学認証ID | @mail.ryukoku.ac.jp なし |
 | 2 | 認証時に受け取ったキー | hash(user + salt) |
 | 3 | ログタイプ | 8char [A/M]：Auto/Manual + Version Info|
-| 4 | 日時 | yyy-MM-dd HH-mm-ss |
+| 4 | 日時 | yyy-MM-dd HH:mm:ss |
 | 5 | Beacon0 Major | 整数値文字列 |
 | 6 | Beacon0 Minor | 整数値文字列 |
 | 7 | Beacon0 距離 | 浮動小数点数文字列 e.g. "0.12345" |
@@ -81,7 +81,7 @@
 
 ## sk2 info サーバ ##
 * 出席記録取得用サーバ(sk2info.py)
-* sk2.st.ryukoku.ac.jp:4441 (133.83.80.65:4441)
+* sk2.st.ryukoku.ac.jp:4441 (133.83.30.65:4441)
 * 送信データに改行を含んじゃダメ、送信データは(utf-8)バイト列で
 * byted utf-8 text csv
 
