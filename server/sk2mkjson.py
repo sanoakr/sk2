@@ -37,7 +37,7 @@ df = df.rename(
         "場所": "Room",
         "メジャー番号": "Major",
         "マイナー番号": "Minor",
-        #"UUID": "Uuid",
+        # "UUID": "Uuid",
     }
 )
 
@@ -45,44 +45,54 @@ df = df.rename(
 df["Notes"] = df["Build"] + "_" + df["Floor"] + "_" + df["Room"]
 
 ### add Beacons
-## Major 16bits = Unused(2)+SignalType(2)+BeaconFlag(1)+BeaconType(11)
+## Major 16bits = Building(8) + Floor(Reagion)(8) [Building < 200]
+##              = BeaconType(8) + BeaconNum(8)   [BeaconType >= 200]
+## // Major 16bits = Unused(2)+SignalType(2)+BeaconFlag(1)+BeaconType(11)
 ## //// Major 16bits = Unused(3)+BeaconFlag(1)+BeaconType(8)+SignalType(4)
 ## Minor 16bits = Sequency
+##              = BeaconSignal
 
 ## 固定ビーコン配置
-bPlace = {
-    1: "瀬田バス停北",
-    2: "瀬田バス停南",
-    3: "瀬田生協売店",
-}
+bPlace = {0: "瀬田バス停北", 1: "瀬田バス停南", 2: "瀬田生協売店", 3: "未設置"}
 
-bFlag = 1 << 11
-bType = {(1, "STB001", "固定ビーコン"), (2, "STB002", "携帯ビーコン"), (3, "STB003", "ボタンビーコン")}
+bType = {
+    (200, "STB001", "固定ビーコン"),
+    (201, "STB002", "携帯ビーコン"),
+    (202, "STB003", "ボタンビーコン"),
+}
 bSignal = {(0b00, "S"), (0b01, "L"), (0b11, "D")}
 
-minorNum = 4
-#uuid = "ebf59ccc-21f2-4558-9488-00f2b388e5e6"
+BeaconNum = 4
+# uuid = "ebf59ccc-21f2-4558-9488-00f2b388e5e6"
 
-for (i, code, type) in bType:
-    bName = type
-    for (val, opr) in bSignal:
-        sFlag = val << 12
-        for n in range(1, minorNum + 1):
-            nStr = str(n).zfill(3)
-            if i == 1 and n in bPlace:
-                nStr= str(n).zfill(3) + "／" + bPlace[n]
-            else:
-                nStr = str(n).zfill(3)
+for (bTypeNum, bTypeCode, bTypeName) in bType:
+    bMajorBase = bTypeNum << 8  # Major up8
+    bCodeBase = bTypeCode
+    bNotesBase = bTypeName
+    for i in range(0, BeaconNum):
+        bMajor = bMajorBase + i
+        bCodeMajor = bCodeBase + "-" + str(i).zfill(3)
+        bNotesMajor = bNotesBase + "_" + str(i).zfill(3)
+
+        if bTypeNum == 202:  # ボタンビーコンでなら Minor を SignalType で
+            minors = bSignal
+        else:
+            minors = {(0b00, "")}
+            if bTypeNum == 200:  # 固定ビーコンなら配置を Notes に
+                bNotesMajor += "／" + bPlace[i]
+
+        for (mNum, mName) in minors:
+            bCode = bCodeMajor + mName
+            bNotes = bNotesMajor + "_" + mName
             bData = pd.DataFrame(
                 [
-                    code + opr + "-" + nStr,
-                    bName,
-                    opr,
-                    nStr,
-                    #uuid,
-                    sFlag + bFlag + i,
-                    n,
-                    bName + "_" + opr + "_" + nStr,
+                    bCode,  # Name
+                    bTypeName,  # Build
+                    str(i).zfill(3),  # Floor
+                    str(mNum).zfill(3),  # Room
+                    bMajor,  # Major
+                    mNum,  # Minor
+                    bNotes,  # Notes
                 ],
                 index=df.columns,
             ).T
